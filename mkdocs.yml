@@ -1,0 +1,46 @@
+site_name: swishbot
+site_description: Install data stack skills into your Claude environment
+site_url: https://swishbi.github.io/swishbot/
+repo_url: https://github.com/swishbi/swishbot
+repo_name: swishbi/swishbot
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - content.code.copy
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - CLI Reference: cli-reference.md
+  - Skills Catalog: skills.md
+  - Creating Skills: creating-skills.md
+  - Development: development.md
+
+hooks:
+  - docs/hooks/skills_catalog.py
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - attr_list
