@@ -41,30 +41,30 @@ swishbot init-project --force
 ## Available Skills
 
 ### Ingestion & Infrastructure
-| Skill | Description |
-|-------|-------------|
-| `iac-terraform` | Deploying infrastructure using Terraform/IaC |
-| `dlt-pipelines` | Writing dlt/Python ingestion pipelines |
+| Skill | Description | Status |
+|-------|-------------|--------|
+| `iac-terraform` | Deploying infrastructure using Terraform/IaC | :x: |
+| `dlt-pipelines` | Writing dlt/Python ingestion pipelines | :x: |
 
 ### Transformation (dbt)
-| Skill | Description |
-|-------|-------------|
-| `dbt-staging` | Building the staging/bronze layer |
-| `dbt-intermediate` | Building the intermediate/silver layer |
-| `dbt-marts` | Building the mart/gold layer |
+| Skill | Description | Status |
+|-------|-------------|--------|
+| `dbt-staging` | Building the staging/bronze layer | :x: |
+| `dbt-intermediate` | Building the intermediate/silver layer | :x: |
+| `dbt-marts` | Building the mart/gold layer | :x: |
 
 ### Modeling & Security
-| Skill | Description |
-|-------|-------------|
-| `dimensional-modeling` | Dimensional modeling best practices |
-| `dba-security` | DBA security practices |
+| Skill | Description | Status |
+|-------|-------------|--------|
+| `dimensional-modeling` | Dimensional modeling best practices | :x: |
+| `dba-security` | DBA security practices | :x: |
 
 ### Analytics & Presentation
-| Skill | Description |
-|-------|-------------|
-| `analytics-architecture` | Analytics reference architecture |
-| `semantic-layer` | Building the semantic layer |
-| `powerbi` | Power BI best practices |
+| Skill | Description | Status |
+|-------|-------------|--------|
+| `analytics-architecture` | Analytics reference architecture | :x: |
+| `semantic-layer` | Building the semantic layer | :x: |
+| `powerbi` | Power BI best practices | :x: |
 
 ## How It Works
 

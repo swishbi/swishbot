@@ -7,19 +7,20 @@ This project uses [swishbot](https://github.com/swishbi/swishbot) skills to guid
 ## Installed Skills
 
 <!-- Run `swishbot list` to see available skills. -->
-<!-- Add the skills relevant to this project below: -->
-<!--
-- dbt-staging — Building the staging/bronze layer
-- dbt-intermediate — Building the intermediate/silver layer
-- dbt-marts — Building the mart/gold layer
-- dlt-pipelines — Writing dlt/Python ingestion pipelines
-- iac-terraform — Deploying infrastructure using Terraform/IaC
-- dimensional-modeling — Dimensional modeling best practices
-- dba-security — DBA security practices
-- analytics-architecture — Analytics reference architecture
-- semantic-layer — Building the semantic layer
-- powerbi — Power BI best practices
--->
+<!-- Add the skills relevant to this project below. -->
+
+| Skill | Description | Status |
+|-------|-------------|--------|
+| dbt-staging | Building the staging/bronze layer | :x: |
+| dbt-intermediate | Building the intermediate/silver layer | :x: |
+| dbt-marts | Building the mart/gold layer | :x: |
+| dlt-pipelines | Writing dlt/Python ingestion pipelines | :x: |
+| iac-terraform | Deploying infrastructure using Terraform/IaC | :x: |
+| dimensional-modeling | Dimensional modeling best practices | :x: |
+| dba-security | DBA security practices | :x: |
+| analytics-architecture | Analytics reference architecture | :x: |
+| semantic-layer | Building the semantic layer | :x: |
+| powerbi | Power BI best practices | :x: |
 
 ## Conventions
 

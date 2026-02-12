@@ -28,7 +28,7 @@ swishbot = "swishbot.cli:main"
 where = ["src"]
 
 [project.optional-dependencies]
-test = ["pytest>=7.0", "ruff>=0.4"]
+test = ["pytest>=7.0", "ruff>=0.4", "pre-commit>=3.0"]
 
 [tool.setuptools.package-data]
 swishbot = ["CLAUDE.md", "skills/**/*"]
