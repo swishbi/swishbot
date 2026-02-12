@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68.0", "setuptools-scm>=8.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "swishbot"
+version = "0.1.0"
+description = "Install data stack skills into your Claude environment"
+requires-python = ">=3.10"
+license = { text = "Proprietary" }
+keywords = [
+    "analytics",
+    "claude",
+    "dagster",
+    "data-engineering",
+    "dbt",
+    "dlt",
+    "powerbi",
+    "python",
+    "skills",
+    "terraform",
+]
+
+[project.scripts]
+swishbot = "swishbot.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+swishbot = ["CLAUDE.md", "skills/**/*"]
