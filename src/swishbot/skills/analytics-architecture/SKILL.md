@@ -20,3 +20,7 @@ description: "Design analytics reference architectures. Use when planning the ov
 ## Anti-Patterns
 
 [TODO: What to avoid.]
+
+---
+
+*Copyright (c) 2026 Swish BI Limited. All rights reserved.*

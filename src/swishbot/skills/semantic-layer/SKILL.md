@@ -20,3 +20,7 @@ description: "Build the semantic layer using the Boring Semantic Layer or simila
 ## Anti-Patterns
 
 [TODO: What to avoid.]
+
+---
+
+*Copyright (c) 2026 Swish BI Limited. All rights reserved.*

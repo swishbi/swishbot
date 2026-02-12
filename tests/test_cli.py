@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Swish BI Limited. All rights reserved.
+# Licensed under proprietary license. See LICENSE for details.
+
 """Tests for swishbot CLI."""
 
 import argparse

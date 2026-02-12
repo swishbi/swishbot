@@ -20,3 +20,7 @@ description: "Apply DBA security best practices. Use when configuring warehouse 
 ## Anti-Patterns
 
 [TODO: What to avoid.]
+
+---
+
+*Copyright (c) 2026 Swish BI Limited. All rights reserved.*

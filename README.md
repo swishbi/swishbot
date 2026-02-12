@@ -116,4 +116,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, testing, and how t
 
 ## License
 
-Proprietary — [Your consultancy name]
+Proprietary — Copyright (c) 2026 Swish BI Limited. All rights reserved.

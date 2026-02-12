@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Swish BI Limited. All rights reserved.
+# Licensed under proprietary license. See LICENSE for details.
+
 """swishbot CLI — Install data stack skills into your Claude environment."""
 
 import argparse
@@ -39,6 +42,10 @@ looks like. Include both the pattern and the reasoning behind it.]
 [TODO: What to avoid. This is often where the most valuable
 signal lives — the mistakes you've seen clients make that
 Claude should steer away from.]
+
+---
+
+*Copyright (c) 2026 Swish BI Limited. All rights reserved.*
 """
 
 

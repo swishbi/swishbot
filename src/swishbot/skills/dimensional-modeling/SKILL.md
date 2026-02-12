@@ -20,3 +20,7 @@ description: "Apply dimensional modeling best practices. Use when designing fact
 ## Anti-Patterns
 
 [TODO: What to avoid.]
+
+---
+
+*Copyright (c) 2026 Swish BI Limited. All rights reserved.*

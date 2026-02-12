@@ -20,3 +20,7 @@ description: "Apply Power BI best practices. Use when building reports, designin
 ## Anti-Patterns
 
 [TODO: What to avoid.]
+
+---
+
+*Copyright (c) 2026 Swish BI Limited. All rights reserved.*

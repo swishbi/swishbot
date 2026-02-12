@@ -20,3 +20,7 @@ description: "Write dlt/Python data ingestion pipelines. Use when building extra
 ## Anti-Patterns
 
 [TODO: What to avoid.]
+
+---
+
+*Copyright (c) 2026 Swish BI Limited. All rights reserved.*

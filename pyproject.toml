@@ -8,6 +8,7 @@ version = "0.1.0"
 description = "Install data stack skills into your Claude environment"
 requires-python = ">=3.10"
 license = { text = "Proprietary" }
+authors = [{ name = "Swish BI Limited" }]
 keywords = [
     "analytics",
     "claude",

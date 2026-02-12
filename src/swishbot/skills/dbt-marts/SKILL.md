@@ -20,3 +20,7 @@ description: "Build the mart/gold layer in dbt. Use when creating final business
 ## Anti-Patterns
 
 [TODO: What to avoid.]
+
+---
+
+*Copyright (c) 2026 Swish BI Limited. All rights reserved.*

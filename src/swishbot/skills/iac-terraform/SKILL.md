@@ -20,3 +20,7 @@ description: "Deploy data infrastructure using Terraform/IaC. Use when provision
 ## Anti-Patterns
 
 [TODO: What to avoid.]
+
+---
+
+*Copyright (c) 2026 Swish BI Limited. All rights reserved.*
