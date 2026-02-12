@@ -1,5 +1,10 @@
 # swishbot
 
+[![CI](https://github.com/swishbi/swishbot/actions/workflows/ci.yml/badge.svg)](https://github.com/swishbi/swishbot/actions/workflows/ci.yml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![License](https://img.shields.io/badge/license-Proprietary-red)](LICENSE)
+
 A distributable skill library for [Swish BI](swishbi.com). Install skills into your Claude environment with a single command.
 
 ## Quick Start
