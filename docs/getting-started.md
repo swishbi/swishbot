@@ -1,0 +1,69 @@
+# Getting Started
+
+## Installation
+
+```bash
+pip install swishbot
+```
+
+Or install from source in dev mode:
+
+```bash
+git clone https://github.com/swishbi/swishbot.git
+cd swishbot
+pip install -e .
+```
+
+## Install skills
+
+Browse what's available:
+
+```bash
+swishbot list
+```
+
+Install the skills you need:
+
+```bash
+# Install a single skill
+swishbot install dbt-staging
+
+# Install multiple skills
+swishbot install dbt-staging dbt-intermediate dbt-marts
+
+# Install everything
+swishbot install --all
+
+# Install to a custom path
+swishbot install dbt-staging --path ~/my-project/.claude/skills
+```
+
+Skills are copied to `~/.claude/skills/` by default.
+
+## Set up your project
+
+Generate a starter `CLAUDE.md` in your project directory:
+
+```bash
+cd ~/my-project
+swishbot init-project
+```
+
+This creates a `CLAUDE.md` file that:
+
+- Lists your installed skills
+- Defines project conventions
+- Describes your project structure and platform environment
+
+Edit the file to uncomment the skills you've installed and fill in your project details. Claude reads this file to understand your project context and apply the right skill guidance.
+
+!!! tip
+    If you already have a `CLAUDE.md`, use `--force` to overwrite it:
+
+    ```bash
+    swishbot init-project --force
+    ```
+
+## Verify it works
+
+Open Claude Code in your project and start working. Claude will automatically read the `CLAUDE.md` and apply the methodology from your installed skills.

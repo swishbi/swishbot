@@ -22,5 +22,8 @@ htmlcov/
 .vscode/
 .idea/
 
+# Docs
+site/
+
 # OS
 .DS_Store
