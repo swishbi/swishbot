@@ -65,13 +65,14 @@ When adding a new skill, complete every step:
 5. Update related skills to cross-reference back to the new skill
 6. Update the status table in `README.md` — add the skill row and set status to `:white_check_mark:`
 7. Update the status table in `src/swishbot/CLAUDE.md` — same as above
-8. Update the project structure tree in `README.md` if the directory layout changed
-9. Run `uv run ruff check src/ tests/` and `uv run ruff format src/ tests/`
-10. Run `uv run pytest -v` — all tests must pass
+8. Update the `CATEGORIES` dict in `docs/hooks/skills_catalog.py` — add the skill to the correct category
+9. Update the project structure tree in `README.md` if the directory layout changed
+10. Run `uv run ruff check src/ tests/` and `uv run ruff format src/ tests/`
+11. Run `uv run pytest -v` — all tests must pass
 
 ## Commit Checklist
 
 - Lint and format pass (`uv run ruff check` + `uv run ruff format`)
 - Tests pass (`uv run pytest -v`)
-- If skills changed: update status tables in both `README.md` and `src/swishbot/CLAUDE.md`
+- If skills changed: update status tables in both `README.md` and `src/swishbot/CLAUDE.md`, and `CATEGORIES` in `docs/hooks/skills_catalog.py`
 - New skills need correct `name`/`description` frontmatter in SKILL.md

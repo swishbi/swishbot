@@ -58,7 +58,7 @@ Before committing, make sure you've covered everything:
 - [ ] **Lint & format** — `uv run ruff check src/ tests/` and `uv run ruff format src/ tests/` pass cleanly
 - [ ] **Tests pass** — `uv run pytest -v` with no failures
 - [ ] **Version bump** — update `version` in `pyproject.toml` if this is a release-worthy change
-- [ ] **Skill tables updated** — if you added, removed, or changed a skill's availability, update the status tables in both `README.md` and `src/swishbot/CLAUDE.md`
+- [ ] **Skill tables updated** — if you added, removed, or changed a skill's availability, update the status tables in both `README.md` and `src/swishbot/CLAUDE.md`, and the `CATEGORIES` dict in `docs/hooks/skills_catalog.py`
 - [ ] **SKILL.md frontmatter** — new or renamed skills have correct `name` and `description` in their frontmatter
 - [ ] **Project structure** — if you added new files/directories, update the tree in `README.md`
 
@@ -112,6 +112,7 @@ Complete every step when adding a skill:
 - [ ] **Back-reference** — update related skills to link back to the new skill
 - [ ] **README.md status table** — add the skill row with `:white_check_mark:` status
 - [ ] **src/swishbot/CLAUDE.md status table** — same as above
+- [ ] **Docs catalog hook** — add skill to the correct category in `docs/hooks/skills_catalog.py`
 - [ ] **README.md project tree** — update if directory layout changed
 - [ ] **Lint & format** — `uv run ruff check src/ tests/` and `uv run ruff format src/ tests/`
 - [ ] **Tests pass** — `uv run pytest -v`
