@@ -9,21 +9,21 @@ swishbot is a Python CLI that distributes "skills" — opinionated methodology g
 ## Commands
 
 ```bash
-# Install in dev mode
-pip install -e ".[test]"
+# Install dev environment (uses uv for package management)
+uv sync --extra test
 
 # Lint and format
-ruff check src/ tests/
-ruff format src/ tests/
+uv run ruff check src/ tests/
+uv run ruff format src/ tests/
 
 # Run all tests
-pytest -v
+uv run pytest -v
 
 # Run a single test
-pytest -v tests/test_cli.py::test_function_name
+uv run pytest -v tests/test_cli.py::test_function_name
 
 # Pre-commit hooks (ruff on commit, pytest on push)
-pre-commit install && pre-commit install --hook-type pre-push
+uv run pre-commit install && uv run pre-commit install --hook-type pre-push
 ```
 
 ## Architecture
@@ -52,9 +52,26 @@ The `description` field is extracted via regex (`description:\s*"?([^"\n]+)"?`) 
 - Ruff config: line-length 120, rules E/F/I/UP
 - Tests use monkeypatching and `tmp_path` for isolation; organized by command with section comments
 
+## New Skill Checklist
+
+When adding a new skill, complete every step:
+
+1. Scaffold the skill directory: `swishbot init <skill-name>`
+2. Write `SKILL.md` with YAML frontmatter (`name`, `description`) and methodology content
+   - `description` must be a single line (extracted via regex)
+   - End file with copyright footer: `*Copyright (c) 2026 Swish BI Limited. All rights reserved.*`
+3. Add optional subdirectories if needed: `examples/`, `scripts/`
+4. Add cross-references to related skills in a `## Related Skills` section
+5. Update related skills to cross-reference back to the new skill
+6. Update the status table in `README.md` — add the skill row and set status to `:white_check_mark:`
+7. Update the status table in `src/swishbot/CLAUDE.md` — same as above
+8. Update the project structure tree in `README.md` if the directory layout changed
+9. Run `uv run ruff check src/ tests/` and `uv run ruff format src/ tests/`
+10. Run `uv run pytest -v` — all tests must pass
+
 ## Commit Checklist
 
-- Lint and format pass (`ruff check` + `ruff format`)
-- Tests pass (`pytest -v`)
+- Lint and format pass (`uv run ruff check` + `uv run ruff format`)
+- Tests pass (`uv run pytest -v`)
 - If skills changed: update status tables in both `README.md` and `src/swishbot/CLAUDE.md`
 - New skills need correct `name`/`description` frontmatter in SKILL.md
