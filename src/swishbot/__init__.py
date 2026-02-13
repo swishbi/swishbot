@@ -3,4 +3,6 @@
 
 """swishbot — Install data stack skills into your Claude environment."""
 
-__version__ = "0.1.0"
+from swishbot._version import __version__
+
+__all__ = ["__version__"]

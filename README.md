@@ -13,12 +13,6 @@ A distributable skill library for [Swish BI](swishbi.com). Install skills into y
 # Install swishbot
 pip install swishbot
 
-# Or install in dev mode from source
-pip install -e .
-
-# Install with test/dev dependencies
-pip install -e ".[test]"
-
 # List available skills
 swishbot list
 
@@ -49,9 +43,12 @@ swishbot init-project --force
 ### Transformation (dbt)
 | Skill | Description | Status |
 |-------|-------------|--------|
-| `dbt-staging` | Building the staging/bronze layer | :x: |
-| `dbt-intermediate` | Building the intermediate/silver layer | :x: |
-| `dbt-marts` | Building the mart/gold layer | :x: |
+| `dbt-style` | Cross-cutting dbt style, naming, and project structure conventions | :white_check_mark: |
+| `dbt-staging` | Building the staging/bronze layer | :white_check_mark: |
+| `dbt-staging-model` | Conventions for writing a dbt staging model SQL file | :white_check_mark: |
+| `dbt-intermediate` | Building the intermediate/silver layer | :white_check_mark: |
+| `dbt-marts` | Building the mart/gold layer | :white_check_mark: |
+| `dbt-mcp` | Configure and use the dbt MCP server with Claude | :white_check_mark: |
 
 ### Modeling & Security
 | Skill | Description | Status |
@@ -90,11 +87,19 @@ swishbot/
 │           │   └── SKILL.md
 │           ├── dlt-pipelines/
 │           │   └── SKILL.md
-│           ├── dbt-staging/
+│           ├── dbt-style/
 │           │   └── SKILL.md
+│           ├── dbt-staging/
+│           │   ├── SKILL.md
+│           │   └── examples/
+│           ├── dbt-staging-model/
+│           │   ├── SKILL.md
+│           │   └── examples/
 │           ├── dbt-intermediate/
 │           │   └── SKILL.md
 │           ├── dbt-marts/
+│           │   └── SKILL.md
+│           ├── dbt-mcp/
 │           │   └── SKILL.md
 │           ├── dimensional-modeling/
 │           │   └── SKILL.md
