@@ -1,23 +1,25 @@
 ---
 name: dbt-staging-model
-description: "Conventions for writing a dbt staging model SQL file. Covers SQL structure, column casting, naming, ordering, and dlt metadata handling."
+description: "Conventions for writing a dbt staging model SQL file. Covers SQL structure, column casting, naming, ordering, and metadata handling."
 ---
 
 # dbt-staging-model
 
-Conventions for writing a dbt staging model SQL file. Covers SQL structure, column casting, naming, ordering, and dlt metadata handling.
+Conventions for writing a dbt staging model SQL file. Covers SQL structure, column casting, naming, ordering, and metadata handling.
 
 ## Usage
 
-When creating or updating a staging model, first inspect the source data to understand its structure. Run the `get_source_sample` macro to retrieve sample data from the source table:
+When creating or updating a staging model, first inspect the source data to understand its structure. Use the dbt MCP **`show`** tool to preview source data:
 
-```bash
-cd transformation && dbt --quiet run-operation get_source_sample --args '{"source_name": "<source_name>", "table_name": "<table_name>"}'
+```sql
+select * from {{ source('<source_name>', '<table_name>') }} limit 10
 ```
 
-This returns a dictionary where keys are column names (uppercase) and values are lists of sample data (up to 500 rows). Use the results to identify JSON field names, determine correct data types, and spot nested objects that should remain uncast.
+Use the results to identify column types, JSON field names, nested structures, and data types. For nested/variant columns, inspect them individually:
 
-If sample data is not available (e.g., no Snowflake connection), you can alternatively provide a sample JSON payload from the `attributes` column (or equivalent nested JSON column). Claude will produce a staging model following project conventions.
+```sql
+select <nested_column> from {{ source('<source_name>', '<table_name>') }} limit 10
+```
 
 ## Instructions
 
@@ -33,45 +35,32 @@ renamed as (
     select
         -- primary key
         id as <entity>_id,
-        type,
 
-        -- expanded attributes columns (see Column Ordering below) --
+        -- expanded columns (see Column Ordering below) --
 
-        -- dlt metadata
-        _dlt_id,
-        _dlt_load_id,
-        {%- if var('<source_name>_scd2_enabled', false) or ('scd2' in (env_var('SOURCES__<SOURCE_NAME_UPPER>_PIPELINE__WRITE_DISPOSITION', '') | lower)) %}
-        _dlt_valid_from,
-        _dlt_valid_to,
-        row_number() over (partition by id order by _dlt_valid_from) as _dlt_version,
-        {%- endif %}
-        '<source_name>' as _dlt_source
+        -- loader metadata
+        ...
 
     from source
-    {%- if var('<source_name>_scd2_enabled', false) or ('scd2' in (env_var('SOURCES__<SOURCE_NAME_UPPER>_PIPELINE__WRITE_DISPOSITION', '') | lower)) %}
-    where _dlt_valid_to is null
-    {%- endif %}
 )
 select * from renamed
 ```
 
-Replace `<SOURCE_NAME_UPPER>` with the uppercase version (e.g., `centerpoint` -> `CENTERPOINT`).
+The `source` CTE selects from the raw source. The `renamed` CTE applies all casting, renaming, and ordering. The final select is always `select * from renamed`.
 
 ### Column Casting Rules
 
-Use dbt type macros for casting. Use Snowflake variant syntax (`json_column:fieldName`) to access JSON fields.
+Use dbt type macros for casting. Access JSON/variant fields using your warehouse's native syntax (see [dbt-staging](../dbt-staging/SKILL.md) for warehouse-specific syntax).
 
-| JSON Type | dbt Macro | Example |
+| Data Type | dbt Macro | Example |
 |-----------|-----------|---------|
-| String | `{{ type_string() }}` | `cast(attributes:name as {{ type_string() }}) as entity_name` |
-| Integer | `{{ type_int() }}` | `cast(attributes:accountId as {{ type_int() }}) as account_id` |
-| Decimal/Float | `{{ type_numeric() }}` | `cast(attributes:amount as {{ type_numeric() }}) as amount` |
-| Timestamp (ISO) | `{{ type_timestamp() }}` | `cast(attributes:createdAt as {{ type_timestamp() }}) as created_at` |
-| Date | `date` | `cast(attributes:invoiceDate as date) as invoice_date` |
-| Boolean | `{{ type_boolean() }}` | `cast(attributes:isActive as {{ type_boolean() }}) as is_active` |
-| Nested Object | No cast | `attributes:options as options` |
-
-Replace `attributes` with the actual JSON column name (e.g., `data`, `payload`, `properties`).
+| String | `{{ type_string() }}` | `cast(name as {{ type_string() }}) as entity_name` |
+| Integer | `{{ type_int() }}` | `cast(account_id as {{ type_int() }}) as account_id` |
+| Decimal/Float | `{{ type_numeric() }}` | `cast(amount as {{ type_numeric() }}) as amount` |
+| Timestamp (ISO) | `{{ type_timestamp() }}` | `cast(created_at as {{ type_timestamp() }}) as created_at` |
+| Date | `date` | `cast(invoice_date as date) as invoice_date` |
+| Boolean | `{{ type_boolean() }}` | `cast(is_active as {{ type_boolean() }}) as is_active` |
+| Nested Object | No cast | `options as options` |
 
 ### Naming Conventions
 
@@ -86,17 +75,17 @@ Replace `attributes` with the actual JSON column name (e.g., `data`, `payload`, 
 
 Group columns in this order with section comments:
 
-1. **Primary key** - `id as <entity>_id`, `type`
-2. **Identifiable info** (ungrouped) - fields that identify the entity: `name`, `description`, `status`, `domain`, etc.
-3. **Relationships** - foreign key IDs grouped together: `profile_id`, `company_id`, `property_id`, etc.
-4. **Strings** - remaining string fields
-5. **Integers** - non-FK integer fields
-6. **Numerics** - decimal/float fields: `cost`, `price`, `total`, etc.
-7. **Booleans** - boolean fields
-8. **Dates** - date-only fields
-9. **Timestamps** - entity-specific first, then standard `created_at`, `updated_at`, `deleted_at` last
-10. **Nested objects** - JSON objects/arrays without casting
-11. **dlt metadata** - `_dlt_id`, `_dlt_load_id`, SCD2 columns, `_dlt_source`
+1. **Primary key** — `id as <entity>_id`, `type`
+2. **Identifiable info** (ungrouped) — fields that identify the entity: `name`, `description`, `status`, `domain`, etc.
+3. **Relationships** — foreign key IDs grouped together: `profile_id`, `company_id`, `property_id`, etc.
+4. **Strings** — remaining string fields
+5. **Integers** — non-FK integer fields
+6. **Numerics** — decimal/float fields: `cost`, `price`, `total`, etc.
+7. **Booleans** — boolean fields
+8. **Dates** — date-only fields
+9. **Timestamps** — entity-specific first, then standard `created_at`, `updated_at`, `deleted_at` last
+10. **Nested objects** — JSON objects/arrays without casting
+11. **Loader metadata** — system columns from your ingestion tool (see below)
 
 Example section comments:
 ```sql
@@ -110,75 +99,61 @@ Example section comments:
 -- dates
 -- timestamps
 -- nested objects
--- dlt metadata
+-- loader metadata
 ```
 
 ### Standard Timestamp Fields
 
 Always include these at the end of the timestamps section (before nested objects), if they exist in the source data:
 ```sql
-cast(attributes:createdAt as {{ type_timestamp() }}) as created_at,
-cast(attributes:updatedAt as {{ type_timestamp() }}) as updated_at,
-cast(attributes:deletedAt as {{ type_timestamp() }}) as deleted_at,
+cast(created_at as {{ type_timestamp() }}) as created_at,
+cast(updated_at as {{ type_timestamp() }}) as updated_at,
+cast(deleted_at as {{ type_timestamp() }}) as deleted_at,
 ```
 
 ### Nested Objects
 
-Leave nested objects (arrays or objects) without casting. Place at the end before dlt metadata:
+Leave nested objects (arrays or objects) without casting. Place at the end before loader metadata:
 ```sql
-attributes:custom as custom,
-attributes:customWithLabels as custom_with_labels,
-attributes:options as options,
+custom as custom,
+custom_with_labels as custom_with_labels,
+options as options,
 ```
 
-### dlt Metadata Block
+For guidance on when to unnest objects inline vs. create separate flattened models, see [dbt-staging](../dbt-staging/SKILL.md) Step 6.
 
-Always include these columns at the end of the select, after nested objects:
-- `_dlt_id` - unique row identifier
-- `_dlt_load_id` - load batch identifier
-- SCD2 columns (conditional) - `_dlt_valid_from`, `_dlt_valid_to`, `_dlt_version`
-- `'<source_name>' as _dlt_source` - literal source name string
+### Loader Metadata Block
 
-The SCD2 block and `where` clause use a dual check pattern:
-```sql
-{%- if var('<source_name>_scd2_enabled', false) or ('scd2' in (env_var('SOURCES__<SOURCE_NAME_UPPER>_PIPELINE__WRITE_DISPOSITION', '') | lower)) %}
-```
-
-This allows SCD2 to be enabled via either a dbt var or an environment variable.
+Always include loader-specific metadata columns at the end of the select, after nested objects. The exact columns depend on your ingestion tool. See the [Loader-Specific Considerations](../dbt-staging/SKILL.md#loader-specific-considerations) section in the dbt-staging skill for details on each loader's metadata pattern.
 
 ### Quick Example
 
-Given this JSON from the `attributes` column:
-```json
-{
-  "accountId": 555078,
-  "name": "Example Company",
-  "closeRate": "0.0000",
-  "isActive": true,
-  "options": { "setting": true },
-  "createdAt": "2025-08-22T00:24:14+00:00"
-}
+Given this source data:
+```
+| account_id | name            | close_rate | is_active | options              | created_at                    |
+|------------|-----------------|------------|-----------|----------------------|-------------------------------|
+| 555078     | Example Company | 0.0500     | true      | { "setting": true }  | 2025-08-22T00:24:14+00:00     |
 ```
 
 Transform to:
 ```sql
 -- identifiable info (ungrouped)
-cast(attributes:name as {{ type_string() }}) as company_name,
+cast(name as {{ type_string() }}) as company_name,
 
 -- relationships
-cast(attributes:accountId as {{ type_int() }}) as account_id,
+cast(account_id as {{ type_int() }}) as account_id,
 
 -- numerics
-cast(attributes:closeRate as {{ type_numeric() }}) as close_rate,
+cast(close_rate as {{ type_numeric() }}) as close_rate,
 
 -- booleans
-cast(attributes:isActive as {{ type_boolean() }}) as is_active,
+cast(is_active as {{ type_boolean() }}) as is_active,
 
 -- timestamps
-cast(attributes:createdAt as {{ type_timestamp() }}) as created_at,
+cast(created_at as {{ type_timestamp() }}) as created_at,
 
 -- nested objects
-attributes:options as options,
+options as options,
 ```
 
 ### Full Example
@@ -188,7 +163,7 @@ See [examples/stg_source__entities.sql](examples/stg_source__entities.sql) for a
 ## Related Skills
 
 - **[dbt-style](../dbt-style/SKILL.md)** — Foundational naming, SQL style, and structure conventions
-- **[dbt-staging](../dbt-staging/SKILL.md)** — Full staging workflow (Step 1-11) that uses this skill for model creation
+- **[dbt-staging](../dbt-staging/SKILL.md)** — Full staging workflow including complex structure handling and loader-specific metadata
 - **[dbt-mcp](../dbt-mcp/SKILL.md)** — Use `compile` to verify Jinja rendering, `show` to preview results
 
 ---

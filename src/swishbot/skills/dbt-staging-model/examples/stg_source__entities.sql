@@ -2,40 +2,13 @@
     Example Staging Model
 
     Demonstrates the complete staging model pattern including:
-    - JSON attribute expansion with type casting
+    - Column casting with dbt type macros
     - Column grouping and ordering
-    - SCD2-aware dlt metadata handling
+    - camelCase to snake_case conversion
 
-    Source JSON example:
-    {
-      "accountId": 12345,
-      "name": "Example Entity",
-      "type": "EntityType",
-      "externalId": "EXT-001",
-      "importId": null,
-      "status": "Active",
-      "rate": "0.0500",
-      "itemCount": 10,
-      "streetAddress": "123 Main St",
-      "subpremise": "Suite 100",
-      "locality": "Springfield",
-      "region": "IL",
-      "postalCode": "62701",
-      "county": "Sangamon County",
-      "country": "US",
-      "latitude": 39.7817,
-      "longitude": -89.6501,
-      "placeId": "ChIJ-abc123",
-      "timezone": "America/Chicago",
-      "website": "https://example.com",
-      "custom": { "customField": "value" },
-      "customWithLabels": { "Custom Field": "value" },
-      "options": { "settingA": true, "settingB": false },
-      "recentActivity": "2025-09-04T19:29:47+00:00",
-      "createdAt": "2025-08-22T00:24:14+00:00",
-      "updatedAt": "2025-09-04T19:29:47+00:00",
-      "deletedAt": null
-    }
+    This example is loader-agnostic. Add loader metadata
+    columns (e.g., _dlt_id, _fivetran_synced) as the last
+    section based on your ingestion tool.
 */
 with source as (
     select * from {{ source('source_name', 'table_name') }}
@@ -47,59 +20,51 @@ renamed as (
         type,
 
         -- identifiable info (ungrouped)
-        cast(attributes:name as {{ type_string() }}) as entity_name,
-        cast(attributes:type as {{ type_string() }}) as entity_type,
-        cast(attributes:status as {{ type_string() }}) as status,
+        cast(name as {{ type_string() }}) as entity_name,
+        cast(status as {{ type_string() }}) as status,
 
         -- relationships
-        cast(attributes:accountId as {{ type_int() }}) as account_id,
+        cast(account_id as {{ type_int() }}) as account_id,
 
         -- strings
-        cast(attributes:externalId as {{ type_string() }}) as external_id,
-        cast(attributes:streetAddress as {{ type_string() }}) as street_address,
-        cast(attributes:subpremise as {{ type_string() }}) as subpremise,
-        cast(attributes:locality as {{ type_string() }}) as locality,
-        cast(attributes:region as {{ type_string() }}) as region,
-        cast(attributes:postalCode as {{ type_string() }}) as postal_code,
-        cast(attributes:county as {{ type_string() }}) as county,
-        cast(attributes:country as {{ type_string() }}) as country,
-        cast(attributes:placeId as {{ type_string() }}) as place_id,
-        cast(attributes:timezone as {{ type_string() }}) as timezone,
-        cast(attributes:website as {{ type_string() }}) as website,
+        cast(external_id as {{ type_string() }}) as external_id,
+        cast(street_address as {{ type_string() }}) as street_address,
+        cast(subpremise as {{ type_string() }}) as subpremise,
+        cast(locality as {{ type_string() }}) as locality,
+        cast(region as {{ type_string() }}) as region,
+        cast(postal_code as {{ type_string() }}) as postal_code,
+        cast(county as {{ type_string() }}) as county,
+        cast(country as {{ type_string() }}) as country,
+        cast(place_id as {{ type_string() }}) as place_id,
+        cast(timezone as {{ type_string() }}) as timezone,
+        cast(website as {{ type_string() }}) as website,
 
         -- integers
-        cast(attributes:importId as {{ type_int() }}) as import_id,
-        cast(attributes:itemCount as {{ type_int() }}) as item_count,
+        cast(import_id as {{ type_int() }}) as import_id,
+        cast(item_count as {{ type_int() }}) as item_count,
 
         -- numerics
-        cast(attributes:rate as {{ type_numeric() }}) as rate,
-        cast(attributes:latitude as {{ type_numeric() }}) as latitude,
-        cast(attributes:longitude as {{ type_numeric() }}) as longitude,
+        cast(rate as {{ type_numeric() }}) as rate,
+        cast(latitude as {{ type_numeric() }}) as latitude,
+        cast(longitude as {{ type_numeric() }}) as longitude,
 
         -- timestamps
-        cast(attributes:recentActivity as {{ type_timestamp() }}) as recent_activity_at,
-        cast(attributes:createdAt as {{ type_timestamp() }}) as created_at,
-        cast(attributes:updatedAt as {{ type_timestamp() }}) as updated_at,
-        cast(attributes:deletedAt as {{ type_timestamp() }}) as deleted_at,
+        cast(recent_activity as {{ type_timestamp() }}) as recent_activity_at,
+        cast(created_at as {{ type_timestamp() }}) as created_at,
+        cast(updated_at as {{ type_timestamp() }}) as updated_at,
+        cast(deleted_at as {{ type_timestamp() }}) as deleted_at,
 
         -- nested objects
-        attributes:custom as custom,
-        attributes:customWithLabels as custom_with_labels,
-        attributes:options as options,
+        custom as custom,
+        custom_with_labels as custom_with_labels,
+        options as options
 
-        -- dlt metadata
-        _dlt_id,
-        _dlt_load_id,
-        {%- if var('source_name_scd2_enabled', false) or ('scd2' in (env_var('SOURCES__SOURCE_NAME_PIPELINE__WRITE_DISPOSITION', '') | lower)) %}
-        _dlt_valid_from,
-        _dlt_valid_to,
-        row_number() over (partition by id order by _dlt_valid_from) as _dlt_version,
-        {%- endif %}
-        'source_name' as _dlt_source
+        -- loader metadata
+        -- Add loader-specific columns here, e.g.:
+        -- _dlt_id, _dlt_load_id (dlt)
+        -- _fivetran_synced, _fivetran_deleted (Fivetran)
+        -- _airbyte_raw_id, _airbyte_extracted_at (Airbyte)
 
     from source
-    {%- if var('source_name_scd2_enabled', false) or ('scd2' in (env_var('SOURCES__SOURCE_NAME_PIPELINE__WRITE_DISPOSITION', '') | lower)) %}
-    where _dlt_valid_to is null
-    {%- endif %}
 )
 select * from renamed
