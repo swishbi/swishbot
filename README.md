@@ -34,6 +34,11 @@ swishbot init-project --force
 
 ## Available Skills
 
+### Discovery & Planning
+| Skill | Description | Status |
+|-------|-------------|--------|
+| `requirements-discovery` | Act as a business analyst to guide stakeholders from idea to implementation-ready requirements | :white_check_mark: |
+
 ### Infrastructure
 | Skill | Description | Status |
 |-------|-------------|--------|
@@ -100,6 +105,8 @@ swishbot/
 │           ├── dbt-marts/
 │           │   └── SKILL.md
 │           ├── dbt-mcp/
+│           │   └── SKILL.md
+│           ├── requirements-discovery/
 │           │   └── SKILL.md
 │           ├── dimensional-modeling/
 │           │   └── SKILL.md

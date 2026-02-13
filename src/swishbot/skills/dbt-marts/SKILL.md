@@ -206,6 +206,7 @@ select * from final
 
 ## Related Skills
 
+- **[requirements-discovery](../requirements-discovery/SKILL.md)** — Upstream discovery process that defines what marts need to be built
 - **[dbt-style](../dbt-style/SKILL.md)** — Foundational naming, SQL style, and structure conventions
 - **[dbt-intermediate](../dbt-intermediate/SKILL.md)** — The upstream layer feeding into marts
 - **[dbt-staging](../dbt-staging/SKILL.md)** — The first transformation layer
