@@ -10,10 +10,18 @@ SKILLS_DIR = Path(__file__).resolve().parents[2] / "src" / "swishbot" / "skills"
 PLACEHOLDER = "<!-- SKILLS_CATALOG -->"
 
 CATEGORIES = {
-    "Ingestion & Infrastructure": ["dlt-pipelines", "iac-terraform"],
-    "Transformation (dbt)": ["dbt-staging", "dbt-intermediate", "dbt-marts"],
-    "Modeling & Security": ["dimensional-modeling", "dba-security"],
-    "Analytics & Presentation": ["analytics-architecture", "semantic-layer", "powerbi"],
+    "Infrastructure": ["analytics-architecture", "dba-security", "iac-terraform"],
+    "Ingestion": ["dlt-pipelines"],
+    "Transformation (dbt)": [
+        "dbt-intermediate",
+        "dbt-marts",
+        "dbt-mcp",
+        "dbt-staging",
+        "dbt-staging-model",
+        "dbt-style",
+        "dimensional-modeling",
+    ],
+    "Analytics & Presentation": ["powerbi", "semantic-layer"],
 }
 
 

@@ -9,21 +9,34 @@ This project uses [swishbot](https://github.com/swishbi/swishbot) skills to guid
 <!-- Run `swishbot list` to see available skills. -->
 <!-- Add the skills relevant to this project below. -->
 
+### Infrastructure
 | Skill | Description | Status |
 |-------|-------------|--------|
-| dbt-style | Cross-cutting dbt style, naming, and project structure conventions | :white_check_mark: |
-| dbt-staging | Building the staging/bronze layer | :white_check_mark: |
-| dbt-staging-model | Conventions for writing a dbt staging model SQL file | :white_check_mark: |
+| analytics-architecture | Analytics reference architecture | :x: |
+| dba-security | DBA security practices | :x: |
+| iac-terraform | Deploying infrastructure using Terraform/IaC | :x: |
+
+### Ingestion
+| Skill | Description | Status |
+|-------|-------------|--------|
+| dlt-pipelines | Writing dlt/Python ingestion pipelines | :x: |
+
+### Transformation (dbt)
+| Skill | Description | Status |
+|-------|-------------|--------|
 | dbt-intermediate | Building the intermediate/silver layer | :white_check_mark: |
 | dbt-marts | Building the mart/gold layer | :white_check_mark: |
 | dbt-mcp | Configure and use the dbt MCP server with Claude | :white_check_mark: |
-| dlt-pipelines | Writing dlt/Python ingestion pipelines | :x: |
-| iac-terraform | Deploying infrastructure using Terraform/IaC | :x: |
+| dbt-staging | Building the staging/bronze layer | :white_check_mark: |
+| dbt-staging-model | Conventions for writing a dbt staging model SQL file | :white_check_mark: |
+| dbt-style | Cross-cutting dbt style, naming, and project structure conventions | :white_check_mark: |
 | dimensional-modeling | Dimensional modeling best practices | :x: |
-| dba-security | DBA security practices | :x: |
-| analytics-architecture | Analytics reference architecture | :x: |
-| semantic-layer | Building the semantic layer | :x: |
+
+### Analytics & Presentation
+| Skill | Description | Status |
+|-------|-------------|--------|
 | powerbi | Power BI best practices | :x: |
+| semantic-layer | Building the semantic layer | :x: |
 
 ## Conventions
 
