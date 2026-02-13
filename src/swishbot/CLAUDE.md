@@ -12,6 +12,7 @@ This project uses [swishbot](https://github.com/swishbi/swishbot) skills to guid
 ### Discovery & Planning
 | Skill | Description | Status |
 |-------|-------------|--------|
+| business-logic-mapping | Map tribal knowledge from SMEs into implementation-ready business logic tied to staging columns | :white_check_mark: |
 | requirements-discovery | Act as a business analyst to guide stakeholders from idea to implementation-ready requirements | :white_check_mark: |
 
 ### Infrastructure

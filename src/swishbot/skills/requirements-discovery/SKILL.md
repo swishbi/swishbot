@@ -93,6 +93,7 @@ During the intake conversation with the stakeholder:
 
 ## Related Skills
 
+- **[business-logic-mapping](../business-logic-mapping/SKILL.md)** — Downstream: maps tribal knowledge from SMEs into implementation-ready business logic tied to staging columns
 - **[dbt-staging](../dbt-staging/SKILL.md)** — Building the staging/bronze layer identified during reverse engineering
 - **[dbt-intermediate](../dbt-intermediate/SKILL.md)** — Building the intermediate/silver layer for complex transformations
 - **[dbt-marts](../dbt-marts/SKILL.md)** — Building the mart/gold layer that produces the stakeholder's output
