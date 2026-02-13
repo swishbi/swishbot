@@ -213,6 +213,7 @@ The dbt MCP server can modify data models, sources, and warehouse objects. Only 
 - **[dbt-staging](../dbt-staging/SKILL.md)** — Staging layer workflow
 - **[dbt-intermediate](../dbt-intermediate/SKILL.md)** — Intermediate layer methodology
 - **[dbt-marts](../dbt-marts/SKILL.md)** — Mart layer methodology
+- **[dlt-pipelines](../dlt-pipelines/SKILL.md)** — Build dlt ingestion pipelines upstream of dbt
 
 ---
 

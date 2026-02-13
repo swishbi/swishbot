@@ -10,6 +10,7 @@ SKILLS_DIR = Path(__file__).resolve().parents[2] / "src" / "swishbot" / "skills"
 PLACEHOLDER = "<!-- SKILLS_CATALOG -->"
 
 CATEGORIES = {
+    "Discovery & Planning": ["business-logic-mapping", "requirements-discovery"],
     "Infrastructure": ["analytics-architecture", "dba-security", "iac-terraform"],
     "Ingestion": ["dlt-pipelines"],
     "Transformation (dbt)": [

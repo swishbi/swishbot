@@ -21,6 +21,10 @@ description: "Apply dimensional modeling best practices. Use when designing fact
 
 [TODO: What to avoid.]
 
+## Related Skills
+
+- **[requirements-discovery](../requirements-discovery/SKILL.md)** — Upstream discovery process that identifies which facts and dimensions need to be modeled
+
 ---
 
 *Copyright (c) 2026 Swish BI Limited. All rights reserved.*

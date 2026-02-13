@@ -34,6 +34,12 @@ swishbot init-project --force
 
 ## Available Skills
 
+### Discovery & Planning
+| Skill | Description | Status |
+|-------|-------------|--------|
+| `business-logic-mapping` | Map tribal knowledge from SMEs into implementation-ready business logic tied to staging columns | :white_check_mark: |
+| `requirements-discovery` | Act as a business analyst to guide stakeholders from idea to implementation-ready requirements | :white_check_mark: |
+
 ### Infrastructure
 | Skill | Description | Status |
 |-------|-------------|--------|
@@ -44,7 +50,7 @@ swishbot init-project --force
 ### Ingestion
 | Skill | Description | Status |
 |-------|-------------|--------|
-| `dlt-pipelines` | Writing dlt/Python ingestion pipelines | :x: |
+| `dlt-pipelines` | Writing dlt/Python ingestion pipelines | :white_check_mark: |
 
 ### Transformation (dbt)
 | Skill | Description | Status |
@@ -100,6 +106,10 @@ swishbot/
 │           ├── dbt-marts/
 │           │   └── SKILL.md
 │           ├── dbt-mcp/
+│           │   └── SKILL.md
+│           ├── business-logic-mapping/
+│           │   └── SKILL.md
+│           ├── requirements-discovery/
 │           │   └── SKILL.md
 │           ├── dimensional-modeling/
 │           │   └── SKILL.md

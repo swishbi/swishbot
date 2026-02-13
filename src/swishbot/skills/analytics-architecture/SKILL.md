@@ -21,6 +21,10 @@ description: "Design analytics reference architectures. Use when planning the ov
 
 [TODO: What to avoid.]
 
+## Related Skills
+
+- **[requirements-discovery](../requirements-discovery/SKILL.md)** — Upstream discovery process that may reveal infrastructure gaps
+
 ---
 
 *Copyright (c) 2026 Swish BI Limited. All rights reserved.*

@@ -9,6 +9,12 @@ This project uses [swishbot](https://github.com/swishbi/swishbot) skills to guid
 <!-- Run `swishbot list` to see available skills. -->
 <!-- Add the skills relevant to this project below. -->
 
+### Discovery & Planning
+| Skill | Description | Status |
+|-------|-------------|--------|
+| business-logic-mapping | Map tribal knowledge from SMEs into implementation-ready business logic tied to staging columns | :white_check_mark: |
+| requirements-discovery | Act as a business analyst to guide stakeholders from idea to implementation-ready requirements | :white_check_mark: |
+
 ### Infrastructure
 | Skill | Description | Status |
 |-------|-------------|--------|
@@ -19,7 +25,7 @@ This project uses [swishbot](https://github.com/swishbi/swishbot) skills to guid
 ### Ingestion
 | Skill | Description | Status |
 |-------|-------------|--------|
-| dlt-pipelines | Writing dlt/Python ingestion pipelines | :x: |
+| dlt-pipelines | Writing dlt/Python ingestion pipelines | :white_check_mark: |
 
 ### Transformation (dbt)
 | Skill | Description | Status |
