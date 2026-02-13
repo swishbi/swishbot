@@ -49,9 +49,12 @@ swishbot init-project --force
 ### Transformation (dbt)
 | Skill | Description | Status |
 |-------|-------------|--------|
+| `dbt-style` | Cross-cutting dbt style, naming, and project structure conventions | :x: |
 | `dbt-staging` | Building the staging/bronze layer | :x: |
+| `dbt-staging-model` | Conventions for writing a dbt staging model SQL file | :x: |
 | `dbt-intermediate` | Building the intermediate/silver layer | :x: |
 | `dbt-marts` | Building the mart/gold layer | :x: |
+| `dbt-mcp` | Configure and use the dbt MCP server with Claude | :x: |
 
 ### Modeling & Security
 | Skill | Description | Status |
@@ -90,11 +93,19 @@ swishbot/
 │           │   └── SKILL.md
 │           ├── dlt-pipelines/
 │           │   └── SKILL.md
-│           ├── dbt-staging/
+│           ├── dbt-style/
 │           │   └── SKILL.md
+│           ├── dbt-staging/
+│           │   ├── SKILL.md
+│           │   └── examples/
+│           ├── dbt-staging-model/
+│           │   ├── SKILL.md
+│           │   └── examples/
 │           ├── dbt-intermediate/
 │           │   └── SKILL.md
 │           ├── dbt-marts/
+│           │   └── SKILL.md
+│           ├── dbt-mcp/
 │           │   └── SKILL.md
 │           ├── dimensional-modeling/
 │           │   └── SKILL.md

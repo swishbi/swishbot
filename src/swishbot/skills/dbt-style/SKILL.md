@@ -1,0 +1,253 @@
+---
+name: dbt-style
+description: "Cross-cutting dbt style, naming, and project structure conventions. Use as the foundational reference for all dbt work — SQL formatting, model naming, folder organization, and materialization strategy. References official dbt best practices."
+---
+
+# dbt Style & Structure
+
+## Overview
+
+This skill defines the foundational conventions for all dbt work. It covers project structure, naming, SQL style, Jinja style, and YAML style. Rather than duplicating dbt's official guidance, this skill **references the authoritative sources** and layers on opinionated defaults for consistency.
+
+Install this skill alongside any layer-specific skill (`dbt-staging`, `dbt-intermediate`, `dbt-marts`). It provides the "how things should look and where things go" foundation that layer skills build on.
+
+## Authoritative References
+
+These are the official dbt best practice guides. **Read and follow these** — they are the source of truth:
+
+| Topic | URL |
+|-------|-----|
+| Best practices hub | https://docs.getdbt.com/best-practices |
+| How we structure dbt projects | https://docs.getdbt.com/best-practices/how-we-structure/1-guide-overview |
+| How we style dbt projects | https://docs.getdbt.com/best-practices/how-we-style/0-how-we-style-our-dbt-projects |
+| SQL style guide | https://docs.getdbt.com/best-practices/how-we-style/2-how-we-style-our-sql |
+| Jinja style guide | https://docs.getdbt.com/best-practices/how-we-style/4-how-we-style-our-jinja |
+| YAML style guide | https://docs.getdbt.com/best-practices/how-we-style/5-how-we-style-our-yaml |
+| Materialization best practices | https://docs.getdbt.com/best-practices/materializations/1-guide-overview |
+
+If the dbt MCP server is available, use its Discovery tools (`get_model_details`, `get_lineage`, `get_all_models`) to understand the existing project before making changes.
+
+## Project Structure
+
+dbt's structure guide defines three primary layers. Data flows from **source-conformed** (shaped by external systems) to **business-conformed** (shaped by business needs).
+
+Reference: https://docs.getdbt.com/best-practices/how-we-structure/1-guide-overview
+
+### Folder Layout
+
+```
+models/
+├── staging/                 # 1:1 with source tables, organized by source system
+│   ├── <source_name>/
+│   │   ├── _<source_name>__sources.yml
+│   │   ├── _<source_name>__models.yml
+│   │   ├── stg_<source_name>__<entity>.sql
+│   │   └── stg_<source_name>__<entity>.yml
+│   └── ...
+├── intermediate/            # Purpose-built transforms, organized by business concern
+│   ├── <business_area>/
+│   │   └── int_<entity>s_<verb>ed.sql
+│   └── ...
+└── marts/                   # Business-facing models, organized by department
+    ├── <department>/
+    │   ├── _<department>__models.yml
+    │   └── <entity>.sql
+    └── ...
+```
+
+### Layer Summary
+
+| Layer | Naming | Organized By | Materialization | Exposed to Users |
+|-------|--------|-------------|-----------------|-----------------|
+| **Staging** | `stg_<source>__<entity>` | Source system | `view` | No |
+| **Intermediate** | `int_<entity>s_<verb>ed` | Business concern | `ephemeral` | No |
+| **Marts** | `<entity>` (plain name) | Department | `table` / `incremental` | Yes |
+
+Reference: https://docs.getdbt.com/best-practices/how-we-structure/1-guide-overview
+
+### Materialization Strategy
+
+Configure at the directory level in `dbt_project.yml`:
+
+```yaml
+models:
+  staging:
+    +materialized: view
+  intermediate:
+    +materialized: ephemeral
+  marts:
+    +materialized: table
+    finance:
+      +schema: finance
+    marketing:
+      +schema: marketing
+```
+
+Reference: https://docs.getdbt.com/best-practices/materializations/1-guide-overview
+
+## Naming Conventions
+
+Reference: https://docs.getdbt.com/best-practices/how-we-style/1-how-we-style-our-dbt-models
+
+### Models
+
+- Use `snake_case` for all schema, table, and column names
+- Pluralize model names: `customers`, `orders`, `payments`
+- Use the double-underscore convention to separate source from entity: `stg_stripe__payments`
+- Drop the double underscore at business-conformed layers (intermediate and marts)
+- Do not abbreviate: `customers` not `cust`, `transactions` not `txn`
+- Do not use reserved words as column names
+
+### Columns
+
+- **Primary keys**: `<object>_id` (e.g., `account_id`), string data type
+- **Booleans**: prefix with `is_` or `has_` (e.g., `is_active`, `has_subscription`)
+- **Timestamps**: `<event>_at` in UTC (e.g., `created_at`, `updated_at`, `deleted_at`)
+- **Dates**: `<event>_date` (e.g., `created_date`)
+- **Currency**: decimal format (19.99); suffix for alternates (`price_in_cents`)
+- Use past tense for event descriptors: `created`, `updated`, `deleted`
+- Convert camelCase source fields to snake_case
+
+### Files
+
+- YAML config per folder: `_<directory>__models.yml`, `_<directory>__sources.yml`
+- Leading underscore sorts YAML to top of each folder
+- One `.yml` file per `.sql` model (or one per folder for small projects)
+- Docs blocks: `_<directory>__docs.md`
+
+## SQL Style
+
+Reference: https://docs.getdbt.com/best-practices/how-we-style/2-how-we-style-our-sql
+
+### Formatting
+
+- **4-space indentation** (no tabs)
+- **Lowercase** for SQL keywords, field names, and function names
+- Trailing commas
+- Use explicit `as` keyword for all aliases
+- Prefix column names with the model/CTE name when joining multiple tables
+
+### CTEs
+
+CTEs are the primary pattern for organizing dbt SQL. Every model should use CTEs rather than subqueries.
+
+```sql
+with
+
+source as (
+    select * from {{ source('stripe', 'payments') }}
+),
+
+renamed as (
+    select
+        id as payment_id,
+        amount / 100.0 as amount,
+        created::timestamp_ltz as created_at
+    from source
+)
+
+select * from renamed
+```
+
+**Import CTEs** go at the top — one per `{{ ref() }}` or `{{ source() }}`:
+
+```sql
+with
+
+orders as (
+    select * from {{ ref('stg_jaffle_shop__orders') }}
+),
+
+payments as (
+    select * from {{ ref('stg_stripe__payments') }}
+),
+
+...
+```
+
+### Joins
+
+- Always use explicit join types: `inner join`, `left join` (never bare `join`)
+- Always move left to right: prefer `left join` over `right join`
+- Avoid table aliases, especially initialisms — use the full CTE/model name
+- Prefix all column references with the source name when joining
+
+### Aggregation
+
+- Execute aggregations as early as possible on the smallest dataset
+- Place fields before aggregates and window functions in the select
+- Prefer `group by 1, 2` over listing column names
+
+### Other SQL Conventions
+
+- Prefer `union all` over `union` unless deduplication is required
+- Use Jinja comments (`{# #}`) for SQL that should not compile
+- Use `coalesce` over `ifnull` or `nvl` for portability
+
+## Jinja Style
+
+Reference: https://docs.getdbt.com/best-practices/how-we-style/4-how-we-style-our-jinja
+
+- Spaces inside delimiters: `{{ this }}` not `{{this}}`
+- 4-space indentation inside Jinja blocks
+- Newlines to separate distinct logical sections
+- Do not over-optimize whitespace control (`{%-` / `-%}`); prioritize readability
+
+```jinja
+{% macro cents_to_dollars(column_name, decimal_places=2) %}
+    round({{ column_name }} / 100.0, {{ decimal_places }})
+{% endmacro %}
+```
+
+## YAML Style
+
+Reference: https://docs.getdbt.com/best-practices/how-we-style/5-how-we-style-our-yaml
+
+- **2-space indentation**
+- List syntax for single items: `['other_user']`
+- Separate complex dictionary items with blank lines for readability
+- Use the dbt JSON schema with your IDE for validation
+
+## YAML Configuration
+
+### Source YAML
+
+Every source system must have a corresponding source YAML with:
+- Dynamic database/schema references using Jinja vars
+- Description for the source and each table
+- Primary key tests (`not_null`, `unique`) on each table
+
+### Model YAML
+
+Every model must have a corresponding YAML file with at minimum:
+- Model description
+- Column-level descriptions for key business columns (progressive enrichment)
+
+## Linting & Formatting
+
+- **SQLFluff** for SQL linting (dbt templater) — or use the style conventions above when SQLFluff is not configured
+- **Prettier** for YAML formatting
+- **Ruff/Black** for Python model formatting
+
+## Anti-Patterns
+
+- **Monolithic YAML**: Do not put all models/sources in a single `schema.yml`. Split by folder.
+- **Abbreviations**: Do not abbreviate table or column names.
+- **Subqueries**: Use CTEs instead of nested subqueries.
+- **`select *` in non-staging models**: Explicitly list columns in intermediate and mart models.
+- **Right joins**: Rewrite as left joins for readability.
+- **Bare `join`**: Always specify `inner join`, `left join`, etc.
+- **Time dimensions in model names**: Use `orders` not `orders_per_day`. Use metrics for time-based aggregation.
+- **Department-specific variants**: Do not create `finance_orders` and `marketing_orders`. Build one `orders` mart.
+
+## Related Skills
+
+- **[dbt-staging](../dbt-staging/SKILL.md)** — Staging layer workflow (Step 1-11)
+- **[dbt-staging-model](../dbt-staging-model/SKILL.md)** — Staging model SQL conventions
+- **[dbt-intermediate](../dbt-intermediate/SKILL.md)** — Intermediate layer methodology
+- **[dbt-marts](../dbt-marts/SKILL.md)** — Mart layer methodology
+- **[dbt-mcp](../dbt-mcp/SKILL.md)** — dbt MCP server setup and tool usage
+
+---
+
+*Copyright (c) 2026 Swish BI Limited. All rights reserved.*

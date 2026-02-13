@@ -1,3 +1,8 @@
+---
+name: dbt-staging-model
+description: "Conventions for writing a dbt staging model SQL file. Covers SQL structure, column casting, naming, ordering, and dlt metadata handling."
+---
+
 # dbt-staging-model
 
 Conventions for writing a dbt staging model SQL file. Covers SQL structure, column casting, naming, ordering, and dlt metadata handling.
@@ -179,3 +184,13 @@ attributes:options as options,
 ### Full Example
 
 See [examples/stg_source__entities.sql](examples/stg_source__entities.sql) for a complete staging model with all column groups.
+
+## Related Skills
+
+- **[dbt-style](../dbt-style/SKILL.md)** — Foundational naming, SQL style, and structure conventions
+- **[dbt-staging](../dbt-staging/SKILL.md)** — Full staging workflow (Step 1-11) that uses this skill for model creation
+- **[dbt-mcp](../dbt-mcp/SKILL.md)** — Use `compile` to verify Jinja rendering, `show` to preview results
+
+---
+
+*Copyright (c) 2026 Swish BI Limited. All rights reserved.*

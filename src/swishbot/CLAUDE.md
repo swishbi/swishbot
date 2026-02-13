@@ -11,9 +11,12 @@ This project uses [swishbot](https://github.com/swishbi/swishbot) skills to guid
 
 | Skill | Description | Status |
 |-------|-------------|--------|
+| dbt-style | Cross-cutting dbt style, naming, and project structure conventions | :x: |
 | dbt-staging | Building the staging/bronze layer | :x: |
+| dbt-staging-model | Conventions for writing a dbt staging model SQL file | :x: |
 | dbt-intermediate | Building the intermediate/silver layer | :x: |
 | dbt-marts | Building the mart/gold layer | :x: |
+| dbt-mcp | Configure and use the dbt MCP server with Claude | :x: |
 | dlt-pipelines | Writing dlt/Python ingestion pipelines | :x: |
 | iac-terraform | Deploying infrastructure using Terraform/IaC | :x: |
 | dimensional-modeling | Dimensional modeling best practices | :x: |

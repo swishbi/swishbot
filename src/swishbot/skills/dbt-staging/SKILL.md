@@ -9,7 +9,7 @@ description: "Build the staging/bronze layer in dbt. Use when a source system ne
 
 The staging layer is the first transformation layer in dbt. It sits directly on top of raw source data and provides a clean, consistently shaped interface for downstream models. Stage a new source system in dbt using the codegen package. This skill walks through generating source YAML, creating base staging models, and transforming them to follow project conventions.
 
-[TODO: Replace this with your actual staging skill content — you mentioned this one is already working well after 2-3 iterations. Paste that SKILL.md content here.]
+Official reference: https://docs.getdbt.com/best-practices/how-we-structure/2-staging
 
 ## Prerequisites
 
@@ -399,6 +399,13 @@ cd transformation && dbt build --select staging.<source_name>
 See [examples/](examples/) for reference files:
 - `_source__sources.yml` - Source YAML with SCD2 tests
 - `stg_source__entities.sql` - Staging model with full conventions
+
+## Related Skills
+
+- **[dbt-style](../dbt-style/SKILL.md)** — Foundational naming, SQL style, and structure conventions
+- **[dbt-staging-model](../dbt-staging-model/SKILL.md)** — Detailed SQL conventions for staging model files
+- **[dbt-intermediate](../dbt-intermediate/SKILL.md)** — The downstream layer consuming staging models
+- **[dbt-mcp](../dbt-mcp/SKILL.md)** — Use `generate_source` and `generate_staging_model` MCP tools to scaffold boilerplate
 
 ---
 
