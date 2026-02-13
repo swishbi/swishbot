@@ -24,7 +24,7 @@ This project uses [swishbot](https://github.com/swishbi/swishbot) skills to guid
 ### Ingestion
 | Skill | Description | Status |
 |-------|-------------|--------|
-| dlt-pipelines | Writing dlt/Python ingestion pipelines | :x: |
+| dlt-pipelines | Writing dlt/Python ingestion pipelines | :white_check_mark: |
 
 ### Transformation (dbt)
 | Skill | Description | Status |

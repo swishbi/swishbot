@@ -426,6 +426,7 @@ See [examples/](examples/) for reference files:
 - **[dbt-staging-model](../dbt-staging-model/SKILL.md)** — Detailed SQL conventions for staging model files
 - **[dbt-intermediate](../dbt-intermediate/SKILL.md)** — The downstream layer consuming staging models
 - **[dbt-mcp](../dbt-mcp/SKILL.md)** — Use `show` to inspect source data and preview model results
+- **[dlt-pipelines](../dlt-pipelines/SKILL.md)** — Build dlt ingestion pipelines that feed into staging models
 
 ---
 
