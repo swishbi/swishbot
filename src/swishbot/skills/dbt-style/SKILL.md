@@ -178,6 +178,72 @@ payments as (
 - Place fields before aggregates and window functions in the select
 - Prefer `group by 1, 2` over listing column names
 
+### Column Selection
+
+Prefer `dbt_utils.star()` over explicit column lists in intermediate and mart models. This reduces maintenance — adding a new attribute at the staging layer flows through automatically without touching every downstream model.
+
+```sql
+-- Preferred: dynamic column selection
+select
+    {{ dbt_utils.generate_surrogate_key(['product_id']) }} as product_key,
+    {{ dbt_utils.star(from=ref('stg_shopify__products'), relation_alias='products', except=[]) }}
+from products
+```
+
+Use the `except` parameter to explicitly exclude columns you do not want to expose:
+
+```sql
+{{ dbt_utils.star(from=ref('stg_crm__customers'), relation_alias='customers', except=['_dlt_load_id', '_dlt_id']) }}
+```
+
+When using `dbt_utils.star()`:
+
+- Always pass `relation_alias` when the CTE name differs from the ref, or when joining multiple models
+- Use `except` to drop internal/metadata columns that should not propagate downstream
+- The YAML schema file is the column contract with downstream consumers — not the SQL `select` list
+- For models with [dbt contracts](https://docs.getdbt.com/docs/collaborate/govern/model-contracts) enabled, the contract enforces the column list at build time regardless of `star()`
+
+`dbt_utils.get_filtered_columns_in_relation` is the companion macro for when you need column names as a list (e.g., for `generate_surrogate_key` to build a `hash_diff`):
+
+```sql
+{%- set column_names = dbt_utils.get_filtered_columns_in_relation(from=ref('stg_shopify__products'), except=[]) %}
+{{ dbt_utils.generate_surrogate_key(column_names) }} as hash_diff
+```
+
+### Cross-Database Macros
+
+Use cross-database macros to keep models portable across warehouse platforms. Two sources are available:
+
+**dbt native macros** ([reference](https://docs.getdbt.com/reference/dbt-jinja-functions/cross-database-macros)):
+
+Use dbt's built-in type macros for casting, as these resolve to the correct data type per platform:
+
+```sql
+-- Preferred: explicit cast with type macro
+cast(column_name as {{ dbt.type_string() }})
+cast(column_name as {{ dbt.type_int() }})
+cast(column_name as {{ dbt.type_timestamp() }})
+cast(null as {{ dbt.type_numeric() }})
+```
+
+Prefer `cast(... as {{ type_macro }})` over `{{ dbt.cast() }}` — the `cast` function syntax is universal across platforms and more readable. The `type_*` macros handle the platform differences (e.g., `string` vs `varchar` vs `text`).
+
+Other useful dbt native macros: `dbt.concat()`, `dbt.date_trunc()`, `dbt.datediff()`, `dbt.safe_cast()`, `dbt.bool_or()`.
+
+**dbt_utils macros** ([reference](https://hub.getdbt.com/dbt-labs/dbt_utils/latest/)):
+
+Use `dbt_utils` for common operations that vary across platforms:
+
+| Macro | Use Instead Of |
+|-------|---------------|
+| `dbt_utils.safe_divide(numerator, denominator)` | `numerator / nullif(denominator, 0)` |
+| `dbt_utils.generate_surrogate_key([...])` | Platform-specific hashing |
+| `dbt_utils.star(from=ref(...))` | Explicit column lists |
+| `dbt_utils.pivot(...)` | Manual `case when` pivoting |
+| `dbt_utils.date_spine(...)` | Recursive CTEs for date generation |
+
+When in doubt, check if a dbt or dbt_utils macro exists before writing platform-specific SQL.
+
 ### Other SQL Conventions
 
 - Prefer `union all` over `union` unless deduplication is required
@@ -234,7 +300,8 @@ Every model must have a corresponding YAML file with at minimum:
 - **Monolithic YAML**: Do not put all models/sources in a single `schema.yml`. Split by folder.
 - **Abbreviations**: Do not abbreviate table or column names.
 - **Subqueries**: Use CTEs instead of nested subqueries.
-- **`select *` in non-staging models**: Explicitly list columns in intermediate and mart models.
+- **`select *` in non-staging models**: Use `dbt_utils.star()` instead of bare `select *` — it is explicit about the source relation and supports `except` for column exclusion. Bare `select *` hides where columns originate; `star()` makes it traceable.
+- **Platform-specific SQL when a cross-database macro exists**: Use `dbt_utils.safe_divide()` not `nullif` patterns, `dbt.type_string()` not `varchar`, etc.
 - **Right joins**: Rewrite as left joins for readability.
 - **Bare `join`**: Always specify `inner join`, `left join`, etc.
 - **Time dimensions in model names**: Use `orders` not `orders_per_day`. Use metrics for time-based aggregation.
