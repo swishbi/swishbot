@@ -24,6 +24,7 @@ description: "Design analytics reference architectures. Use when planning the ov
 ## Related Skills
 
 - **[requirements-discovery](../requirements-discovery/SKILL.md)** — Upstream discovery process that may reveal infrastructure gaps
+- **[dba-security](../dba-security/SKILL.md)** — Security roles, database separation, and access controls for the warehouse
 
 ---
 

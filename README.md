@@ -44,7 +44,7 @@ swishbot init-project --force
 | Skill | Description | Status |
 |-------|-------------|--------|
 | `analytics-architecture` | Analytics reference architecture | :x: |
-| `dba-security` | DBA security practices | :x: |
+| `dba-security` | DBA security practices | :white_check_mark: |
 | `iac-terraform` | Deploying infrastructure using Terraform/IaC | :x: |
 
 ### Ingestion
@@ -114,7 +114,8 @@ swishbot/
 │           ├── dimensional-modeling/
 │           │   └── SKILL.md
 │           ├── dba-security/
-│           │   └── SKILL.md
+│           │   ├── SKILL.md
+│           │   └── examples/
 │           ├── analytics-architecture/
 │           │   └── SKILL.md
 │           ├── semantic-layer/

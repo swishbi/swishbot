@@ -19,7 +19,7 @@ This project uses [swishbot](https://github.com/swishbi/swishbot) skills to guid
 | Skill | Description | Status |
 |-------|-------------|--------|
 | analytics-architecture | Analytics reference architecture | :x: |
-| dba-security | DBA security practices | :x: |
+| dba-security | DBA security practices | :white_check_mark: |
 | iac-terraform | Deploying infrastructure using Terraform/IaC | :x: |
 
 ### Ingestion
