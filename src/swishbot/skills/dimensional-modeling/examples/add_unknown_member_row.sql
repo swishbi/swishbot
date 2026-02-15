@@ -26,7 +26,6 @@
                 '{{ unknown_label }}' as {{ column.name }}
 
             {%- elif 'int' in dtype
-                or 'num' in dtype
                 or 'long' in dtype
                 or 'short' in dtype
                 or 'byte' in dtype
