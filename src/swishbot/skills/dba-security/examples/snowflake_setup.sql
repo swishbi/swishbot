@@ -178,6 +178,7 @@ grant create schema on database RAW_DEV to role LOADER;
 grant usage on database RAW to role DEVELOPER;
 grant usage on database RAW_DEV to role DEVELOPER;
 grant usage on database ANALYTICS_DEV to role DEVELOPER;
+grant usage on database ANALYTICS to role DEVELOPER;
 grant usage on database ANALYTICS to role ANALYST;
 grant create schema on database ANALYTICS_DEV to role DEVELOPER;
 
