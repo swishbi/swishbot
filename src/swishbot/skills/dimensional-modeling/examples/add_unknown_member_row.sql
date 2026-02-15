@@ -5,7 +5,7 @@
 --   vars:
 --     unknown_member_label: '*Unknown*'
 
-{% macro add_unknown_member_row(model_name, unknown_label) %}
+{% macro add_unknown_member_row(model_name, unknown_label=none) %}
 
     {# Default the label from a project variable if not passed explicitly #}
     {%- set unknown_label = unknown_label or var('unknown_member_label', '*Unknown*') -%}
