@@ -1,60 +1,93 @@
 /*
 Postgres Environment Setup
 ===========================
-This script sets up roles, schemas, and grants for a Postgres data warehouse.
+This script sets up roles, users, and database-level grants for a Postgres
+data warehouse. All schemas live in a single database (Postgres does not
+support cross-database queries, so dbt cannot reference a separate raw database).
 
 Postgres limitations:
   - No cross-database queries — all schemas live in a single database
-  - No future grants — must re-run grants when new tables are created
-    (use default privileges to approximate future grants)
+  - No future grants on schemas — use ALTER DEFAULT PRIVILEGES to approximate
   - No dedicated compute per role — all roles share the same server
+  - No key-pair auth — service users use passwords (rotate regularly)
 
-The schema naming convention encodes the layer separation that Snowflake
-achieves with separate databases:
-  - raw_<source>   → raw layer (one schema per source system)
-  - staging        → staging/bronze layer
-  - intermediate   → intermediate/silver layer
-  - marts          → marts/gold layer
+No schemas are created in this script — they are all created at runtime:
+  - Raw schemas: created by the ingestion tool (dlt, Fivetran, etc.)
+    using the naming convention raw_<source> (e.g., raw_hubspot, raw_stripe)
+  - Analytics schemas: created by dbt (staging, intermediate, marts, etc.)
+  - Developer schemas: created by dbt (dbt_jsmith, etc.)
+
+The order of operations problem:
+  Postgres has no equivalent of Snowflake's future grants on schemas. You can't
+  grant USAGE ON SCHEMA before the schema exists. This script uses two strategies:
+
+  1. ALTER DEFAULT PRIVILEGES (without IN SCHEMA) — applies to all future tables
+     created by a role in ANY schema. Handles SELECT grants automatically.
+
+  2. dbt's on-run-end hook (grant_usage_on_schemas_where_select) — grants USAGE
+     on schemas after dbt creates them. Handles schema-level access at runtime.
+
+  Together, these cover the gap: DEFAULT PRIVILEGES handles table-level SELECT,
+  and the on-run-end hook handles schema-level USAGE.
+
+Ownership note:
+  In Postgres, the role that creates an object owns it. A role can only DROP
+  objects it owns. This is not an issue with the environment separation model:
+  - Developer creates schemas in analytics_dev → developer owns them
+  - Automation creates schemas in analytics → automation owns them
+  The roles never cross paths in the same schema, so ownership stays clean.
 
 Sections:
-  1. Roles
-  2. Role hierarchy
-  3. Schemas
-  4. Schema grants
-  5. Default privileges (approximates future grants)
-  6. Developer schema creation
+  1. Roles (group roles)
+  2. Users (login roles)
+  3. Role hierarchy
+  4. Database grants
+  5. Default privileges
 */
 
 
 -- ============================================================================
--- 1. Roles
+-- 1. Roles (Group Roles)
 -- ============================================================================
--- Postgres roles double as both users and groups.
--- NOLOGIN roles act as groups; LOGIN roles act as service/human users.
+-- NOLOGIN roles act as permission groups. Human users and service users
+-- are granted these roles to inherit their permissions.
 
--- Group roles (no login)
-CREATE ROLE analyst NOLOGIN;
-COMMENT ON ROLE analyst IS 'Analyst role — read access to marts schemas.';
+CREATE ROLE analyst;
+COMMENT ON ROLE analyst IS 'Analyst role — read access to analytics marts.';
 
-CREATE ROLE developer NOLOGIN;
+CREATE ROLE developer;
 COMMENT ON ROLE developer IS 'Developer role — read raw and analytics, write dev schemas.';
 
-CREATE ROLE automation NOLOGIN;
+CREATE ROLE automation;
 COMMENT ON ROLE automation IS 'Automation role — read raw, write all analytics schemas.';
 
-CREATE ROLE loader NOLOGIN;
+CREATE ROLE loader;
 COMMENT ON ROLE loader IS 'Loader role — read/write raw schemas.';
-
--- Service users (login)
-CREATE ROLE loader_svc LOGIN;
-COMMENT ON ROLE loader_svc IS 'Service user for data loading (dlt, Fivetran, etc).';
-
-CREATE ROLE automation_svc LOGIN;
-COMMENT ON ROLE automation_svc IS 'Service user for dbt CI/CD automation.';
 
 
 -- ============================================================================
--- 2. Role Hierarchy
+-- 2. Users (Login Roles)
+-- ============================================================================
+-- CREATE USER is equivalent to CREATE ROLE with LOGIN.
+-- Change passwords immediately after running this script.
+
+CREATE USER loader_user WITH PASSWORD 'changeme';
+CREATE USER automation_user WITH PASSWORD 'changeme';
+
+-- ALTER USER loader_user WITH PASSWORD '<secure password>';
+-- ALTER USER automation_user WITH PASSWORD '<secure password>';
+
+-- Grant group roles to service users
+GRANT loader TO loader_user;
+GRANT automation TO automation_user;
+
+-- Human developers get the developer role
+-- CREATE USER jsmith WITH PASSWORD '...';
+-- GRANT developer TO jsmith;
+
+
+-- ============================================================================
+-- 3. Role Hierarchy
 -- ============================================================================
 -- Analyst < Developer < Automation (with inheritance)
 -- Loader is standalone
@@ -62,112 +95,47 @@ COMMENT ON ROLE automation_svc IS 'Service user for dbt CI/CD automation.';
 GRANT analyst TO developer;
 GRANT developer TO automation;
 
--- Assign group roles to service users
-GRANT loader TO loader_svc;
-GRANT automation TO automation_svc;
-
--- Human developers get the developer role
--- GRANT developer TO <username>;
-
 
 -- ============================================================================
--- 3. Schemas
+-- 4. Database Grants
 -- ============================================================================
--- Raw layer: one schema per source system
--- Transformed layers: one schema per layer
--- Dev schemas: created per developer (see section 6)
+-- CONNECT controls who can connect to the database.
+-- CREATE controls who can create schemas at runtime.
+-- The loader creates raw schemas; automation creates analytics schemas;
+-- developers create their own dbt_<name> schemas.
 
--- Raw schemas are NOT created here — the ingestion tool (dlt, Fivetran, etc.)
--- creates them at runtime using the loader role's CREATE permission.
--- In Postgres, raw schemas use the naming convention: raw_<source>
--- (e.g., raw_hubspot, raw_stripe)
+GRANT CONNECT ON DATABASE current_database TO loader;
+GRANT CONNECT ON DATABASE current_database TO developer;
+GRANT CONNECT ON DATABASE current_database TO analyst;
 
--- Analytics schemas
-CREATE SCHEMA IF NOT EXISTS staging;
-CREATE SCHEMA IF NOT EXISTS intermediate;
-CREATE SCHEMA IF NOT EXISTS marts;
-
--- Dev schema (shared development space)
-CREATE SCHEMA IF NOT EXISTS dev;
-
-
--- ============================================================================
--- 4. Schema Grants
--- ============================================================================
-
--- Loader: create schemas in the database (raw schemas created by ingestion tool)
--- In Postgres, there is no CREATE SCHEMA ON DATABASE — the loader role must own
--- or have the CREATEDB privilege, or you grant schema creation via:
 GRANT CREATE ON DATABASE current_database TO loader;
+GRANT CREATE ON DATABASE current_database TO developer;
+GRANT CREATE ON DATABASE current_database TO automation;
 
--- NOTE: After the loader creates a raw schema (e.g., raw_hubspot), you must grant
--- read access to the developer role. This can be scripted or run manually:
+
+-- ============================================================================
+-- 5. Default Privileges
+-- ============================================================================
+-- ALTER DEFAULT PRIVILEGES without IN SCHEMA applies to ALL future tables
+-- created by the specified role, regardless of which schema they're in.
+-- This is Postgres's closest equivalent to Snowflake's future grants.
 --
---   GRANT USAGE ON SCHEMA raw_<source> TO developer;
---   GRANT SELECT ON ALL TABLES IN SCHEMA raw_<source> TO developer;
---   ALTER DEFAULT PRIVILEGES FOR ROLE loader IN SCHEMA raw_<source>
---     GRANT SELECT ON TABLES TO developer;
+-- Schema-level USAGE grants cannot be set in advance — those are handled
+-- by dbt's grant_usage_on_schemas_where_select on-run-end hook.
 
--- Developer: read all analytics schemas
-GRANT USAGE ON SCHEMA staging TO developer;
-GRANT SELECT ON ALL TABLES IN SCHEMA staging TO developer;
-GRANT USAGE ON SCHEMA intermediate TO developer;
-GRANT SELECT ON ALL TABLES IN SCHEMA intermediate TO developer;
-GRANT USAGE ON SCHEMA marts TO developer;
-GRANT SELECT ON ALL TABLES IN SCHEMA marts TO developer;
-
--- Developer: read/write dev schema
-GRANT USAGE, CREATE ON SCHEMA dev TO developer;
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA dev TO developer;
-
--- Analyst: read marts only
-GRANT USAGE ON SCHEMA marts TO analyst;
-GRANT SELECT ON ALL TABLES IN SCHEMA marts TO analyst;
-
--- Automation: read/write all analytics schemas
-GRANT USAGE, CREATE ON SCHEMA staging TO automation;
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA staging TO automation;
-GRANT USAGE, CREATE ON SCHEMA intermediate TO automation;
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA intermediate TO automation;
-GRANT USAGE, CREATE ON SCHEMA marts TO automation;
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA marts TO automation;
-
-
--- ============================================================================
--- 5. Default Privileges (approximates future grants)
--- ============================================================================
--- Default privileges apply to objects created by a specific role in the future.
--- Run these for each role that creates objects so that other roles can read them.
-
--- NOTE: Default privileges for raw schemas must be set after the loader
--- creates each schema. See the grant notes in section 4 above.
-
--- Tables created by automation in analytics schemas are readable by developer
-ALTER DEFAULT PRIVILEGES FOR ROLE automation IN SCHEMA staging
-  GRANT SELECT ON TABLES TO developer;
-ALTER DEFAULT PRIVILEGES FOR ROLE automation IN SCHEMA intermediate
-  GRANT SELECT ON TABLES TO developer;
-ALTER DEFAULT PRIVILEGES FOR ROLE automation IN SCHEMA marts
+-- Tables created by loader (in any schema) are readable by developer
+ALTER DEFAULT PRIVILEGES FOR ROLE loader
   GRANT SELECT ON TABLES TO developer;
 
--- Tables created by automation in marts are readable by analyst
-ALTER DEFAULT PRIVILEGES FOR ROLE automation IN SCHEMA marts
-  GRANT SELECT ON TABLES TO analyst;
-
--- Tables created by developer in dev schema are readable by other developers
-ALTER DEFAULT PRIVILEGES FOR ROLE developer IN SCHEMA dev
+-- Tables created by automation (in any schema) are readable by developer
+ALTER DEFAULT PRIVILEGES FOR ROLE automation
   GRANT SELECT ON TABLES TO developer;
 
+-- Tables created by developer (in any schema) are readable by other developers
+ALTER DEFAULT PRIVILEGES FOR ROLE developer
+  GRANT SELECT ON TABLES TO developer;
 
--- ============================================================================
--- 6. Developer Schema Creation
--- ============================================================================
--- In Postgres, developers share the `dev` schema rather than creating
--- individual schemas (dbt_jsmith, etc). If you prefer per-developer schemas,
--- create them manually and grant accordingly:
---
--- CREATE SCHEMA dbt_jsmith;
--- GRANT USAGE, CREATE ON SCHEMA dbt_jsmith TO developer;
--- GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA dbt_jsmith TO developer;
--- ALTER DEFAULT PRIVILEGES FOR ROLE developer IN SCHEMA dbt_jsmith
---   GRANT SELECT ON TABLES TO developer;
+-- Analyst grants are NOT set here — they are managed by dbt's +grants config
+-- which grants SELECT only on marts models, and the on-run-end hook which
+-- grants USAGE on the marts schema. This keeps analyst access scoped to
+-- exactly the models that dbt declares, rather than broad database-level access.

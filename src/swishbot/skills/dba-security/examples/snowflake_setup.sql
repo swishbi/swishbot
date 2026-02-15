@@ -148,11 +148,8 @@ create or replace database ANALYTICS
 create or replace database ANALYTICS_DEV
   comment = 'Contains development schemas for transformed data.';
 
--- Uncomment if using CI databases:
--- create or replace database RAW_CI
---   comment = 'Raw data for CI environment.';
--- create or replace database ANALYTICS_CI
---   comment = 'Transformed data for CI environment.';
+create or replace database ANALYTICS_CI
+  comment = 'Transformed data for CI environment. CI reads raw from production.';
 
 
 -- ============================================================================
@@ -184,17 +181,23 @@ grant usage on database ANALYTICS_DEV to role DEVELOPER;
 grant usage on database ANALYTICS to role ANALYST;
 grant create schema on database ANALYTICS_DEV to role DEVELOPER;
 
--- Automation: write analytics (prod)
+-- Automation: write analytics (prod and CI)
 grant create schema on database ANALYTICS to role AUTOMATION;
+grant usage on database ANALYTICS_CI to role AUTOMATION;
+grant create schema on database ANALYTICS_CI to role AUTOMATION;
 
 
 -- ============================================================================
 -- 9. Future Grants
 -- ============================================================================
 -- Future grants ensure new schemas and tables automatically inherit permissions.
--- Raw schemas are NOT created here — the ingestion tool (dlt, Fivetran, etc.)
--- creates them at runtime using the loader role's CREATE SCHEMA grant.
--- Schema names are determined by the ingestion tool (typically just the source name).
+-- No schemas are created in this script — they are all created at runtime:
+--   - Raw schemas: created by the ingestion tool (dlt, Fivetran, etc.)
+--   - Analytics schemas: created by dbt (staging, intermediate, marts, etc.)
+--
+-- Future grants handle the broad read access (developer can read everything).
+-- Fine-grained grants (e.g., analyst reads only marts) are handled by dbt's
+-- +grants config and the grant_usage_on_schemas_where_select on-run-end hook.
 
 -- Developer can read all raw data
 grant usage on future schemas in database RAW to role DEVELOPER;

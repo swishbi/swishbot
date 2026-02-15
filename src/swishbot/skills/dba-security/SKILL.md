@@ -40,17 +40,29 @@ On platforms that don't support cross-database queries (Postgres, DuckDB), apply
 
 ## Environment Strategy
 
-Create environment-specific databases to isolate development, CI, and production:
+Create environment-specific databases to isolate where each process **writes**. Reads flow differently — CI and development both read from production raw, avoiding the need to clone or duplicate source data.
 
-| Environment | Raw database | Analytics database | Who writes |
-|-------------|-------------|-------------------|------------|
-| **Production** | `raw` | `analytics` | Loader (raw), Automation (analytics) |
-| **CI** | `raw_ci` | `analytics_ci` | Automation only |
-| **Development** | `raw_dev` | `analytics_dev` | Loader (raw_dev), Developers (analytics_dev) |
+| Database | Purpose | Who writes | Who reads |
+|----------|---------|------------|-----------|
+| **`raw`** | Production source data | Loader | Developer, Automation |
+| **`raw_dev`** | Pipeline development sandbox | Loader (during testing) | Developer |
+| **`analytics`** | Production transformations | Automation | Developer, Analyst |
+| **`analytics_ci`** | CI test transformations | Automation | Automation |
+| **`analytics_dev`** | Developer workspaces | Developer | Developer |
 
-- **CI and production** are only touched by automation/devops processes — never by humans directly
-- **Development** gives developers write access to `analytics_dev` and read access to CI and production
+Key principles:
+
+- **No `raw_ci` database.** CI tests transformations, not ingestion — it reads source data from production `raw` and writes results to `analytics_ci`. This avoids cloning large raw datasets into CI.
+- **`raw_dev` is ephemeral.** It exists for testing new pipelines during development. Once a pipeline is promoted to production, the `raw_dev` data for that source is stale and disposable.
+- **CI and production analytics** are only touched by automation — never by humans directly
+- **Development** gives developers write access to `analytics_dev` and read access to production `raw` and `analytics`
 - **dbt developer schemas** live in `analytics_dev` using the pattern `dbt_<first-initial><lastname>` (e.g., `dbt_jsmith`). Developers can create their own schemas and read other developer schemas
+
+### Source Promotion Workflow
+
+1. **Pipeline development** — Loader writes test extractions to `raw_dev`. Developer builds staging models against `raw_dev` using a source database var override
+2. **First production deploy** — Run a full backfill into `raw` (prod). Remove the source database var override so dbt reads from `raw`
+3. **Ongoing transformation changes** — CI and dev both read from `raw` (prod) directly. No cloning needed — dbt profiles and source vars control which raw database is read
 
 ## Roles
 
@@ -66,19 +78,19 @@ Analyst < Developer < Automation
 
 | Role | Purpose |
 |------|---------|
-| **Loader** | Standalone role (no inheritance). Reads and writes to raw databases. Used by ingestion services (dlt, Fivetran, etc.) |
+| **Loader** | Standalone role (no inheritance). Reads and writes to raw databases (`raw`, `raw_dev`). Used by ingestion services (dlt, Fivetran, etc.) |
 | **Analyst** | Read-only access to analytics marts layer. Starting point for business users |
-| **Developer** | Inherits Analyst. Plus: read raw databases, read/write `analytics_dev`, read CI and production analytics |
-| **Automation** | Inherits Developer. Plus: read/write `analytics` (CI and production), create schemas. Used by dbt CI/CD |
+| **Developer** | Inherits Analyst. Plus: read `raw` and `raw_dev`, read/write `analytics_dev`, read production `analytics` |
+| **Automation** | Inherits Developer. Plus: read/write `analytics` and `analytics_ci`, create schemas. Used by dbt CI/CD |
 
 ### Role Permissions Summary
 
-| Role | Raw (prod) | Raw (dev) | Analytics (prod) | Analytics (dev) | Analytics (CI) |
-|------|-----------|-----------|-------------------|-----------------|----------------|
+| Role | `raw` | `raw_dev` | `analytics` | `analytics_dev` | `analytics_ci` |
+|------|-------|-----------|-------------|-----------------|----------------|
 | **Loader** | read/write | read/write | — | — | — |
 | **Analyst** | — | — | read (marts only) | — | — |
-| **Developer** | read | read | read | read/write + create schema | read |
-| **Automation** | read | read | read/write + create schema | read | read/write + create schema |
+| **Developer** | read | read | read | read/write + create schema | — |
+| **Automation** | read | — | read/write + create schema | — | read/write + create schema |
 
 ### Growing the Analyst Role
 
@@ -141,6 +153,22 @@ See [`examples/duckdb_setup.sql`](examples/duckdb_setup.sql) for a complete refe
 ## dbt Integration
 
 dbt enforces part of the security model at build time through grants, custom database/schema resolution, and on-run-end hooks. This closes the gap between warehouse-level setup scripts and the actual permissions analysts and developers experience.
+
+### Order of Operations
+
+Setup scripts and dbt have distinct responsibilities:
+
+| Responsibility | Handled by |
+|---------------|-----------|
+| Create databases/catalogs | Setup script |
+| Create roles and role hierarchy | Setup script |
+| Grant database-level access (USAGE, CREATE SCHEMA) | Setup script |
+| Grant future table-level SELECT (where supported) | Setup script (Snowflake future grants, Postgres DEFAULT PRIVILEGES) |
+| Create schemas (staging, marts, etc.) | dbt at runtime (via CREATE SCHEMA grant) |
+| Grant SELECT on specific models | dbt `+grants` config |
+| Grant USAGE on schemas | dbt `on-run-end` hook |
+
+This means setup scripts never reference specific schemas like `staging` or `marts` — those don't exist yet. The scripts only operate at the database/catalog level.
 
 ### Model-Level Grants (`+grants`)
 
@@ -224,6 +252,80 @@ This override must exist at `macros/get_custom_schema.sql`. See [`examples/get_c
 **Why:** The alias determines the final table/view name within the schema. dbt's default uses the model filename (or a custom `alias` config if provided). For versioned models, it appends `_v<version>`.
 
 **Default behaviour (no override needed):** dbt's built-in implementation is typically sufficient. Override at `macros/get_custom_alias.sql` only if you need project-specific naming conventions (e.g., adding prefixes). See [`examples/get_custom_alias.sql`](examples/get_custom_alias.sql) for the default implementation.
+
+### dbt Profiles
+
+dbt profiles are the control plane that ties the security model together. Each target sets `target.database` (where models are written), `target.schema` (the developer's namespace), and `target.name` (which the `generate_schema_name_for_env` macro uses to decide between bare and prefixed schemas).
+
+```yaml
+my_project:
+  target: dev
+  outputs:
+
+    dev:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      role: DEVELOPER
+      warehouse: DEVELOPER_WH
+      database: ANALYTICS_DEV
+      schema: dbt_jsmith          # target.schema → developer namespace
+      # ... authenticator, etc.
+
+    ci:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: AUTOMATION
+      role: AUTOMATION
+      warehouse: AUTOMATION_WH
+      database: ANALYTICS_CI
+      schema: dbt_ci              # target.schema → CI namespace
+      # ... key-pair auth
+
+    prod:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: AUTOMATION
+      role: AUTOMATION
+      warehouse: AUTOMATION_WH
+      database: ANALYTICS
+      schema: dbt_prod            # target.schema → ignored in prod by generate_schema_name_for_env
+      # ... key-pair auth
+```
+
+How the profile fields interact with the security model:
+
+| Field | Dev | CI | Prod |
+|-------|-----|-----|------|
+| `target.name` | `dev` | `ci` | `prod` |
+| `target.database` | `ANALYTICS_DEV` | `ANALYTICS_CI` | `ANALYTICS` |
+| `target.schema` | `dbt_jsmith` | `dbt_ci` | `dbt_prod` (unused) |
+| **Role** | `DEVELOPER` | `AUTOMATION` | `AUTOMATION` |
+| **Warehouse** | `DEVELOPER_WH` | `AUTOMATION_WH` | `AUTOMATION_WH` |
+| **Schema output** | `dbt_jsmith_staging` | `dbt_ci_staging` | `staging` |
+| **Sources read from** | `RAW` (or `RAW_DEV` override) | `RAW` | `RAW` |
+
+Key points:
+
+- `target.database` controls where dbt **writes** models — this is the environment split
+- `target.schema` provides the developer namespace prefix — `generate_schema_name_for_env` prepends it in non-prod environments
+- In production, `target.schema` is effectively ignored because `generate_schema_name_for_env` uses the bare `custom_schema_name` when `target.name = 'prod'`
+- Sources default to reading from `raw` (prod). During pipeline development, override per source with a dbt var:
+
+```yaml
+# dbt_project.yml (or via CLI --vars)
+vars:
+  hubspot_database: RAW_DEV   # only while developing the hubspot pipeline
+```
+
+```yaml
+# models/staging/hubspot/_hubspot__sources.yml
+sources:
+  - name: hubspot
+    database: "{{ var('hubspot_database', 'RAW') }}"
+```
+
+Once the pipeline is promoted to production, remove the var override — all environments then read from `RAW`.
 
 ## Anti-Patterns
 
