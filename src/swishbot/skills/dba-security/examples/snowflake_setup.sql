@@ -73,13 +73,11 @@ create or replace role LOADER
 
 create or replace user LOADER with
     default_role = LOADER
-    default_warehouse = LOADER_WH
     type = 'SERVICE'
     rsa_public_key = 'MIIBIjANBgkqh...';  -- replace with actual public key
 
 create or replace user AUTOMATION with
     default_role = AUTOMATION
-    default_warehouse = AUTOMATION_WH
     type = 'SERVICE'
     rsa_public_key = 'MIIBIjANBgkqh...';  -- replace with actual public key
 
