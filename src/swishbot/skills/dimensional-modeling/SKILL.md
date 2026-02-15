@@ -123,19 +123,21 @@ How this works:
 1. The `add_unknown_member_row` macro generates a `select` with one unknown row `union all select * from ref(...)` — this becomes the source CTE
 2. `dbt_utils.star()` dynamically lists all columns from the staging relation, keeping the model DRY
 3. `dbt_utils.generate_surrogate_key(column_names)` produces a `hash_diff` for change detection — the unknown row gets its own deterministic hash
-4. The surrogate key for the unknown row is a hash of the `unknown_label` value (since the macro filled the natural key column with the label string)
+4. The surrogate key for the unknown row is produced by the same `dbt_utils.generate_surrogate_key` expression as every other row; for the unknown, the macro supplies default natural-key values (for example, the `unknown_label` for string keys and `-1` for numeric keys), so the hash is deterministic and reproducible
 5. The `where valid_to is null` filter passes the unknown row through because the macro sets date columns to `null`
 
 > **Important:** The macro introspects columns via `adapter.get_columns_in_relation`, which requires the target relation to already exist in the warehouse. On a fresh `dbt run` against an empty schema, the first run materializes without the unknown row. The second run picks it up. This is acceptable for initial deployment — the unknown row is a quality feature, not a structural dependency.
 
 **Coalescing in the fact table:**
 
-Fact tables replace NULL dimension keys with the unknown member's surrogate key so NULLs never propagate. See [examples/fct_single_source.sql](examples/fct_single_source.sql) for the full pattern. The coalesce computes the same hash the dimension's unknown row has:
+Fact tables replace NULL dimension keys with the unknown member's surrogate key so NULLs never propagate. See [examples/fct_single_source.sql](examples/fct_single_source.sql) for the full pattern. The coalesce must reuse the same natural-key expression (including default values such as `-1` or the `unknown_member_label`) that the dimension uses to compute the unknown-member hash:
 
 ```sql
 coalesce(
     customers.customer_key,
-    {{ dbt_utils.generate_surrogate_key(["var('unknown_member_label', '*Unknown*')"]) }}
+    {{ dbt_utils.generate_surrogate_key([
+        "coalesce(customers.customer_natural_key, -1)"
+    ]) }}
 ) as customer_key
 ```
 
