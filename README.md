@@ -44,7 +44,7 @@ swishbot init-project --force
 | Skill | Description | Status |
 |-------|-------------|--------|
 | `analytics-architecture` | Analytics reference architecture | :x: |
-| `dba-security` | DBA security practices | :x: |
+| `dba-security` | DBA security practices | :white_check_mark: |
 | `iac-terraform` | Deploying infrastructure using Terraform/IaC | :x: |
 
 ### Ingestion
@@ -61,7 +61,7 @@ swishbot init-project --force
 | `dbt-staging` | Building the staging/bronze layer | :white_check_mark: |
 | `dbt-staging-model` | Conventions for writing a dbt staging model SQL file | :white_check_mark: |
 | `dbt-style` | Cross-cutting dbt style, naming, and project structure conventions | :white_check_mark: |
-| `dimensional-modeling` | Dimensional modeling best practices | :x: |
+| `dimensional-modeling` | Dimensional modeling best practices | :white_check_mark: |
 
 ### Analytics & Presentation
 | Skill | Description | Status |
@@ -112,9 +112,11 @@ swishbot/
 │           ├── requirements-discovery/
 │           │   └── SKILL.md
 │           ├── dimensional-modeling/
-│           │   └── SKILL.md
+│           │   ├── SKILL.md
+│           │   └── examples/
 │           ├── dba-security/
-│           │   └── SKILL.md
+│           │   ├── SKILL.md
+│           │   └── examples/
 │           ├── analytics-architecture/
 │           │   └── SKILL.md
 │           ├── semantic-layer/

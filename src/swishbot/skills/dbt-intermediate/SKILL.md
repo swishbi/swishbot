@@ -175,6 +175,7 @@ select * from pivoted
 - **[dbt-staging](../dbt-staging/SKILL.md)** — The upstream layer feeding into intermediate models
 - **[dbt-marts](../dbt-marts/SKILL.md)** — The downstream layer consuming intermediate models
 - **[dbt-mcp](../dbt-mcp/SKILL.md)** — Use `get_lineage` and `get_model_details` to understand the DAG before adding intermediate models
+- **[dimensional-modeling](../dimensional-modeling/SKILL.md)** — Design-level decisions that drive what intermediate models are needed (cross-references, grain changes)
 
 ---
 

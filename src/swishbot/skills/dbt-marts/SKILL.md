@@ -199,7 +199,7 @@ select * from final
 - **Department-specific variants** — Do not build `finance_orders` and `marketing_orders`. Build one `orders` mart and control access via schema permissions.
 - **Time dimensions in model names** — Use `orders` not `orders_per_day`. Time aggregation belongs in the semantic layer or metrics.
 - **Views for marts** — Marts should be tables or incremental. Views defeat the performance purpose.
-- **`select *`** — Always explicitly list columns in mart models. This documents the contract with downstream consumers.
+- **Bare `select *`** — Use `dbt_utils.star()` instead of bare `select *`. It is explicit about the source relation and supports `except` for column exclusion. The YAML schema file documents the contract with downstream consumers, not the SQL select list.
 - **Over-joining** — If you have 6+ joins, add intermediate models. Marts should be readable at a glance.
 - **Narrow marts** — Marts should be wide and denormalized. Do not force downstream users to join marts together.
 - **Prefixed names** — Use `customers` not `dim_customers` or `fct_orders`. The folder structure provides the context.
@@ -211,6 +211,7 @@ select * from final
 - **[dbt-intermediate](../dbt-intermediate/SKILL.md)** — The upstream layer feeding into marts
 - **[dbt-staging](../dbt-staging/SKILL.md)** — The first transformation layer
 - **[dbt-mcp](../dbt-mcp/SKILL.md)** — Use `get_lineage` to understand downstream dependencies before modifying marts
+- **[dimensional-modeling](../dimensional-modeling/SKILL.md)** — Design-level decisions for fact tables, dimension tables, grain, and conformance
 
 ---
 

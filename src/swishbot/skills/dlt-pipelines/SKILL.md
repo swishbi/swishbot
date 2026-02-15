@@ -136,6 +136,7 @@ Once data is loaded, dbt picks up from the destination. Cross-reference:
 - **[dbt-staging](../dbt-staging/SKILL.md)** — Build staging models over dlt-loaded tables
 - **[dbt-mcp](../dbt-mcp/SKILL.md)** — Explore loaded schemas from the dbt side
 - **[analytics-architecture](../analytics-architecture/SKILL.md)** — Where dlt fits in the overall platform
+- **[dba-security](../dba-security/SKILL.md)** — Loader role permissions and raw database access controls
 
 ---
 
