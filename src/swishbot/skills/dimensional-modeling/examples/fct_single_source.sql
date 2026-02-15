@@ -22,11 +22,11 @@ final as (
         {{ dbt_utils.generate_surrogate_key(['orders.order_id']) }} as order_key,
         coalesce(
             customers.customer_key,
-            {{ dbt_utils.generate_surrogate_key(["var('unknown_member_label', '*Unknown*')"]) }}
+            {{ dbt_utils.generate_surrogate_key([dbt.string_literal(var('unknown_member_label', '*Unknown*'))]) }}
         ) as customer_key,
         coalesce(
             products.product_key,
-            {{ dbt_utils.generate_surrogate_key(["var('unknown_member_label', '*Unknown*')"]) }}
+            {{ dbt_utils.generate_surrogate_key([dbt.string_literal(var('unknown_member_label', '*Unknown*'))]) }}
         ) as product_key,
         orders.order_id,
         orders.order_date,
