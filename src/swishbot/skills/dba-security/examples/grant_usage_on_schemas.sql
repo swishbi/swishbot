@@ -168,15 +168,14 @@ Dispatches:
     {%- endfor %}
   {%- endif %}
 
-  {%- set grant_list %}
-    {%- for schema, roles in schema_grants.items() %}
-      {%- for role in roles %}
-        {%- set query = 'grant use schema on schema ' ~ schema ~ ' to ' ~ role ~ ';' %}
-        {{ run_query(query) }}
-      {%- endfor %}
+  {%- for schema, roles in schema_grants.items() %}
+    {%- for role in roles %}
+      {%- set query = 'grant use schema on schema ' ~ schema ~ ' to ' ~ role ~ ';' %}
+      {%- do run_query(query) %}
     {%- endfor %}
-  {%- endset %}
+  {%- endfor %}
 
+  {{ return('select 1;') }}
   {%- else %}
   select 1; -- hooks will error if they don't have valid SQL in them
   {%- endif %}
