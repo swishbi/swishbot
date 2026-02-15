@@ -103,14 +103,15 @@ GRANT developer TO automation;
 -- CREATE controls who can create schemas at runtime.
 -- The loader creates raw schemas; automation creates analytics schemas;
 -- developers create their own dbt_<name> schemas.
+-- NOTE: Replace <database_name> with the actual database name before running.
 
-GRANT CONNECT ON DATABASE current_database TO loader;
-GRANT CONNECT ON DATABASE current_database TO developer;
-GRANT CONNECT ON DATABASE current_database TO analyst;
+GRANT CONNECT ON DATABASE <database_name> TO loader;
+GRANT CONNECT ON DATABASE <database_name> TO developer;
+GRANT CONNECT ON DATABASE <database_name> TO analyst;
 
-GRANT CREATE ON DATABASE current_database TO loader;
-GRANT CREATE ON DATABASE current_database TO developer;
-GRANT CREATE ON DATABASE current_database TO automation;
+GRANT CREATE ON DATABASE <database_name> TO loader;
+GRANT CREATE ON DATABASE <database_name> TO developer;
+GRANT CREATE ON DATABASE <database_name> TO automation;
 
 
 -- ============================================================================
