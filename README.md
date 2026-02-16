@@ -88,41 +88,47 @@ swishbot/
 │       ├── __init__.py
 │       ├── cli.py               # CLI logic
 │       ├── CLAUDE.md            # Starter project config
-│       └── skills/
-│           ├── iac-terraform/
-│           │   └── SKILL.md
-│           ├── dlt-pipelines/
-│           │   └── SKILL.md
-│           ├── dbt-style/
-│           │   └── SKILL.md
-│           ├── dbt-staging/
-│           │   ├── SKILL.md
-│           │   └── examples/
-│           ├── dbt-staging-model/
-│           │   ├── SKILL.md
-│           │   └── examples/
-│           ├── dbt-intermediate/
-│           │   └── SKILL.md
-│           ├── dbt-marts/
-│           │   └── SKILL.md
-│           ├── dbt-mcp/
-│           │   └── SKILL.md
-│           ├── business-logic-mapping/
-│           │   └── SKILL.md
-│           ├── requirements-discovery/
-│           │   └── SKILL.md
-│           ├── dimensional-modeling/
-│           │   ├── SKILL.md
-│           │   └── examples/
-│           ├── dba-security/
-│           │   ├── SKILL.md
-│           │   └── examples/
-│           ├── analytics-architecture/
-│           │   └── SKILL.md
-│           ├── semantic-layer/
-│           │   └── SKILL.md
-│           └── powerbi/
-│               └── SKILL.md
+│       └── .claude/             # Mirrors ~/.claude/ install target
+│           ├── agents/          # Future: agent persona definitions
+│           └── skills/
+│               ├── dbt-staging/
+│               │   ├── SKILL.md         # Router: overview + workflow index
+│               │   ├── workflows/       # Step-by-step procedures
+│               │   │   ├── create-staging-source.md
+│               │   │   ├── transform-staging-models.md
+│               │   │   └── validate-staging-models.md
+│               │   └── examples/
+│               ├── dbt-staging-model/
+│               │   ├── SKILL.md
+│               │   └── examples/
+│               ├── dbt-style/
+│               │   └── SKILL.md
+│               ├── dbt-intermediate/
+│               │   └── SKILL.md
+│               ├── dbt-marts/
+│               │   └── SKILL.md
+│               ├── dbt-mcp/
+│               │   └── SKILL.md
+│               ├── dlt-pipelines/
+│               │   └── SKILL.md
+│               ├── dimensional-modeling/
+│               │   ├── SKILL.md
+│               │   └── examples/
+│               ├── business-logic-mapping/
+│               │   └── SKILL.md
+│               ├── requirements-discovery/
+│               │   └── SKILL.md
+│               ├── analytics-architecture/
+│               │   └── SKILL.md
+│               ├── dba-security/
+│               │   ├── SKILL.md
+│               │   └── examples/
+│               ├── iac-terraform/
+│               │   └── SKILL.md
+│               ├── semantic-layer/
+│               │   └── SKILL.md
+│               └── powerbi/
+│                   └── SKILL.md
 └── tests/
     └── test_cli.py              # CLI test suite
 ```

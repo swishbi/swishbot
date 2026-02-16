@@ -6,7 +6,7 @@ Only exposes skill names and descriptions — not the actual skill content.
 import re
 from pathlib import Path
 
-SKILLS_DIR = Path(__file__).resolve().parents[2] / "src" / "swishbot" / "skills"
+SKILLS_DIR = Path(__file__).resolve().parents[2] / "src" / "swishbot" / ".claude" / "skills"
 PLACEHOLDER = "<!-- SKILLS_CATALOG -->"
 
 CATEGORIES = {

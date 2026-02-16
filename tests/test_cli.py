@@ -98,6 +98,19 @@ def test_cmd_install_no_skill_no_all(tmp_path):
         cli.cmd_install(args)
 
 
+def test_cmd_install_copies_workflows(tmp_path):
+    args = argparse.Namespace(skills=["dbt-staging"], all=False, path=str(tmp_path))
+    cli.cmd_install(args)
+
+    installed = tmp_path / "dbt-staging"
+    assert installed.is_dir()
+    assert (installed / "SKILL.md").exists()
+    assert (installed / "workflows").is_dir()
+    # Verify at least one workflow file was copied
+    workflow_files = list((installed / "workflows").glob("*.md"))
+    assert len(workflow_files) > 0
+
+
 # ─── cmd_init ─────────────────────────────────────────────────────────
 
 
@@ -114,6 +127,18 @@ def test_cmd_init_scaffolds_skill(monkeypatch, tmp_path):
     content = skill_md.read_text()
     assert "my-new-skill" in content
     assert "My New Skill" in content
+
+
+def test_cmd_init_creates_workflows_dir(monkeypatch, tmp_path):
+    skills_dir = tmp_path / "skills"
+    skills_dir.mkdir()
+    monkeypatch.setattr(cli, "SKILLS_DIR", skills_dir)
+
+    args = argparse.Namespace(name="test-skill")
+    cli.cmd_init(args)
+
+    workflows_dir = skills_dir / "test-skill" / "workflows"
+    assert workflows_dir.is_dir()
 
 
 def test_cmd_init_existing_skill_errors(monkeypatch, tmp_path):

@@ -9,7 +9,8 @@ import shutil
 import sys
 from pathlib import Path
 
-SKILLS_DIR = Path(__file__).parent / "skills"
+CLAUDE_DIR = Path(__file__).parent / ".claude"
+SKILLS_DIR = CLAUDE_DIR / "skills"
 CLAUDE_MD = Path(__file__).parent / "CLAUDE.md"
 DEFAULT_INSTALL_PATH = Path.home() / ".claude" / "skills"
 
@@ -17,6 +18,7 @@ SKILL_TEMPLATE = """\
 ---
 name: {name}
 description: "[TODO: Describe when to use this skill and what it does.]"
+workflows: []
 ---
 
 # {title}
@@ -24,6 +26,15 @@ description: "[TODO: Describe when to use this skill and what it does.]"
 ## Overview
 
 [TODO: What this skill does and the methodology behind it.]
+
+## Workflows
+
+[TODO: Add workflow files in the `workflows/` subdirectory and
+reference them here. Each workflow is a focused, step-by-step
+procedure for a specific task within this skill.]
+
+| Workflow | When to Use |
+|----------|-------------|
 
 ## Methodology
 
@@ -140,6 +151,7 @@ def cmd_init(args: argparse.Namespace) -> None:
         sys.exit(1)
 
     dest.mkdir(parents=True)
+    (dest / "workflows").mkdir()
     title = " ".join(w.capitalize() for w in name.split("-"))
     (dest / "SKILL.md").write_text(SKILL_TEMPLATE.format(name=name, title=title))
 

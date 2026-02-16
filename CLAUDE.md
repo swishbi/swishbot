@@ -30,16 +30,22 @@ uv run pre-commit install && uv run pre-commit install --hook-type pre-push
 
 Single-module CLI (`src/swishbot/cli.py`) with four subcommands routed via `match` statement:
 
-- **`list`** — Discovers skills by scanning `src/swishbot/skills/*/SKILL.md`, extracts metadata from YAML frontmatter via regex
-- **`install`** — Copies skill directories to `~/.claude/skills/` (or `--path`)
-- **`init`** — Scaffolds a new skill directory from `SKILL_TEMPLATE`
+- **`list`** — Discovers skills by scanning `src/swishbot/.claude/skills/*/SKILL.md`, extracts metadata from YAML frontmatter via regex
+- **`install`** — Copies skill directories (including `workflows/` subdirs) to `~/.claude/skills/` (or `--path`)
+- **`init`** — Scaffolds a new skill directory with `workflows/` subdir from `SKILL_TEMPLATE`
 - **`init-project`** — Copies `src/swishbot/CLAUDE.md` (the user-facing template) into a target project
 
-Key constants: `SKILLS_DIR`, `DEFAULT_INSTALL_PATH`, `CLAUDE_MD` (all `pathlib.Path`).
+Key constants: `CLAUDE_DIR`, `SKILLS_DIR`, `DEFAULT_INSTALL_PATH`, `CLAUDE_MD` (all `pathlib.Path`).
+
+The source tree under `src/swishbot/.claude/` mirrors the install target `~/.claude/`:
+- `src/swishbot/.claude/skills/` → `~/.claude/skills/`
+- `src/swishbot/.claude/agents/` → `~/.claude/agents/` (future)
 
 ## Skills
 
-Each skill lives in `src/swishbot/skills/<skill-name>/` with a mandatory `SKILL.md` containing YAML frontmatter (`name`, `description`) and methodology content. Optional subdirectories: `examples/`, `scripts/`.
+Each skill lives in `src/swishbot/.claude/skills/<skill-name>/` with a mandatory `SKILL.md` containing YAML frontmatter (`name`, `description`, optional `workflows`) and methodology content. Optional subdirectories: `workflows/`, `examples/`, `scripts/`.
+
+Skills with workflows use SKILL.md as a **router** that maps user intents to specific workflow files. Each workflow is a focused, step-by-step procedure in `workflows/<workflow-name>.md`. Skills without workflows continue to work as flat methodology guides.
 
 The `description` field is extracted via regex (`description:\s*"?([^"\n]+)"?`) — keep it on one line.
 
@@ -56,11 +62,13 @@ The `description` field is extracted via regex (`description:\s*"?([^"\n]+)"?`) 
 
 When adding a new skill, complete every step:
 
-1. Scaffold the skill directory: `swishbot init <skill-name>`
-2. Write `SKILL.md` with YAML frontmatter (`name`, `description`) and methodology content
+1. Scaffold the skill directory: `swishbot init <skill-name>` (creates `SKILL.md` + `workflows/`)
+2. Write `SKILL.md` with YAML frontmatter (`name`, `description`, optional `workflows`) and methodology content
    - `description` must be a single line (extracted via regex)
    - End file with copyright footer: `*Copyright (c) 2026 Swish BI Limited. All rights reserved.*`
+   - For skills with workflows: add `workflows` list to frontmatter and use SKILL.md as a router
 3. Add optional subdirectories if needed: `examples/`, `scripts/`
+   - Add workflow files in `workflows/` if the skill has multi-step procedures
 4. Add cross-references to related skills in a `## Related Skills` section
 5. Update related skills to cross-reference back to the new skill
 6. Update the status table in `README.md` — add the skill row and set status to `:white_check_mark:`
