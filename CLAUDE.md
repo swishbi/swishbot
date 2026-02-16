@@ -33,7 +33,7 @@ Single-module CLI (`src/swishbot/cli.py`) with four subcommands routed via `matc
 - **`list`** — Discovers skills and agents by scanning `*/SKILL.md` and `*/AGENT.md`, extracts metadata from YAML frontmatter via regex
 - **`install`** — Copies skill directories to `~/.claude/skills/` (or `--path`). With `--agent`, copies agent directories to `~/.claude/agents/`
 - **`init`** — Scaffolds a new skill directory with `workflows/` subdir from `SKILL_TEMPLATE`
-- **`init-project`** — Copies `src/swishbot/CLAUDE.md` (the user-facing template) into a target project
+- **`init-project`** — Copies `src/swishbot/.claude/CLAUDE.md` (the user-facing template) into a target project
 
 Key constants: `CLAUDE_DIR`, `SKILLS_DIR`, `AGENTS_DIR`, `DEFAULT_INSTALL_PATH`, `DEFAULT_AGENT_INSTALL_PATH`, `CLAUDE_MD` (all `pathlib.Path`).
 
@@ -78,7 +78,7 @@ When adding a new skill, complete every step:
 4. Add cross-references to related skills in a `## Related Skills` section
 5. Update related skills to cross-reference back to the new skill
 6. Update the status table in `README.md` — add the skill row and set status to `:white_check_mark:`
-7. Update the status table in `src/swishbot/CLAUDE.md` — same as above
+7. Update the status table in `src/swishbot/.claude/CLAUDE.md` — same as above
 8. Update the `CATEGORIES` dict in `docs/hooks/skills_catalog.py` — add the skill to the correct category
 9. Update the project structure tree in `README.md` if the directory layout changed
 10. Run `uv run ruff check src/ tests/` and `uv run ruff format src/ tests/`
@@ -88,5 +88,5 @@ When adding a new skill, complete every step:
 
 - Lint and format pass (`uv run ruff check` + `uv run ruff format`)
 - Tests pass (`uv run pytest -v`)
-- If skills changed: update status tables in both `README.md` and `src/swishbot/CLAUDE.md`, and `CATEGORIES` in `docs/hooks/skills_catalog.py`
+- If skills changed: update status tables in both `README.md` and `src/swishbot/.claude/CLAUDE.md`, and `CATEGORIES` in `docs/hooks/skills_catalog.py`
 - New skills need correct `name`/`description` frontmatter in SKILL.md

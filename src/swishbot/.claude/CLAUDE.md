@@ -44,6 +44,18 @@ This project uses [swishbot](https://github.com/swishbi/swishbot) skills to guid
 | powerbi | Power BI best practices | :x: |
 | semantic-layer | Building the semantic layer | :x: |
 
+## Installed Agents
+
+<!-- Agents compose multiple skills into a focused persona. Install with: swishbot install --agent <agent-name> -->
+
+| Agent | Description |
+|-------|-------------|
+| analytics-engineer | Builds dbt models across all layers with MCP tooling |
+| business-analyst | Guides stakeholders from idea to implementation-ready spec |
+| data-engineer | Builds ingestion pipelines with proper security |
+| data-modeler | Designs and builds dimensional models across the full dbt DAG |
+| platform-engineer | Sets up infrastructure, security, and platform architecture |
+
 ## Conventions
 
 - Follow the methodology defined in each installed skill before applying general knowledge.

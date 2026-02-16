@@ -4,6 +4,7 @@
 """Tests for swishbot CLI."""
 
 import argparse
+import re
 
 import pytest
 
@@ -58,6 +59,46 @@ def test_get_available_agents_empty_dir(monkeypatch, tmp_path):
     empty_dir.mkdir()
     monkeypatch.setattr(cli, "AGENTS_DIR", empty_dir)
     assert cli.get_available_agents() == []
+
+
+def test_agent_frontmatter_has_skills_list():
+    available_skills = {s["name"] for s in cli.get_available_skills()}
+    for d in sorted(cli.AGENTS_DIR.iterdir()):
+        agent_md = d / "AGENT.md"
+        if not (d.is_dir() and agent_md.exists()):
+            continue
+        content = agent_md.read_text()
+        # Extract only the YAML frontmatter between --- markers
+        fm_match = re.match(r"^---\n(.+?)\n---", content, re.DOTALL)
+        assert fm_match, f"Agent {d.name} missing YAML frontmatter"
+        frontmatter = fm_match.group(1)
+        skills = re.findall(r"^\s+-\s+(\S+)", frontmatter, re.MULTILINE)
+        assert len(skills) > 0, f"Agent {d.name} has no skills listed in frontmatter"
+        for skill in skills:
+            assert skill in available_skills, f"Agent {d.name} references unknown skill '{skill}'"
+
+
+def test_agent_descriptions_are_single_line():
+    for d in sorted(cli.AGENTS_DIR.iterdir()):
+        agent_md = d / "AGENT.md"
+        if not (d.is_dir() and agent_md.exists()):
+            continue
+        content = agent_md.read_text()
+        match = re.search(r'description:\s*"?([^"\n]+)"?', content)
+        assert match, f"Agent {d.name} missing description"
+        desc = match.group(1).strip()
+        assert "\n" not in desc, f"Agent {d.name} description contains newline"
+
+
+def test_all_agents_have_copyright_footer():
+    for d in sorted(cli.AGENTS_DIR.iterdir()):
+        agent_md = d / "AGENT.md"
+        if not (d.is_dir() and agent_md.exists()):
+            continue
+        content = agent_md.read_text().rstrip()
+        assert content.endswith("*Copyright (c) 2026 Swish BI Limited. All rights reserved.*"), (
+            f"Agent {d.name} missing copyright footer"
+        )
 
 
 # ─── cmd_list ─────────────────────────────────────────────────────────

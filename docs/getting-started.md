@@ -40,6 +40,23 @@ swishbot install dbt-staging --path ~/my-project/.claude/skills
 
 Skills are copied to `~/.claude/skills/` by default.
 
+## Install agents
+
+Agents compose multiple skills into a focused persona. Install one to give Claude a specific role:
+
+```bash
+# Install a single agent
+swishbot install --agent data-modeler
+
+# Install all agents
+swishbot install --agent --all
+
+# Install to a custom path
+swishbot install --agent data-modeler --path ~/my-project/.claude/agents
+```
+
+Agents are copied to `~/.claude/agents/` by default.
+
 ## Set up your project
 
 Generate a starter `CLAUDE.md` in your project directory:

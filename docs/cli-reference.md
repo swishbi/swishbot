@@ -4,7 +4,7 @@ All commands are run via the `swishbot` CLI.
 
 ## `swishbot list`
 
-List all available skills with their descriptions.
+List all available skills and agents with their descriptions.
 
 ```bash
 swishbot list
@@ -23,11 +23,21 @@ Available skills:
   ...
 
 Install with: swishbot install <skill-name>
+
+Available agents:
+
+  analytics-engineer  Builds dbt models across all layers with MCP tooling
+  business-analyst    Guides stakeholders from idea to implementation-ready spec
+  data-engineer       Builds ingestion pipelines with proper security
+  data-modeler        Designs and builds dimensional models across the full dbt DAG
+  platform-engineer   Sets up infrastructure, security, and platform architecture
+
+Install agent: swishbot install --agent <agent-name>
 ```
 
 ## `swishbot install`
 
-Install one or more skills to your Claude environment.
+Install one or more skills or agents to your Claude environment.
 
 ```bash
 # Single skill
@@ -41,15 +51,22 @@ swishbot install --all
 
 # Custom install path
 swishbot install dbt-staging --path ~/my-project/.claude/skills
+
+# Install an agent
+swishbot install --agent data-modeler
+
+# Install all agents
+swishbot install --agent --all
 ```
 
 | Option | Description |
 |--------|-------------|
-| `skills` | One or more skill names to install |
-| `--all` | Install all available skills |
-| `--path` | Custom install directory (default: `~/.claude/skills/`) |
+| `skills` | One or more skill or agent names to install |
+| `--all` | Install all available skills (or all agents with `--agent`) |
+| `--agent` | Install agents instead of skills (default target: `~/.claude/agents/`) |
+| `--path` | Custom install directory (default: `~/.claude/skills/` or `~/.claude/agents/`) |
 
-If a skill is already installed, it will be overwritten.
+If a skill or agent is already installed, it will be overwritten.
 
 ## `swishbot init-project`
 

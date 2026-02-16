@@ -12,7 +12,7 @@ from pathlib import Path
 CLAUDE_DIR = Path(__file__).parent / ".claude"
 SKILLS_DIR = CLAUDE_DIR / "skills"
 AGENTS_DIR = CLAUDE_DIR / "agents"
-CLAUDE_MD = Path(__file__).parent / "CLAUDE.md"
+CLAUDE_MD = CLAUDE_DIR / "CLAUDE.md"
 DEFAULT_INSTALL_PATH = Path.home() / ".claude" / "skills"
 DEFAULT_AGENT_INSTALL_PATH = Path.home() / ".claude" / "agents"
 

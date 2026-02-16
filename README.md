@@ -105,8 +105,8 @@ swishbot/
 │   └── swishbot/
 │       ├── __init__.py
 │       ├── cli.py               # CLI logic
-│       ├── CLAUDE.md            # Starter project config
 │       └── .claude/             # Mirrors ~/.claude/ install target
+│           ├── CLAUDE.md        # Starter project config
 │           ├── agents/          # Agent persona definitions
 │           │   ├── analytics-engineer/
 │           │   │   └── AGENT.md
