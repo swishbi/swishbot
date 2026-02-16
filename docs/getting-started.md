@@ -40,6 +40,23 @@ swishbot install dbt-staging --path ~/my-project/.claude/skills
 
 Skills are copied to `~/.claude/skills/` by default.
 
+## Install agents
+
+Agents compose multiple skills into a focused persona. Install one to give Claude a specific role:
+
+```bash
+# Install a single agent
+swishbot install --agent data-modeler
+
+# Install all agents
+swishbot install --agent --all
+
+# Install to a custom path
+swishbot install --agent data-modeler --path ~/my-project/.claude/agents
+```
+
+Agents are copied to `~/.claude/agents/` by default.
+
 ## Set up your project
 
 Generate a starter `CLAUDE.md` in your project directory:
@@ -63,6 +80,26 @@ Edit the file to uncomment the skills you've installed and fill in your project 
     ```bash
     swishbot init-project --force
     ```
+
+## Set up hooks
+
+Some skills include hooks that automatically enforce rules (e.g., SQL validation, style checks). See what hooks your installed skills provide:
+
+```bash
+swishbot hooks
+```
+
+Copy the hook definitions into your `.claude/settings.json` to activate them. See the [CLI Reference](cli-reference.md#swishbot-hooks) for details.
+
+## Set up project memory (optional)
+
+Scaffold a memory directory so Claude can persist modeling decisions, source metadata, and conventions across sessions:
+
+```bash
+swishbot init-memory
+```
+
+This creates `.claude/memory/` with template files and a session-end hook. See the [CLI Reference](cli-reference.md#swishbot-init-memory) for details.
 
 ## Verify it works
 

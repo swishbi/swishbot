@@ -1,13 +1,15 @@
-"""MkDocs hook to auto-generate the skills catalog from SKILL.md frontmatter.
+"""MkDocs hook to auto-generate the skills and agents catalog from frontmatter.
 
-Only exposes skill names and descriptions — not the actual skill content.
+Only exposes names and descriptions — not the actual content.
 """
 
 import re
 from pathlib import Path
 
-SKILLS_DIR = Path(__file__).resolve().parents[2] / "src" / "swishbot" / "skills"
+SKILLS_DIR = Path(__file__).resolve().parents[2] / "src" / "swishbot" / ".claude" / "skills"
+AGENTS_DIR = Path(__file__).resolve().parents[2] / "src" / "swishbot" / ".claude" / "agents"
 PLACEHOLDER = "<!-- SKILLS_CATALOG -->"
+AGENTS_PLACEHOLDER = "<!-- AGENTS_CATALOG -->"
 
 CATEGORIES = {
     "Discovery & Planning": ["business-logic-mapping", "requirements-discovery"],
@@ -65,11 +67,38 @@ def _build_catalog(skills: dict[str, str]) -> str:
     return "\n".join(lines)
 
 
-def on_page_markdown(markdown: str, **kwargs) -> str:
-    """Replace the SKILLS_CATALOG placeholder with the generated table."""
-    if PLACEHOLDER not in markdown:
-        return markdown
+def _read_agents() -> dict[str, str]:
+    """Read agent names and descriptions from AGENT.md frontmatter."""
+    agents = {}
+    for d in sorted(AGENTS_DIR.iterdir()):
+        agent_md = d / "AGENT.md"
+        if d.is_dir() and agent_md.exists():
+            content = agent_md.read_text()
+            match = re.search(r'description:\s*"?([^"\n]+)"?', content)
+            desc = match.group(1).strip().rstrip('"') if match else "(no description)"
+            agents[d.name] = desc
+    return agents
 
-    skills = _read_skills()
-    catalog = _build_catalog(skills)
-    return markdown.replace(PLACEHOLDER, catalog)
+
+def _build_agents_catalog(agents: dict[str, str]) -> str:
+    """Build markdown table for agents."""
+    lines = ["| Agent | Description |", "|-------|-------------|"]
+    for name, desc in sorted(agents.items()):
+        lines.append(f"| `{name}` | {desc} |")
+    lines.append("")
+    return "\n".join(lines)
+
+
+def on_page_markdown(markdown: str, **kwargs) -> str:
+    """Replace catalog placeholders with generated tables."""
+    if PLACEHOLDER in markdown:
+        skills = _read_skills()
+        catalog = _build_catalog(skills)
+        markdown = markdown.replace(PLACEHOLDER, catalog)
+
+    if AGENTS_PLACEHOLDER in markdown:
+        agents = _read_agents()
+        agents_catalog = _build_agents_catalog(agents)
+        markdown = markdown.replace(AGENTS_PLACEHOLDER, agents_catalog)
+
+    return markdown

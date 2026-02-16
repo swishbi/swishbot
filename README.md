@@ -5,7 +5,7 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![License](https://img.shields.io/badge/license-Proprietary-red)](LICENSE)
 
-A distributable skill library for [Swish BI](swishbi.com). Install skills into your Claude environment with a single command.
+A distributable skill and agent library for [Swish BI](swishbi.com). Install skills and agents into your Claude environment with a single command.
 
 ## Quick Start
 
@@ -25,11 +25,23 @@ swishbot install dbt-staging --path ~/.claude/skills
 # Install all skills
 swishbot install --all
 
+# Install an agent
+swishbot install --agent data-modeler
+
+# Install all agents
+swishbot install --agent --all
+
 # Add a starter CLAUDE.md to your project
 swishbot init-project
 
 # Overwrite an existing CLAUDE.md
 swishbot init-project --force
+
+# List hooks provided by installed skills
+swishbot hooks
+
+# Scaffold project memory directory
+swishbot init-memory
 ```
 
 ## Available Skills
@@ -69,9 +81,21 @@ swishbot init-project --force
 | `powerbi` | Power BI best practices | :x: |
 | `semantic-layer` | Building the semantic layer | :x: |
 
+## Available Agents
+
+Agents are persona definitions that compose multiple skills into roles. Install an agent to give Claude a focused identity for a specific type of work.
+
+| Agent | Description | Skills Composed |
+|-------|-------------|-----------------|
+| `analytics-engineer` | Builds dbt models across all layers with MCP tooling | dbt-staging, dbt-staging-model, dbt-intermediate, dbt-marts, dbt-style, dbt-mcp |
+| `business-analyst` | Guides stakeholders from idea to implementation-ready spec | requirements-discovery, business-logic-mapping |
+| `data-engineer` | Builds ingestion pipelines with proper security | dlt-pipelines, dba-security |
+| `data-modeler` | Designs and builds dimensional models across the full dbt DAG | dbt-staging, dbt-staging-model, dbt-intermediate, dbt-marts, dbt-style, dimensional-modeling |
+| `platform-engineer` | Sets up infrastructure, security, and platform architecture | analytics-architecture, iac-terraform, dba-security |
+
 ## How It Works
 
-Each skill is a self-contained directory with a `SKILL.md` file that Claude reads to understand how to execute the work. When you run `swishbot install <skill>`, it copies the skill directory into your Claude configuration so it's available in your sessions.
+Each skill is a self-contained directory with a `SKILL.md` file that Claude reads to understand how to execute the work. Agents are persona definitions (`AGENT.md`) that compose multiple skills into a role. When you run `swishbot install <skill>` or `swishbot install --agent <agent>`, it copies the directory into your Claude configuration so it's available in your sessions.
 
 Skills are designed to be platform-agnostic at the methodology level — they encode *how to think about the problem*, and Claude applies that reasoning to whatever platform you're working on (Snowflake, BigQuery, Databricks, etc.).
 
@@ -80,6 +104,7 @@ Skills are designed to be platform-agnostic at the methodology level — they en
 ```
 swishbot/
 ├── pyproject.toml
+├── SECURITY.md                  # Contributor security policy
 ├── .github/
 │   └── workflows/
 │       └── ci.yml               # CI: lint, format, test
@@ -87,42 +112,70 @@ swishbot/
 │   └── swishbot/
 │       ├── __init__.py
 │       ├── cli.py               # CLI logic
-│       ├── CLAUDE.md            # Starter project config
-│       └── skills/
-│           ├── iac-terraform/
-│           │   └── SKILL.md
-│           ├── dlt-pipelines/
-│           │   └── SKILL.md
-│           ├── dbt-style/
-│           │   └── SKILL.md
-│           ├── dbt-staging/
-│           │   ├── SKILL.md
-│           │   └── examples/
-│           ├── dbt-staging-model/
-│           │   ├── SKILL.md
-│           │   └── examples/
-│           ├── dbt-intermediate/
-│           │   └── SKILL.md
-│           ├── dbt-marts/
-│           │   └── SKILL.md
-│           ├── dbt-mcp/
-│           │   └── SKILL.md
-│           ├── business-logic-mapping/
-│           │   └── SKILL.md
-│           ├── requirements-discovery/
-│           │   └── SKILL.md
-│           ├── dimensional-modeling/
-│           │   ├── SKILL.md
-│           │   └── examples/
-│           ├── dba-security/
-│           │   ├── SKILL.md
-│           │   └── examples/
-│           ├── analytics-architecture/
-│           │   └── SKILL.md
-│           ├── semantic-layer/
-│           │   └── SKILL.md
-│           └── powerbi/
-│               └── SKILL.md
+│       ├── memory_templates/    # Templates for init-memory
+│       │   ├── MEMORY.md
+│       │   ├── conventions.md
+│       │   ├── modeling-decisions.md
+│       │   └── source-catalog.md
+│       └── .claude/             # Mirrors ~/.claude/ install target
+│           ├── CLAUDE.md        # Starter project config
+│           ├── SECURITY.md      # User-facing security policy
+│           ├── agents/          # Agent persona definitions
+│           │   ├── analytics-engineer/
+│           │   │   └── AGENT.md
+│           │   ├── business-analyst/
+│           │   │   └── AGENT.md
+│           │   ├── data-engineer/
+│           │   │   └── AGENT.md
+│           │   ├── data-modeler/
+│           │   │   └── AGENT.md
+│           │   └── platform-engineer/
+│           │       └── AGENT.md
+│           └── skills/
+│               ├── dbt-staging/
+│               │   ├── SKILL.md         # Router: overview + workflow index
+│               │   ├── workflows/       # Step-by-step procedures
+│               │   │   ├── create-staging-source.md
+│               │   │   ├── transform-staging-models.md
+│               │   │   └── validate-staging-models.md
+│               │   ├── scripts/         # Hook scripts
+│               │   │   └── check-source-yaml.sh
+│               │   └── examples/
+│               ├── dbt-staging-model/
+│               │   ├── SKILL.md
+│               │   └── examples/
+│               ├── dbt-style/
+│               │   └── SKILL.md
+│               ├── dbt-intermediate/
+│               │   └── SKILL.md
+│               ├── dbt-marts/
+│               │   └── SKILL.md
+│               ├── dbt-mcp/
+│               │   └── SKILL.md
+│               ├── dlt-pipelines/
+│               │   ├── SKILL.md
+│               │   └── scripts/
+│               │       └── check-secrets.sh
+│               ├── dimensional-modeling/
+│               │   ├── SKILL.md
+│               │   └── examples/
+│               ├── business-logic-mapping/
+│               │   └── SKILL.md
+│               ├── requirements-discovery/
+│               │   └── SKILL.md
+│               ├── analytics-architecture/
+│               │   └── SKILL.md
+│               ├── dba-security/
+│               │   ├── SKILL.md
+│               │   ├── scripts/
+│               │   │   └── validate-sql.sh
+│               │   └── examples/
+│               ├── iac-terraform/
+│               │   └── SKILL.md
+│               ├── semantic-layer/
+│               │   └── SKILL.md
+│               └── powerbi/
+│                   └── SKILL.md
 └── tests/
     └── test_cli.py              # CLI test suite
 ```
