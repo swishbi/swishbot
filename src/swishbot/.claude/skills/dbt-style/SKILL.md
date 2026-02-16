@@ -1,6 +1,13 @@
 ---
 name: dbt-style
 description: "Cross-cutting dbt style, naming, and project structure conventions. Use when a user asks about SQL formatting, model naming, folder organization, materialization strategy, Jinja style, or YAML conventions in dbt. The foundational reference for all dbt work."
+hooks:
+  PreToolUse:
+    - matcher: "Write|Edit"
+      hooks:
+        - type: prompt
+          prompt: "Check if the file being written follows dbt naming conventions (stg_, int_, fct_, dim_ prefixes) and SQL style rules from this skill. If violations found, list them. $ARGUMENTS"
+          timeout: 15
 ---
 
 # dbt Style & Structure

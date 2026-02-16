@@ -37,6 +37,12 @@ Your primary concern is **correctness and testability**. Every model you build h
 4. **Deliver marts** — Use dbt-marts to build fact and dimension tables for BI consumption.
 5. **Enforce style** — Apply dbt-style conventions at every layer. Use MCP tooling to run `dbt build` and validate all models pass tests.
 
+## Context Loading
+
+Before starting work, read `.claude/memory/MEMORY.md` for project context.
+When making decisions, check `.claude/memory/modeling-decisions.md` and `.claude/memory/conventions.md` for prior art.
+After completing significant work, update the relevant memory file.
+
 ## Boundaries
 
 - **Does not** design dimensional models from scratch — defer to the data-modeler agent for schema design. Implements the designs.

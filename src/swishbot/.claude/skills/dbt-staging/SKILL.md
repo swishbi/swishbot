@@ -2,6 +2,13 @@
 name: dbt-staging
 description: "Build the staging/bronze layer in dbt. Use when a user asks to stage a source, create base models, add a new source system, or set up initial dbt models from raw data. Applies regardless of warehouse platform or ingestion tool."
 argument-hint: "[source-name]"
+hooks:
+  PostToolUse:
+    - matcher: "Write|Edit"
+      hooks:
+        - type: prompt
+          prompt: "If the file just written is a staging model, verify it follows the CTE structure (source, renamed, typed, final) defined in this skill. $ARGUMENTS"
+          timeout: 15
 ---
 
 # dbt Staging Layer

@@ -56,6 +56,10 @@ This project uses [swishbot](https://github.com/swishbi/swishbot) skills to guid
 | data-modeler | Designs and builds dimensional models across the full dbt DAG |
 | platform-engineer | Sets up infrastructure, security, and platform architecture |
 
+## Security
+
+See [SECURITY.md](SECURITY.md) for security guidelines covering SQL safety, credential handling, prompt injection defense, and pipeline safety. Skills with hooks enforce these rules automatically.
+
 ## Conventions
 
 - Follow the methodology defined in each installed skill before applying general knowledge.

@@ -36,6 +36,12 @@ swishbot init-project
 
 # Overwrite an existing CLAUDE.md
 swishbot init-project --force
+
+# List hooks provided by installed skills
+swishbot hooks
+
+# Scaffold project memory directory
+swishbot init-memory
 ```
 
 ## Available Skills
@@ -98,6 +104,7 @@ Skills are designed to be platform-agnostic at the methodology level — they en
 ```
 swishbot/
 ├── pyproject.toml
+├── SECURITY.md                  # Contributor security policy
 ├── .github/
 │   └── workflows/
 │       └── ci.yml               # CI: lint, format, test
@@ -105,8 +112,14 @@ swishbot/
 │   └── swishbot/
 │       ├── __init__.py
 │       ├── cli.py               # CLI logic
+│       ├── memory_templates/    # Templates for init-memory
+│       │   ├── MEMORY.md
+│       │   ├── conventions.md
+│       │   ├── modeling-decisions.md
+│       │   └── source-catalog.md
 │       └── .claude/             # Mirrors ~/.claude/ install target
 │           ├── CLAUDE.md        # Starter project config
+│           ├── SECURITY.md      # User-facing security policy
 │           ├── agents/          # Agent persona definitions
 │           │   ├── analytics-engineer/
 │           │   │   └── AGENT.md
@@ -125,6 +138,8 @@ swishbot/
 │               │   │   ├── create-staging-source.md
 │               │   │   ├── transform-staging-models.md
 │               │   │   └── validate-staging-models.md
+│               │   ├── scripts/         # Hook scripts
+│               │   │   └── check-source-yaml.sh
 │               │   └── examples/
 │               ├── dbt-staging-model/
 │               │   ├── SKILL.md
@@ -138,7 +153,9 @@ swishbot/
 │               ├── dbt-mcp/
 │               │   └── SKILL.md
 │               ├── dlt-pipelines/
-│               │   └── SKILL.md
+│               │   ├── SKILL.md
+│               │   └── scripts/
+│               │       └── check-secrets.sh
 │               ├── dimensional-modeling/
 │               │   ├── SKILL.md
 │               │   └── examples/
@@ -150,6 +167,8 @@ swishbot/
 │               │   └── SKILL.md
 │               ├── dba-security/
 │               │   ├── SKILL.md
+│               │   ├── scripts/
+│               │   │   └── validate-sql.sh
 │               │   └── examples/
 │               ├── iac-terraform/
 │               │   └── SKILL.md

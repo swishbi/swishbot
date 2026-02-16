@@ -305,6 +305,141 @@ def test_cmd_init_project_force_overwrites(tmp_path):
     assert target.read_text() == cli.CLAUDE_MD.read_text()
 
 
+# ─── cmd_init_project (SECURITY.md) ──────────────────────────────────
+
+
+def test_cmd_init_project_copies_security_md(tmp_path):
+    args = argparse.Namespace(path=str(tmp_path), force=False)
+    cli.cmd_init_project(args)
+
+    security_target = tmp_path / "SECURITY.md"
+    assert security_target.exists()
+    assert security_target.read_text() == cli.SECURITY_MD.read_text()
+
+
+# ─── cmd_hooks ───────────────────────────────────────────────────────
+
+
+def test_cmd_hooks_lists_installed_hooks(capsys, tmp_path):
+    # Install skills with hooks to tmp_path
+    args = argparse.Namespace(skills=["dbt-style"], all=False, agent=False, path=str(tmp_path))
+    cli.cmd_install(args)
+
+    hook_args = argparse.Namespace(path=str(tmp_path))
+    cli.cmd_hooks(hook_args)
+    out = capsys.readouterr().out
+    assert "dbt-style" in out
+    assert "PreToolUse" in out
+
+
+def test_cmd_hooks_no_skills_installed(tmp_path):
+    nonexistent = tmp_path / "nonexistent"
+    hook_args = argparse.Namespace(path=str(nonexistent))
+    with pytest.raises(SystemExit, match="1"):
+        cli.cmd_hooks(hook_args)
+
+
+def test_cmd_hooks_no_hooks_found(capsys, tmp_path):
+    # Install a skill without hooks
+    skill_dir = tmp_path / "no-hook-skill"
+    skill_dir.mkdir()
+    (skill_dir / "SKILL.md").write_text('---\nname: no-hook-skill\ndescription: "No hooks"\n---\n')
+
+    hook_args = argparse.Namespace(path=str(tmp_path))
+    cli.cmd_hooks(hook_args)
+    out = capsys.readouterr().out
+    assert "No hooks found" in out
+
+
+def test_cmd_hooks_multiple_skills(capsys, tmp_path):
+    # Install multiple skills with hooks
+    skills = ["dbt-style", "dba-security", "dbt-staging"]
+    args = argparse.Namespace(skills=skills, all=False, agent=False, path=str(tmp_path))
+    cli.cmd_install(args)
+
+    hook_args = argparse.Namespace(path=str(tmp_path))
+    cli.cmd_hooks(hook_args)
+    out = capsys.readouterr().out
+    assert "dbt-style" in out
+    assert "dba-security" in out
+    assert "dbt-staging" in out
+
+
+# ─── cmd_init_memory ─────────────────────────────────────────────────
+
+
+def test_cmd_init_memory_scaffolds_directory(tmp_path):
+    args = argparse.Namespace(path=str(tmp_path), force=False)
+    cli.cmd_init_memory(args)
+
+    memory_dir = tmp_path / ".claude" / "memory"
+    assert memory_dir.is_dir()
+    assert (memory_dir / "MEMORY.md").exists()
+    assert (memory_dir / "modeling-decisions.md").exists()
+    assert (memory_dir / "source-catalog.md").exists()
+    assert (memory_dir / "conventions.md").exists()
+
+
+def test_cmd_init_memory_creates_settings_json(tmp_path):
+    args = argparse.Namespace(path=str(tmp_path), force=False)
+    cli.cmd_init_memory(args)
+
+    settings_path = tmp_path / ".claude" / "settings.json"
+    assert settings_path.exists()
+    import json
+
+    settings = json.loads(settings_path.read_text())
+    assert "hooks" in settings
+    assert "Stop" in settings["hooks"]
+
+
+def test_cmd_init_memory_errors_if_exists(tmp_path):
+    memory_dir = tmp_path / ".claude" / "memory"
+    memory_dir.mkdir(parents=True)
+
+    args = argparse.Namespace(path=str(tmp_path), force=False)
+    with pytest.raises(SystemExit, match="1"):
+        cli.cmd_init_memory(args)
+
+
+def test_cmd_init_memory_force_overwrites(tmp_path):
+    memory_dir = tmp_path / ".claude" / "memory"
+    memory_dir.mkdir(parents=True)
+    (memory_dir / "MEMORY.md").write_text("old content")
+
+    args = argparse.Namespace(path=str(tmp_path), force=True)
+    cli.cmd_init_memory(args)
+
+    assert (memory_dir / "MEMORY.md").read_text() != "old content"
+
+
+def test_cmd_init_memory_preserves_existing_settings(tmp_path):
+    claude_dir = tmp_path / ".claude"
+    claude_dir.mkdir()
+    (claude_dir / "settings.json").write_text('{"existing": true}')
+
+    args = argparse.Namespace(path=str(tmp_path), force=False)
+    # Should not overwrite settings.json
+    cli.cmd_init_memory(args)
+
+    import json
+
+    settings = json.loads((claude_dir / "settings.json").read_text())
+    assert settings == {"existing": True}
+
+
+# ─── cmd_install copies scripts ──────────────────────────────────────
+
+
+def test_cmd_install_copies_scripts(tmp_path):
+    args = argparse.Namespace(skills=["dba-security"], all=False, agent=False, path=str(tmp_path))
+    cli.cmd_install(args)
+
+    installed = tmp_path / "dba-security"
+    assert (installed / "scripts").is_dir()
+    assert (installed / "scripts" / "validate-sql.sh").exists()
+
+
 # ─── main (argparse integration) ────────────────────────────────────
 
 

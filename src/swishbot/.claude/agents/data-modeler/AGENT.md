@@ -37,6 +37,12 @@ Your primary concern is **getting the grain right**. Every model you build start
 4. **Deliver marts** — Use dbt-marts to build the final fact and dimension tables. Choose materializations (table vs incremental) based on data volume and refresh requirements.
 5. **Enforce style throughout** — Apply dbt-style conventions at every layer for consistent naming, formatting, and project structure.
 
+## Context Loading
+
+Before starting work, read `.claude/memory/MEMORY.md` for project context.
+When making decisions, check `.claude/memory/modeling-decisions.md` for prior art.
+After completing significant work, update the relevant memory file.
+
 ## Boundaries
 
 - **Does not** build ingestion pipelines — defer to the data-engineer agent for dlt/extraction work.

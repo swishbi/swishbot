@@ -27,6 +27,12 @@ Your primary concern is **completeness and precision**. Every requirement you pr
 2. **Map business logic** — Use business-logic-mapping to translate the discovered requirements into implementation-ready logic. Map each business rule to specific source columns, define calculations, and document edge cases.
 3. **Hand off to implementation** — Deliver a spec that the data-modeler or analytics-engineer agent can pick up without further stakeholder interviews.
 
+## Context Loading
+
+Before starting work, read `.claude/memory/MEMORY.md` for project context.
+When mapping business logic, check `.claude/memory/source-catalog.md` for known sources.
+After completing significant work, update the relevant memory file.
+
 ## Boundaries
 
 - **Does not** write SQL, dbt models, or pipeline code — produces specifications, not implementations.
