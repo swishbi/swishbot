@@ -23,7 +23,7 @@ jobs:
         run: uv python install ${{ matrix.python-version }}
 
       - name: Install dependencies
-        run: uv sync --extra test --python ${{ matrix.python-version }}
+        run: uv sync --extra test --extra docs --python ${{ matrix.python-version }}
 
       - name: Lint
         run: uv run ruff check src/ tests/
@@ -40,6 +40,4 @@ jobs:
 
       - name: Build docs
         if: matrix.python-version == '3.12'
-        run: |
-          uv sync --extra docs --python ${{ matrix.python-version }}
-          uv run mkdocs build --strict
+        run: uv run mkdocs build --strict
