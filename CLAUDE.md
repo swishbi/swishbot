@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Project Is
 
-swishbot is a Python CLI that distributes "skills" — opinionated methodology guides in Markdown — into `~/.claude/skills/` for Claude Code to reference during data engineering work. Skills encode *how you think* about each layer of the data stack, not platform specifics.
+swishbot is a Python CLI that distributes "skills" and "agents" into `~/.claude/` for Claude Code to reference during data engineering work. Skills are opinionated methodology guides; agents are persona definitions that compose multiple skills into roles (e.g., data-modeler, analytics-engineer).
 
 ## Commands
 
@@ -30,16 +30,16 @@ uv run pre-commit install && uv run pre-commit install --hook-type pre-push
 
 Single-module CLI (`src/swishbot/cli.py`) with four subcommands routed via `match` statement:
 
-- **`list`** — Discovers skills by scanning `src/swishbot/.claude/skills/*/SKILL.md`, extracts metadata from YAML frontmatter via regex
-- **`install`** — Copies skill directories (including `workflows/` subdirs) to `~/.claude/skills/` (or `--path`)
+- **`list`** — Discovers skills and agents by scanning `*/SKILL.md` and `*/AGENT.md`, extracts metadata from YAML frontmatter via regex
+- **`install`** — Copies skill directories to `~/.claude/skills/` (or `--path`). With `--agent`, copies agent directories to `~/.claude/agents/`
 - **`init`** — Scaffolds a new skill directory with `workflows/` subdir from `SKILL_TEMPLATE`
 - **`init-project`** — Copies `src/swishbot/CLAUDE.md` (the user-facing template) into a target project
 
-Key constants: `CLAUDE_DIR`, `SKILLS_DIR`, `DEFAULT_INSTALL_PATH`, `CLAUDE_MD` (all `pathlib.Path`).
+Key constants: `CLAUDE_DIR`, `SKILLS_DIR`, `AGENTS_DIR`, `DEFAULT_INSTALL_PATH`, `DEFAULT_AGENT_INSTALL_PATH`, `CLAUDE_MD` (all `pathlib.Path`).
 
 The source tree under `src/swishbot/.claude/` mirrors the install target `~/.claude/`:
 - `src/swishbot/.claude/skills/` → `~/.claude/skills/`
-- `src/swishbot/.claude/agents/` → `~/.claude/agents/` (future)
+- `src/swishbot/.claude/agents/` → `~/.claude/agents/`
 
 ## Skills
 
@@ -48,6 +48,12 @@ Each skill lives in `src/swishbot/.claude/skills/<skill-name>/` with a mandatory
 Skills with workflows use SKILL.md as a **router** that maps user intents to specific workflow files. Each workflow is a focused, step-by-step procedure in `workflows/<workflow-name>.md`. Skills without workflows continue to work as flat methodology guides.
 
 The `description` field is extracted via regex (`description:\s*"?([^"\n]+)"?`) — keep it on one line.
+
+## Agents
+
+Each agent lives in `src/swishbot/.claude/agents/<agent-name>/` with a mandatory `AGENT.md` containing YAML frontmatter (`name`, `description`, `skills` list) and persona content. Agents compose multiple skills into a role — they tell Claude "you are a [role], use these skills."
+
+Agents are authored by swishbot maintainers (no `init` scaffold). The `description` field follows the same regex extraction as skills.
 
 ## Conventions
 

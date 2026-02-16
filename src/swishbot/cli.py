@@ -11,8 +11,10 @@ from pathlib import Path
 
 CLAUDE_DIR = Path(__file__).parent / ".claude"
 SKILLS_DIR = CLAUDE_DIR / "skills"
+AGENTS_DIR = CLAUDE_DIR / "agents"
 CLAUDE_MD = Path(__file__).parent / "CLAUDE.md"
 DEFAULT_INSTALL_PATH = Path.home() / ".claude" / "skills"
+DEFAULT_AGENT_INSTALL_PATH = Path.home() / ".claude" / "agents"
 
 SKILL_TEMPLATE = """\
 ---
@@ -77,24 +79,61 @@ def get_available_skills() -> list[dict]:
     return skills
 
 
+def get_available_agents() -> list[dict]:
+    """Return list of available agents with name and description."""
+    if not AGENTS_DIR.exists():
+        return []
+
+    agents = []
+    for d in sorted(AGENTS_DIR.iterdir()):
+        agent_md = d / "AGENT.md"
+        if d.is_dir() and agent_md.exists():
+            content = agent_md.read_text()
+            match = re.search(r'description:\s*"?([^"\n]+)"?', content)
+            description = match.group(1).strip() if match else "(no description)"
+            agents.append({"name": d.name, "description": description})
+
+    return agents
+
+
 # ─── Commands ────────────────────────────────────────────────────────
 
 
 def cmd_list(args: argparse.Namespace) -> None:
-    """List available skills."""
+    """List available skills and agents."""
     skills = get_available_skills()
-    if not skills:
-        print("No skills found.")
+    agents = get_available_agents()
+
+    if not skills and not agents:
+        print("No skills or agents found.")
         return
 
-    max_name = max(len(s["name"]) for s in skills)
-    print("\nAvailable skills:\n")
-    for s in skills:
-        print(f"  {s['name']:<{max_name + 2}} {s['description']}")
-    print("\nInstall with: swishbot install <skill-name>\n")
+    if skills:
+        max_name = max(len(s["name"]) for s in skills)
+        print("\nAvailable skills:\n")
+        for s in skills:
+            print(f"  {s['name']:<{max_name + 2}} {s['description']}")
+        print("\nInstall with: swishbot install <skill-name>")
+
+    if agents:
+        max_name = max(len(a["name"]) for a in agents)
+        print("\nAvailable agents:\n")
+        for a in agents:
+            print(f"  {a['name']:<{max_name + 2}} {a['description']}")
+        print("\nInstall agent: swishbot install --agent <agent-name>")
+
+    print()
 
 
 def cmd_install(args: argparse.Namespace) -> None:
+    """Install one or more skills or agents."""
+    if args.agent:
+        _install_agents(args)
+    else:
+        _install_skills(args)
+
+
+def _install_skills(args: argparse.Namespace) -> None:
     """Install one or more skills."""
     dest = Path(args.path) if args.path else DEFAULT_INSTALL_PATH
     available = {s["name"] for s in get_available_skills()}
@@ -124,6 +163,39 @@ def cmd_install(args: argparse.Namespace) -> None:
         print(f"  ✓ {name} → {skill_dest}")
 
     print(f"\nDone. Skills installed to {dest}")
+    print("Make sure your Claude project references this path.\n")
+
+
+def _install_agents(args: argparse.Namespace) -> None:
+    """Install one or more agents."""
+    dest = Path(args.path) if args.path else DEFAULT_AGENT_INSTALL_PATH
+    available = {a["name"] for a in get_available_agents()}
+
+    if args.all:
+        names = sorted(available)
+    elif args.skills:
+        names = args.skills
+    else:
+        print("Error: specify an agent name or use --all", file=sys.stderr)
+        sys.exit(1)
+
+    for name in names:
+        if name not in available:
+            print(f"Error: agent '{name}' not found.", file=sys.stderr)
+            print(f"Available: {', '.join(sorted(available))}", file=sys.stderr)
+            sys.exit(1)
+
+        src = AGENTS_DIR / name
+        agent_dest = dest / name
+
+        if agent_dest.exists():
+            print(f"  ⟳ {name} — already installed, overwriting")
+            shutil.rmtree(agent_dest)
+
+        shutil.copytree(src, agent_dest)
+        print(f"  ✓ {name} → {agent_dest}")
+
+    print(f"\nDone. Agents installed to {dest}")
     print("Make sure your Claude project references this path.\n")
 
 
@@ -173,9 +245,10 @@ def main() -> None:
     subparsers.add_parser("list", help="List available skills")
 
     # install
-    install_parser = subparsers.add_parser("install", help="Install skills")
-    install_parser.add_argument("skills", nargs="*", help="Skill names to install")
-    install_parser.add_argument("--all", action="store_true", help="Install all skills")
+    install_parser = subparsers.add_parser("install", help="Install skills or agents")
+    install_parser.add_argument("skills", nargs="*", help="Skill or agent names to install")
+    install_parser.add_argument("--all", action="store_true", help="Install all skills (or all agents with --agent)")
+    install_parser.add_argument("--agent", action="store_true", help="Install agents instead of skills")
     install_parser.add_argument("--path", type=str, help=f"Install target (default: {DEFAULT_INSTALL_PATH})")
 
     # init
