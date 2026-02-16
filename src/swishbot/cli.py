@@ -271,7 +271,13 @@ def cmd_hooks(args: argparse.Namespace) -> None:
 
 
 def _parse_hooks_from_frontmatter(skill_name: str, frontmatter: str, hooks_found: list) -> None:
-    """Extract hook entries from YAML frontmatter text."""
+    """Extract hook entries from YAML frontmatter text.
+
+    Assumes a single hook per event type per skill. If a skill defines multiple
+    hooks under the same event (e.g., two PreToolUse hooks), only the last one
+    is captured. This is sufficient for current skills but should be revisited
+    if multi-hook-per-event support is needed.
+    """
     current_event = None
     current_matcher = None
 

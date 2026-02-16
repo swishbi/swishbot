@@ -81,6 +81,26 @@ Edit the file to uncomment the skills you've installed and fill in your project 
     swishbot init-project --force
     ```
 
+## Set up hooks
+
+Some skills include hooks that automatically enforce rules (e.g., SQL validation, style checks). See what hooks your installed skills provide:
+
+```bash
+swishbot hooks
+```
+
+Copy the hook definitions into your `.claude/settings.json` to activate them. See the [CLI Reference](cli-reference.md#swishbot-hooks) for details.
+
+## Set up project memory (optional)
+
+Scaffold a memory directory so Claude can persist modeling decisions, source metadata, and conventions across sessions:
+
+```bash
+swishbot init-memory
+```
+
+This creates `.claude/memory/` with template files and a session-end hook. See the [CLI Reference](cli-reference.md#swishbot-init-memory) for details.
+
 ## Verify it works
 
 Open Claude Code in your project and start working. Claude will automatically read the `CLAUDE.md` and apply the methodology from your installed skills.

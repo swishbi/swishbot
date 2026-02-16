@@ -101,6 +101,47 @@ def test_all_agents_have_copyright_footer():
         )
 
 
+# ─── skill frontmatter validation ────────────────────────────────────
+
+
+def test_all_skills_have_copyright_footer():
+    for d in sorted(cli.SKILLS_DIR.iterdir()):
+        skill_md = d / "SKILL.md"
+        if not (d.is_dir() and skill_md.exists()):
+            continue
+        content = skill_md.read_text().rstrip()
+        assert content.endswith("*Copyright (c) 2026 Swish BI Limited. All rights reserved.*"), (
+            f"Skill {d.name} missing copyright footer"
+        )
+
+
+def test_skill_descriptions_are_single_line():
+    for d in sorted(cli.SKILLS_DIR.iterdir()):
+        skill_md = d / "SKILL.md"
+        if not (d.is_dir() and skill_md.exists()):
+            continue
+        content = skill_md.read_text()
+        match = re.search(r'description:\s*"?([^"\n]+)"?', content)
+        assert match, f"Skill {d.name} missing description"
+        desc = match.group(1).strip()
+        assert "\n" not in desc, f"Skill {d.name} description contains newline"
+
+
+def test_skill_frontmatter_has_required_fields():
+    for d in sorted(cli.SKILLS_DIR.iterdir()):
+        skill_md = d / "SKILL.md"
+        if not (d.is_dir() and skill_md.exists()):
+            continue
+        content = skill_md.read_text()
+        fm_match = re.match(r"^---\n(.+?)\n---", content, re.DOTALL)
+        assert fm_match, f"Skill {d.name} missing YAML frontmatter"
+        frontmatter = fm_match.group(1)
+        assert re.search(r"^name:", frontmatter, re.MULTILINE), f"Skill {d.name} missing 'name' in frontmatter"
+        assert re.search(r"^description:", frontmatter, re.MULTILINE), (
+            f"Skill {d.name} missing 'description' in frontmatter"
+        )
+
+
 # ─── cmd_list ─────────────────────────────────────────────────────────
 
 

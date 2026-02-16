@@ -70,7 +70,7 @@ If a skill or agent is already installed, it will be overwritten.
 
 ## `swishbot init-project`
 
-Create a starter `CLAUDE.md` in your project directory.
+Create a starter `CLAUDE.md` and `SECURITY.md` in your project directory.
 
 ```bash
 # Current directory
@@ -88,6 +88,8 @@ swishbot init-project --force
 | `--path` | Target directory (default: current directory) |
 | `--force` | Overwrite an existing `CLAUDE.md` |
 
+Both files are copied together — `CLAUDE.md` defines project conventions and installed skills, while `SECURITY.md` provides security guidelines for SQL safety, credential handling, and prompt injection defense.
+
 ## `swishbot init`
 
 Scaffold a new skill with a template `SKILL.md`.
@@ -97,3 +99,65 @@ swishbot init my-new-skill
 ```
 
 This creates a new skill directory under the bundled skills folder with a template ready to fill in. See [Creating Skills](creating-skills.md) for details.
+
+## `swishbot hooks`
+
+List hooks provided by installed skills. Hooks are Claude Code event handlers (e.g., `PreToolUse`, `PostToolUse`) that skills define to enforce rules automatically.
+
+```bash
+# Default install path
+swishbot hooks
+
+# Custom install path
+swishbot hooks --path ~/my-project/.claude/skills
+```
+
+| Option | Description |
+|--------|-------------|
+| `--path` | Skills install path (default: `~/.claude/skills/`) |
+
+Example output:
+
+```
+Installed hooks:
+
+  dba-security  PreToolUse  (Write|Edit)  validate-sql.sh
+  dbt-staging   PreToolUse  (Write|Edit)  check-staging-refs.sh
+  dbt-style     PreToolUse  (Write|Edit)  check-style.sh
+```
+
+## `swishbot init-memory`
+
+Scaffold a project memory directory with templates for Claude to persist decisions across sessions.
+
+```bash
+# Current directory
+swishbot init-memory
+
+# Specific directory
+swishbot init-memory --path ~/my-project
+
+# Overwrite existing
+swishbot init-memory --force
+```
+
+| Option | Description |
+|--------|-------------|
+| `--path` | Target directory (default: current directory) |
+| `--force` | Overwrite an existing memory directory |
+
+Example output:
+
+```
+  ✓ .claude/settings.json (session capture hook)
+
+  ✓ Memory templates → ~/my-project/.claude/memory
+    - MEMORY.md
+    - conventions.md
+    - modeling-decisions.md
+    - source-catalog.md
+
+Claude will update these files as decisions are made during sessions.
+```
+
+This creates a `.claude/memory/` directory with template files and a `settings.json` with a `Stop` hook that prompts Claude to save decisions at the end of each session.
