@@ -37,6 +37,7 @@ Reference: https://docs.getdbt.com/best-practices/how-we-structure/4-marts
 - **[dbt-staging](../dbt-staging/SKILL.md)** — The first transformation layer
 - **[dbt-mcp](../dbt-mcp/SKILL.md)** — Use `get_lineage` to understand downstream dependencies before modifying marts
 - **[dimensional-modeling](../dimensional-modeling/SKILL.md)** — Design-level decisions for fact tables, dimension tables, grain, and conformance
+- **[powerbi](../powerbi/SKILL.md)** — Power BI semantic models that consume mart tables as star schemas
 
 ---
 

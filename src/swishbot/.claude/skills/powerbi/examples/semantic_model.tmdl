@@ -1,0 +1,2707 @@
+createOrReplace
+
+	model Model
+		culture: en-US
+		defaultPowerBIDataSourceVersion: powerBI_V3
+		discourageImplicitMeasures
+		sourceQueryCulture: en-US
+		dataAccessOptions
+			legacyRedirects
+			returnErrorValuesAsNull
+
+		table _PrmPeriodHierarchy
+			isHidden
+			lineageTag: 2330b05d-09f3-4267-a4de-b37f5f02beed
+
+			column Period
+				isHidden
+				lineageTag: 711c4d2f-79d6-49e9-a97d-663a7641ded3
+				summarizeBy: none
+				sourceColumn: [Value1]
+				sortByColumn: '_PrmPeriodHierarchy Order'
+
+				relatedColumnDetails
+					groupByColumn: '_PrmPeriodHierarchy Fields'
+
+				annotation SummarizationSetBy = Automatic
+
+			column '_PrmPeriodHierarchy Fields'
+				isHidden
+				lineageTag: 36d6772e-b87d-40df-a8ef-e2ecb2ee42b1
+				summarizeBy: none
+				sourceColumn: [Value2]
+				sortByColumn: '_PrmPeriodHierarchy Order'
+
+				extendedProperty ParameterMetadata = {"version":3,"kind":2}
+
+				annotation SummarizationSetBy = Automatic
+
+			column '_PrmPeriodHierarchy Order'
+				isHidden
+				formatString: 0
+				lineageTag: 0178f94a-30f2-4c90-b685-39a1051781d9
+				summarizeBy: sum
+				sourceColumn: [Value3]
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Period Short'
+				isHidden
+				lineageTag: 0490d3a0-23c1-4f75-a69b-12b1557249ed
+				summarizeBy: none
+				sourceColumn: [Value4]
+
+				annotation SummarizationSetBy = Automatic
+
+			partition _PrmPeriodHierarchy = calculated
+				mode: import
+				source =
+						{
+						    ("Year", NAMEOF('DimDate'[Year Number]), 0, "Y"),
+						    ("Quarter", NAMEOF('DimDate'[Quarter Year Name]), 1, "Q"),
+						    ("Month", NAMEOF('DimDate'[Accounting Period Name]), 2, "M")
+						}
+
+		table _Measures
+			lineageTag: 588e760c-2691-436c-876d-a2fb0445fc47
+
+			measure 'KPI PoP Highlight' = ```
+
+					VAR _red = "#D64550"
+					VAR _green = "#1AAB40"
+					VAR _value = [KPI PoP]
+					VAR VarianceGreaterthan0 =
+					    IF ( _value >= 0, _green )
+					VAR VarianceLessthan0 =
+					    IF ( _value < 0, _red )
+					RETURN
+					    COALESCE ( VarianceGreaterthan0, VarianceLessthan0, "#000000" )
+
+					```
+				displayFolder: Time Intelligence\Period-over-period growth
+				lineageTag: 68cbe37a-8b7a-4464-a96f-fdbbb3d4b2a2
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'KPI YoY %' =
+
+					DIVIDE ( [KPI YoY], [KPI PY] )
+				formatString: 0.0%;-0.0%;0.0%
+				displayFolder: Time Intelligence\Period-over-period growth
+				lineageTag: 88b446aa-ec5a-465d-a5ff-2f914c4bff6d
+
+			measure 'KPI PY' =
+
+					IF (
+					    [ShowValueForDates],
+					    SUMX (
+					        VALUES ( DimDate[Fiscal Year Number] ),
+					        VAR CurrentFiscalYearNumber = DimDate[Fiscal Year Number]
+					        VAR DaysSelected =
+					            CALCULATETABLE (
+					                VALUES ( DimDate[Fiscal Day Of Year] ),
+					                REMOVEFILTERS (
+					                    DimDate[Day Of Week Name],
+					                    DimDate[Day Of Week Name Short],
+					                    DimDate[Day Of Week Iso]
+					                ),
+					                DimDate[DateWithSales] = TRUE
+					            )
+					        RETURN
+					            CALCULATE (
+					                [KPI],
+					                DimDate[Fiscal Year Number] = CurrentFiscalYearNumber - 1,
+					                DaysSelected,
+					                ALLEXCEPT (
+					                    DimDate,
+					                    DimDate[Day Of Week Name],
+					                    DimDate[Day Of Week Name Short]
+					                )
+					            )
+					    )
+					)
+				displayFolder: Time Intelligence\Period-over-period growth
+				lineageTag: c9780fc5-5d19-4551-9322-3eedc3e7e5f6
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'KPI YoY' =
+
+					VAR ValueCurrentPeriod = [KPI]
+					VAR ValuePreviousPeriod = [KPI PY]
+					VAR Result =
+					    IF (
+					        NOT ISBLANK ( ValueCurrentPeriod )
+					            && NOT ISBLANK ( ValuePreviousPeriod ),
+					        ValueCurrentPeriod - ValuePreviousPeriod
+					    )
+					RETURN
+					    Result
+				displayFolder: Time Intelligence\Period-over-period growth
+				lineageTag: 8ef8a2e7-0076-4f60-82f4-4fe074b7c16d
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'KPI PQ' =
+
+					IF (
+					    [ShowValueForDates],
+					    SUMX (
+					        VALUES ( DimDate[Fiscal Year Quarter Number] ),
+					        VAR CurrentFiscalYearQuarterNumber = DimDate[Fiscal Year Quarter Number]
+					        VAR DaysSelected =
+					            CALCULATETABLE (
+					                VALUES ( DimDate[Fiscal Day Of Quarter] ),
+					                REMOVEFILTERS (
+					                    DimDate[Day Of Week Name],
+					                    DimDate[Day Of Week Name Short],
+					                    DimDate[Day Of Week Iso]
+					                ),
+					                DimDate[DateWithSales] = TRUE
+					            )
+					        RETURN
+					            CALCULATE (
+					                [KPI],
+					                DimDate[Fiscal Year Quarter Number] = CurrentFiscalYearQuarterNumber - 1,
+					                DaysSelected,
+					                ALLEXCEPT (
+					                    DimDate,
+					                    DimDate[Day Of Week Name],
+					                    DimDate[Day Of Week Name Short]
+					                )
+					            )
+					    )
+					)
+				displayFolder: Time Intelligence\Period-over-period growth
+				lineageTag: f043b357-ddc3-47e9-85f2-94800adfbf1a
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'KPI QoQ' =
+
+					VAR ValueCurrentPeriod = [KPI]
+					VAR ValuePreviousPeriod = [KPI PQ]
+					VAR Result =
+					    IF (
+					        NOT ISBLANK ( ValueCurrentPeriod ) && NOT ISBLANK ( ValuePreviousPeriod ),
+					        ValueCurrentPeriod - ValuePreviousPeriod
+					    )
+					RETURN
+					    Result
+				displayFolder: Time Intelligence\Period-over-period growth
+				lineageTag: 2b45eff3-58ea-4785-9f7d-6852b81af621
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'KPI QoQ %' =
+
+					DIVIDE ( [KPI QoQ], [KPI PQ] )
+				formatString: 0.0%;-0.0%;0.0%
+				displayFolder: Time Intelligence\Period-over-period growth
+				lineageTag: 8dd0cd6c-1aee-4368-8dfc-1de3ddbaeaf0
+
+			measure 'KPI PW' =
+
+					IF (
+					    [ShowValueForDates],
+					    SUMX (
+					        VALUES ( DimDate[Fiscal Year Week Number] ),
+					        VAR CurrentFiscalYearWeekNumber = DimDate[Fiscal Year Week Number]
+					        VAR DaysSelected =
+					            CALCULATETABLE (
+					                VALUES ( DimDate[Day Of Week Iso] ),
+					                REMOVEFILTERS (
+					                    DimDate[Day Of Week Name],
+					                    DimDate[Day Of Week Name Short],
+					                    DimDate[Day Of Week Iso]
+					                ),
+					                DimDate[DateWithSales] = TRUE
+					            )
+					        RETURN
+					            CALCULATE (
+					                [KPI],
+					                DimDate[Fiscal Year Week Number] = CurrentFiscalYearWeekNumber - 1,
+					                KEEPFILTERS ( DaysSelected ),
+					                ALLEXCEPT (
+					                    DimDate,
+					                    DimDate[Day Of Week Name],
+					                    DimDate[Day Of Week Name Short]
+					                )
+					            )
+					    )
+					)
+				displayFolder: Time Intelligence\Period-over-period growth
+				lineageTag: 40ecc824-fc6d-48c7-a25f-2b16cd5fddf9
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'KPI WoW' =
+
+					VAR ValueCurrentPeriod = [KPI]
+					VAR ValuePreviousPeriod = [KPI PW]
+					VAR Result =
+					    IF (
+					        NOT ISBLANK ( ValueCurrentPeriod ) && NOT ISBLANK ( ValuePreviousPeriod ),
+					        ValueCurrentPeriod - ValuePreviousPeriod
+					    )
+					RETURN
+					    Result
+				displayFolder: Time Intelligence\Period-over-period growth
+				lineageTag: d9f65bdc-4311-4dad-8ab7-0812f89917f3
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'KPI WoW %' =
+
+					DIVIDE ( [KPI WoW], [KPI PW] )
+				formatString: 0.0%;-0.0%;0.0%
+				displayFolder: Time Intelligence\Period-over-period growth
+				lineageTag: 4a3e93b7-e7ec-4d2e-802d-cb2281054e95
+
+			measure 'KPI PM' =
+
+					IF (
+					    [ShowValueForDates],
+					    SUMX (
+					        VALUES ( DimDate[Fiscal Year Period Number] ),
+					        VAR CurrentFiscalYearMonthNumber = DimDate[Fiscal Year Period Number]
+					        VAR DaysSelected =
+					            CALCULATETABLE (
+					                VALUES ( DimDate[Fiscal Day Of Period] ),
+					                REMOVEFILTERS (
+					                    DimDate[Day Of Week Name],
+					                    DimDate[Day Of Week Name Short],
+					                    DimDate[Day Of Week Iso]
+					                ),
+					                DimDate[DateWithSales] = TRUE
+					            )
+					        RETURN
+					            CALCULATE (
+					                [KPI],
+					                DimDate[Fiscal Year Period Number] = CurrentFiscalYearMonthNumber - 1,
+					                DaysSelected,
+					                ALLEXCEPT (
+					                    DimDate,
+					                    DimDate[Day Of Week Name],
+					                    DimDate[Day Of Week Name Short]
+					                )
+					            )
+					    )
+					)
+				displayFolder: Time Intelligence\Period-over-period growth
+				lineageTag: a1b2c3d4-1111-2222-3333-444455556666
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'KPI MoM' =
+
+					VAR ValueCurrentPeriod = [KPI]
+					VAR ValuePreviousPeriod = [KPI PM]
+					VAR Result =
+					    IF (
+					        NOT ISBLANK ( ValueCurrentPeriod ) && NOT ISBLANK ( ValuePreviousPeriod ),
+					        ValueCurrentPeriod - ValuePreviousPeriod
+					    )
+					RETURN
+					    Result
+				displayFolder: Time Intelligence\Period-over-period growth
+				lineageTag: a1b2c3d4-2222-3333-4444-555566667777
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'KPI MoM %' =
+
+					DIVIDE ( [KPI MoM], [KPI PM] )
+				formatString: 0.0%;-0.0%;0.0%
+				displayFolder: Time Intelligence\Period-over-period growth
+				lineageTag: a1b2c3d4-3333-4444-5555-666677778888
+
+			measure 'KPI DoD' =
+
+					VAR ValueCurrentPeriod = [KPI]
+					VAR ValuePreviousPeriod =
+					    CALCULATE ( [KPI], DATEADD ( DimDate[Date Day], -1, DAY ) )
+					VAR Result =
+					    IF (
+					        NOT ISBLANK ( ValueCurrentPeriod ) && NOT ISBLANK ( ValuePreviousPeriod ),
+					        ValueCurrentPeriod - ValuePreviousPeriod
+					    )
+					RETURN
+					    Result
+				displayFolder: Time Intelligence\Period-over-period growth
+				lineageTag: a1b2c3d4-4444-5555-6666-777788889999
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'KPI DoD %' =
+
+					VAR ValueCurrentPeriod = [KPI]
+					VAR ValuePreviousPeriod =
+					    CALCULATE ( [KPI], DATEADD ( DimDate[Date Day], -1, DAY ) )
+					RETURN
+					    DIVIDE ( ValueCurrentPeriod - ValuePreviousPeriod, ValuePreviousPeriod )
+				formatString: 0.0%;-0.0%;0.0%
+				displayFolder: Time Intelligence\Period-over-period growth
+				lineageTag: a1b2c3d4-5555-6666-7777-888899990000
+
+			/// A dynamic time-based comparison metric that calculates the percentage change
+			/// in KPI values relative to the equivalent prior period, based on the level of
+			/// the date hierarchy selected.
+			measure 'KPI PoP %' =
+
+					SWITCH (
+					    TRUE,
+					    ISINSCOPE ( DimDate[Date Day] ), [KPI DoD %],
+					    ISINSCOPE ( DimDate[Week Start Date] ), [KPI WoW %],
+					    ISINSCOPE ( DimDate[Accounting Period Name] ), [KPI MoM %],
+					    ISINSCOPE ( DimDate[Fiscal Quarter Name] ), [KPI QoQ %],
+					    ISINSCOPE ( DimDate[Fiscal Year Name] ), [KPI YoY %]
+					)
+				formatString: 0.0%;-0.0%;0.0%
+				displayFolder: Time Intelligence\Period-over-period growth
+				lineageTag: 0c373aac-030f-4c49-a93c-9b0581d8697e
+
+			/// A dynamic time intelligence metric that automatically calculates the change
+			/// in KPI compared to the equivalent prior period, depending on the level of
+			/// the date hierarchy selected in the report.
+			measure 'KPI PoP' =
+
+					SWITCH (
+					    TRUE,
+					    ISINSCOPE ( DimDate[Date Day] ), [KPI DoD],
+					    ISINSCOPE ( DimDate[Week Start Date] ), [KPI WoW],
+					    ISINSCOPE ( DimDate[Accounting Period Name] ), [KPI MoM],
+					    ISINSCOPE ( DimDate[Fiscal Quarter Name] ), [KPI QoQ],
+					    ISINSCOPE ( DimDate[Fiscal Year Name] ), [KPI YoY]
+					)
+				displayFolder: Time Intelligence\Period-over-period growth
+				lineageTag: de1fcb34-f423-48a6-a905-df22868be3dd
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			/// Returns the KPI value from the immediately preceding comparable period,
+			/// dynamically resolved based on the current date hierarchy level.
+			measure 'KPI PP' =
+
+					SWITCH (
+					    TRUE,
+					    ISINSCOPE ( DimDate[Date Day] ), CALCULATE ( [KPI], DATEADD ( DimDate[Date Day], -1, DAY ) ),
+					    ISINSCOPE ( DimDate[Week Start Date] ), [KPI PW],
+					    ISINSCOPE ( DimDate[Accounting Period Name] ), [KPI PM],
+					    ISINSCOPE ( DimDate[Fiscal Quarter Name] ), [KPI PQ],
+					    ISINSCOPE ( DimDate[Fiscal Year Name] ), [KPI PY]
+					)
+				displayFolder: Time Intelligence\Period-over-period growth
+				lineageTag: 8586420a-7898-4e8b-9ebf-d2c40f9f33fc
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'KPI PYTD' =
+
+					IF (
+					    [ShowValueForDates],
+					    VAR PreviousFiscalYear = MAX ( DimDate[Fiscal Year Number] ) - 1
+					    VAR LastDayOfFiscalYearAvailable =
+					        CALCULATE (
+					            MAX ( DimDate[Fiscal Day Of Year] ),
+					            REMOVEFILTERS (
+					                DimDate[Day Of Week Name],
+					                DimDate[Day Of Week Name Short],
+					                DimDate[Day Of Week Iso]
+					            ),
+					            DimDate[DateWithSales] = TRUE
+					        )
+					    VAR Result =
+					        CALCULATE (
+					            [KPI],
+					            ALLEXCEPT (
+					                DimDate,
+					                DimDate[Day Of Week Name],
+					                DimDate[Day Of Week Name Short]
+					            ),
+					            DimDate[Fiscal Year Number] = PreviousFiscalYear,
+					            DimDate[Fiscal Day Of Year] <= LastDayOfFiscalYearAvailable,
+					            DimDate[DateWithSales] = TRUE
+					        )
+					    RETURN
+					        Result
+					)
+				displayFolder: Time Intelligence\Period-to-date growth
+				lineageTag: 46394762-1b2a-4dc8-bab9-0ee721d21d91
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'KPI YoYTD' =
+
+					VAR ValueCurrentPeriod = [KPI YTD]
+					VAR ValuePreviousPeriod = [KPI PYTD]
+					VAR Result =
+					    IF (
+					        NOT ISBLANK ( ValueCurrentPeriod ) && NOT ISBLANK ( ValuePreviousPeriod ),
+					        ValueCurrentPeriod - ValuePreviousPeriod
+					    )
+					RETURN
+					    Result
+				displayFolder: Time Intelligence\Period-to-date growth
+				lineageTag: f7bdc5de-cabb-4f47-9352-46829f461966
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'KPI YoYTD %' =
+
+					DIVIDE ( [KPI YoYTD], [KPI PYTD] )
+				formatString: 0.0%;-0.0%;0.0%
+				displayFolder: Time Intelligence\Period-to-date growth
+				lineageTag: 56ab74d0-67a9-4773-8624-bd3e829fd430
+
+			measure 'KPI YTD' =
+
+					IF (
+					    [ShowValueForDates],
+					    VAR LastDayAvailable = MAX ( DimDate[Fiscal Day Of Year] )
+					    VAR LastFiscalYearAvailable = MAX ( DimDate[Fiscal Year Number] )
+					    VAR Result =
+					        CALCULATE (
+					            [KPI],
+					            ALLEXCEPT ( DimDate, DimDate[Day Of Week Name], DimDate[Day Of Week Name Short] ),
+					            DimDate[Fiscal Day Of Year] <= LastDayAvailable,
+					            DimDate[Fiscal Year Number] = LastFiscalYearAvailable
+					        )
+					    RETURN
+					        Result
+					)
+				displayFolder: Time Intelligence\Period-to-date total
+				lineageTag: 8dffa2bd-67f9-4dcc-a4f8-ff2307996ab3
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'KPI QTD' =
+
+					IF (
+					    [ShowValueForDates],
+					    VAR LastDayAvailable = MAX ( DimDate[Fiscal Day Of Quarter] )
+					    VAR LastFiscalYearQuarterAvailable = MAX ( DimDate[Fiscal Year Quarter Number] )
+					    VAR Result =
+					        CALCULATE (
+					            [KPI],
+					            ALLEXCEPT ( DimDate, DimDate[Day Of Week Name], DimDate[Day Of Week Name Short] ),
+					            DimDate[Fiscal Day Of Quarter] <= LastDayAvailable,
+					            DimDate[Fiscal Year Quarter Number] = LastFiscalYearQuarterAvailable
+					        )
+					    RETURN
+					        Result
+					)
+				displayFolder: Time Intelligence\Period-to-date total
+				lineageTag: fc196e7c-1a50-4764-beb0-2a39c0965c5c
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'KPI MTD' =
+
+					IF (
+					    [ShowValueForDates],
+					    VAR LastDayAvailable = MAX ( DimDate[Fiscal Day Of Period] )
+					    VAR LastFiscalYearMonthAvailable = MAX ( DimDate[Fiscal Year Period Number] )
+					    VAR Result =
+					        CALCULATE (
+					            [KPI],
+					            ALLEXCEPT ( DimDate, DimDate[Day Of Week Name], DimDate[Day Of Week Name Short] ),
+					            DimDate[Fiscal Day Of Period] <= LastDayAvailable,
+					            DimDate[Fiscal Year Period Number] = LastFiscalYearMonthAvailable
+					        )
+					    RETURN
+					        Result
+					)
+				displayFolder: Time Intelligence\Period-to-date total
+				lineageTag: 85e3fe3e-c4f0-4fd4-8023-fbcc41ad403b
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'KPI WTD' =
+
+					IF (
+					    [ShowValueForDates],
+					    VAR LastDayOfWeekAvailable = MAX ( DimDate[Day Of Week Iso] )
+					    VAR LastFiscalYearWeekAvailable = MAX ( DimDate[Fiscal Year Week Number] )
+					    VAR Result =
+					        CALCULATE (
+					            [KPI],
+					            ALLEXCEPT ( DimDate, DimDate[Day Of Week Name], DimDate[Day Of Week Name Short] ),
+					            DimDate[Day Of Week Iso] <= LastDayOfWeekAvailable,
+					            DimDate[Fiscal Year Week Number] = LastFiscalYearWeekAvailable
+					        )
+					    RETURN
+					        Result
+					)
+				displayFolder: Time Intelligence\Period-to-date total
+				lineageTag: ed61c4a6-b0e1-4621-8283-5473d1ed9430
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'KPI to Date' = ```
+
+					CALCULATE (
+					    [KPI],
+					    FILTER (
+					        ALL ( DimDate ),
+					        DimDate[Date Day] <= MAX ( DimDate[Date Day] )
+					    )
+					)
+
+					```
+				displayFolder: Time Intelligence\Period-to-date total
+				lineageTag: f41266f2-0841-4ef5-877d-532e61214c3b
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'KPI MAT (364)' =
+
+					IF (
+					    [ShowValueForDates],
+					    VAR LastDayMAT = MAX ( DimDate[Sequential Day Number] )
+					    VAR FirstDayMAT = LastDayMAT - 363
+					    VAR Result =
+					        CALCULATE (
+					            [KPI],
+					            ALLEXCEPT (
+					                DimDate,
+					                DimDate[Day Of Week Name],
+					                DimDate[Day Of Week Name Short]
+					            ),
+					            DimDate[Sequential Day Number] >= FirstDayMAT
+					                && DimDate[Sequential Day Number] <= LastDayMAT
+					        )
+					    RETURN
+					        Result
+					)
+				displayFolder: Time Intelligence\Moving annual total growth
+				lineageTag: e4c5342b-ff3f-4067-a019-66a0e26cfecb
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'KPI PYMAT (364)' =
+
+					IF (
+					    [ShowValueForDates],
+					    VAR LastDayAvailable = MAX ( DimDate[Sequential Day Number] )
+					    VAR LastDayMAT = LastDayAvailable - 364
+					    VAR FirstDayMAT = LastDayMAT - 363
+					    VAR Result =
+					        CALCULATE (
+					            [KPI],
+					            ALLEXCEPT (
+					                DimDate,
+					                DimDate[Day Of Week Name],
+					                DimDate[Day Of Week Name Short]
+					            ),
+					            DimDate[Sequential Day Number] >= FirstDayMAT
+					                && DimDate[Sequential Day Number] <= LastDayMAT
+					        )
+					    RETURN
+					        Result
+					)
+				displayFolder: Time Intelligence\Moving annual total growth
+				lineageTag: 9b20cffc-2ec7-4502-90b9-0ad5d0224d10
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'KPI YoYMAT (364)' =
+
+					VAR ValueCurrentPeriod = [KPI MAT (364)]
+					VAR ValuePreviousPeriod = [KPI PYMAT (364)]
+					VAR Result =
+					    IF (
+					        NOT ISBLANK ( ValueCurrentPeriod ) && NOT ISBLANK ( ValuePreviousPeriod ),
+					        ValueCurrentPeriod - ValuePreviousPeriod
+					    )
+					RETURN
+					    Result
+				displayFolder: Time Intelligence\Moving annual total growth
+				lineageTag: 52632d4b-5f9a-442c-9255-0f2a0d1327e5
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'KPI YoYMAT % (364)' =
+
+					DIVIDE ( [KPI YoYMAT (364)], [KPI PYMAT (364)] )
+				formatString: 0.00%;-0.00%;0.00%
+				displayFolder: Time Intelligence\Moving annual total growth
+				lineageTag: 1f805b23-854b-4975-b392-351c78f4eb68
+
+			/// Returns the KPI value aggregated over the last 12 months.
+			measure 'KPI LTM' =
+
+					CALCULATE ( [KPI], DATESINPERIOD ( DimDate[Date Day], MAX ( DimDate[Date Day] ), -12, MONTH ) )
+				displayFolder: Time Intelligence\Moving annual total growth
+				lineageTag: a228b52f-b468-46ce-9423-c58a2d03414e
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			/// Returns the KPI value aggregated over the last 3 full months.
+			measure 'KPI L3M' =
+
+					CALCULATE ( [KPI], DATESINPERIOD ( DimDate[Date Day], MAX ( DimDate[Date Day] ), -3, MONTH ) )
+				displayFolder: Time Intelligence\Moving annual total growth
+				lineageTag: 1f233d82-6e08-40df-a5a2-685d44c037d6
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			/// Average of the KPI over the last 4 weeks.
+			measure 'KPI AVG 4W' =
+
+					IF (
+					    [ShowValueForDates],
+					    VAR LastDay = MAX ( DimDate[Sequential Day Number] )
+					    VAR FirstDay = LastDay - 27
+					    VAR Period4W =
+					        CALCULATETABLE (
+					            VALUES ( DimDate[Sequential Day Number] ),
+					            ALLEXCEPT (
+					                DimDate,
+					                DimDate[Day Of Week Name],
+					                DimDate[Day Of Week Name Short]
+					            ),
+					            DimDate[Sequential Day Number] >= FirstDay
+					                && DimDate[Sequential Day Number] <= LastDay,
+					            DimDate[DateWithSales] = TRUE
+					        )
+					    VAR Result =
+					        CALCULATE (
+					            AVERAGEX ( Period4W, [KPI] ),
+					            REMOVEFILTERS ( DimDate )
+					        )
+					    RETURN
+					        Result
+					)
+				displayFolder: Time Intelligence\Moving averages
+				lineageTag: 7ae943a4-0d34-4a0c-99e5-b003f0072e4f
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'KPI Total' =
+
+					CALCULATE ( [KPI], ALL ( DimCompany ) )
+				displayFolder: Time Intelligence\_Base Measures
+				lineageTag: 7bfb867a-070f-4409-b94f-dd8fbc31e2e7
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			measure 'KPI Variance' = [KPI] - [KPI Total]
+				displayFolder: Time Intelligence\_Base Measures
+				lineageTag: 9fed4585-19a3-4664-a848-7728483490cb
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			/// The central KPI dispatch measure. Resolves the currently selected KPI
+			/// from the _PrmKPI field parameter. All time intelligence measures reference
+			/// this measure so they automatically work for any selected KPI.
+			measure KPI = ```
+
+					SWITCH(
+					    SELECTEDVALUE( _PrmKPI[_PrmKPI Fields] ),
+
+					    // ─── Revenue ────────────────────────────────────────────────────────
+					    "'_Measures'[Total Revenue]", [Total Revenue],
+					    "'_Measures'[Average Order Value]", [Average Order Value],
+					    "'_Measures'[Average Daily Revenue]", [Average Daily Revenue],
+
+					    // ─── Orders ─────────────────────────────────────────────────────────
+					    "'_Measures'[Order Count]", [Order Count],
+					    "'_Measures'[Units Sold]", [Units Sold],
+
+					    // ─── Customers ──────────────────────────────────────────────────────
+					    "'_Measures'[Active Customer Count]", [Active Customer Count],
+					    "'_Measures'[New Customer Count]", [New Customer Count],
+					    "'_Measures'[Customer Retention Rate]", [Customer Retention Rate],
+
+					    // ─── Profitability ──────────────────────────────────────────────────
+					    "'_Measures'[Gross Profit]", [Gross Profit],
+					    "'_Measures'[Gross Margin %]", [Gross Margin %],
+					    "'_Measures'[Net Profit]", [Net Profit],
+					    "'_Measures'[Net Margin %]", [Net Margin %],
+
+					    // ─── Fallback ───────────────────────────────────────────────────────
+					    BLANK()
+					)
+
+					```
+				displayFolder: Time Intelligence\_Base Measures
+				lineageTag: 6442064b-4ea8-4566-af58-c341771407f0
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			/// Total revenue from all orders.
+			measure 'Total Revenue' =
+
+					SUM ( FctOrders[Order Amount] )
+				formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+				displayFolder: Revenue
+				lineageTag: 11111111-1111-1111-1111-111111111111
+
+				annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+			/// Average revenue per order.
+			measure 'Average Order Value' =
+
+					DIVIDE ( [Total Revenue], [Order Count] )
+				formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+				displayFolder: Revenue
+				lineageTag: 22222222-2222-2222-2222-222222222222
+
+				annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+			/// Average daily revenue for the selected period.
+			measure 'Average Daily Revenue' =
+
+					DIVIDE (
+					    [Total Revenue],
+					    DISTINCTCOUNT ( FctOrders[Order Date Dt] )
+					)
+				formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+				displayFolder: Revenue
+				lineageTag: 33333333-3333-3333-3333-333333333333
+
+				annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+			/// Count of distinct orders.
+			measure 'Order Count' =
+
+					COUNTROWS ( FctOrders )
+				formatString: #,0
+				displayFolder: Orders
+				lineageTag: 44444444-4444-4444-4444-444444444444
+
+			/// Total units sold across all order line items.
+			measure 'Units Sold' =
+
+					SUM ( FctOrderLineItems[Quantity] )
+				formatString: #,0
+				displayFolder: Orders
+				lineageTag: 55555555-5555-5555-5555-555555555555
+
+			/// Count of distinct customers with at least one order in the selected period.
+			measure 'Active Customer Count' =
+
+					DISTINCTCOUNT ( FctOrders[Customer Key] )
+				formatString: #,0
+				displayFolder: Customers
+				lineageTag: 66666666-6666-6666-6666-666666666666
+
+			/// Count of customers whose first order falls within the selected period.
+			measure 'New Customer Count' =
+
+					COUNTROWS (
+					    FILTER (
+					        VALUES ( DimCustomer[Customer Key] ),
+					        CALCULATE ( MIN ( FctOrders[Order Date Dt] ) )
+					            >= MIN ( DimDate[Date Day] )
+					    )
+					)
+				formatString: #,0
+				displayFolder: Customers
+				lineageTag: 77777777-7777-7777-7777-777777777777
+
+			/// Percentage of prior-period customers who placed at least one order
+			/// in the current period.
+			measure 'Customer Retention Rate' =
+
+					VAR CustomersThisPeriod =
+					    VALUES ( FctOrders[Customer Key] )
+					VAR CustomersPriorPeriod =
+					    CALCULATETABLE (
+					        VALUES ( FctOrders[Customer Key] ),
+					        DATEADD ( DimDate[Date Day], -1, YEAR )
+					    )
+					VAR RetainedCustomers =
+					    INTERSECT ( CustomersThisPeriod, CustomersPriorPeriod )
+					RETURN
+					    DIVIDE (
+					        COUNTROWS ( RetainedCustomers ),
+					        COUNTROWS ( CustomersPriorPeriod )
+					    )
+				formatString: 0.0%;-0.0%;0.0%
+				displayFolder: Customers
+				lineageTag: 88888888-8888-8888-8888-888888888888
+
+			/// Total revenue minus total cost of goods sold.
+			measure 'Gross Profit' =
+
+					[Total Revenue] - SUM ( FctOrders[Cost Amount] )
+				formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+				displayFolder: Profitability
+				lineageTag: 99999999-9999-9999-9999-999999999999
+
+				annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+			/// Gross profit as a percentage of total revenue.
+			measure 'Gross Margin %' =
+
+					DIVIDE ( [Gross Profit], [Total Revenue] )
+				formatString: 0.0%;-0.0%;0.0%
+				displayFolder: Profitability
+				lineageTag: aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa
+
+			/// Total revenue minus all costs (COGS + operating expenses).
+			measure 'Net Profit' =
+
+					[Total Revenue] - SUM ( FctOrders[Cost Amount] ) - SUM ( FctOrders[Operating Expense Amount] )
+				formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+				displayFolder: Profitability
+				lineageTag: bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb
+
+				annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+			/// Net profit as a percentage of total revenue.
+			measure 'Net Margin %' =
+
+					DIVIDE ( [Net Profit], [Total Revenue] )
+				formatString: 0.0%;-0.0%;0.0%
+				displayFolder: Profitability
+				lineageTag: cccccccc-cccc-cccc-cccc-cccccccccccc
+
+			partition _Measures = calculated
+				mode: import
+				source = ROW ( "Column", BLANK () )
+
+		table DimDate
+			lineageTag: 624f6c68-536c-4f5f-96da-e565c9bf130c
+			dataCategory: Time
+
+			measure ShowValueForDates =
+
+					VAR LastDateWithData =
+					    CALCULATE (
+					        MAX ( FctOrders[Order Date Dt] ),
+					        REMOVEFILTERS ()
+					    )
+					VAR FirstDateVisible =
+					    MIN ( DimDate[Date Day] )
+					VAR Result =
+					    FirstDateVisible <= LastDateWithData
+					RETURN
+					    Result
+				formatString: """TRUE"";""TRUE"";""FALSE"""
+				lineageTag: 5d96e357-f94a-4efb-88ce-5ebbfb9d559d
+
+			column PrmDimensionTotal = "Total"
+				lineageTag: 2141c39b-f5a0-48b1-bae1-b526791bb2dc
+				summarizeBy: none
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Date Key'
+				dataType: string
+				isHidden
+				displayFolder: _hidden
+				lineageTag: 9a992348-3d32-4e48-b21c-3aeaa0876848
+				summarizeBy: none
+				sourceColumn: Date Key
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Date Day'
+				dataType: dateTime
+				isKey
+				formatString: Short Date
+				lineageTag: 591f69a7-a851-4cfc-a1a9-a7bd445d3972
+				summarizeBy: none
+				sourceColumn: Date Day
+
+				annotation SummarizationSetBy = Automatic
+				annotation UnderlyingDateTimeDataType = Date
+
+			column 'Day Of Week Iso'
+				dataType: double
+				formatString: 0
+				lineageTag: be2f9132-8853-4567-b3cd-1a3f1f0e990e
+				summarizeBy: sum
+				sourceColumn: Day Of Week Iso
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Day Of Week Name'
+				dataType: string
+				lineageTag: 22354790-085a-4f36-b66c-b5c64e81ce31
+				summarizeBy: none
+				sourceColumn: Day Of Week Name
+				sortByColumn: 'Day Of Week Iso'
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Day Of Week Name Short'
+				dataType: string
+				lineageTag: 15525bd0-8455-44d8-9660-e6bc395c6ed9
+				summarizeBy: none
+				sourceColumn: Day Of Week Name Short
+				sortByColumn: 'Day Of Week Iso'
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Week Start Date'
+				dataType: dateTime
+				formatString: Short Date
+				lineageTag: 98d5ec70-d3d9-400f-a012-129e51f3c7fb
+				summarizeBy: none
+				sourceColumn: Week Start Date
+
+				annotation SummarizationSetBy = Automatic
+				annotation UnderlyingDateTimeDataType = Date
+
+			column 'Month Name'
+				dataType: string
+				lineageTag: f5e30488-c958-4cd7-82fe-a32c46b6b07a
+				summarizeBy: none
+				sourceColumn: Month Name
+				sortByColumn: 'Month Of Year'
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Month Of Year'
+				dataType: double
+				formatString: 0
+				lineageTag: 139fadd7-4efc-4bb5-8296-7414a9385dcb
+				summarizeBy: sum
+				sourceColumn: Month Of Year
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Quarter Of Year'
+				dataType: double
+				formatString: 0
+				lineageTag: cccdaea7-593e-46dd-bccb-66cace73a586
+				summarizeBy: sum
+				sourceColumn: Quarter Of Year
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Year Number'
+				dataType: double
+				formatString: 0
+				lineageTag: 76f9fd4e-125d-4215-819e-762b935683d2
+				summarizeBy: none
+				sourceColumn: Year Number
+
+				annotation SummarizationSetBy = User
+
+			column 'Fiscal Year Number'
+				dataType: double
+				formatString: 0
+				lineageTag: aaaabbbb-cccc-dddd-eeee-ffffffffffff
+				summarizeBy: none
+				sourceColumn: Fiscal Year Number
+
+				annotation SummarizationSetBy = User
+
+			column 'Fiscal Year Name'
+				dataType: string
+				lineageTag: bbbbcccc-dddd-eeee-ffff-111111111111
+				summarizeBy: none
+				sourceColumn: Fiscal Year Name
+				sortByColumn: 'Fiscal Year Number'
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Fiscal Quarter Name'
+				dataType: string
+				lineageTag: ccccdddd-eeee-ffff-1111-222222222222
+				summarizeBy: none
+				sourceColumn: Fiscal Quarter Name
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Fiscal Year Quarter Number'
+				dataType: double
+				formatString: 0
+				lineageTag: ddddeeee-ffff-1111-2222-333333333333
+				summarizeBy: none
+				sourceColumn: Fiscal Year Quarter Number
+
+				annotation SummarizationSetBy = User
+
+			column 'Accounting Period Name'
+				dataType: string
+				lineageTag: eeeeffff-1111-2222-3333-444444444444
+				summarizeBy: none
+				sourceColumn: Accounting Period Name
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Fiscal Year Period Number'
+				dataType: double
+				formatString: 0
+				lineageTag: ffff1111-2222-3333-4444-555555555555
+				summarizeBy: none
+				sourceColumn: Fiscal Year Period Number
+
+				annotation SummarizationSetBy = User
+
+			column 'Fiscal Day Of Year'
+				dataType: double
+				formatString: 0
+				lineageTag: 11112222-3333-4444-5555-666666666666
+				summarizeBy: sum
+				sourceColumn: Fiscal Day Of Year
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Fiscal Day Of Quarter'
+				dataType: double
+				formatString: 0
+				lineageTag: 22223333-4444-5555-6666-777777777777
+				summarizeBy: sum
+				sourceColumn: Fiscal Day Of Quarter
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Fiscal Day Of Period'
+				dataType: double
+				formatString: 0
+				lineageTag: 33334444-5555-6666-7777-888888888888
+				summarizeBy: sum
+				sourceColumn: Fiscal Day Of Period
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Fiscal Year Week Number'
+				dataType: double
+				formatString: 0
+				lineageTag: 44445555-6666-7777-8888-999999999999
+				summarizeBy: none
+				sourceColumn: Fiscal Year Week Number
+
+				annotation SummarizationSetBy = User
+
+			column 'Sequential Day Number'
+				dataType: double
+				formatString: 0
+				lineageTag: 55556666-7777-8888-9999-aaaaaaaaaaaa
+				summarizeBy: sum
+				sourceColumn: Sequential Day Number
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Quarter Year Name'
+				dataType: string
+				lineageTag: 66667777-8888-9999-aaaa-bbbbbbbbbbbb
+				summarizeBy: none
+				sourceColumn: Quarter Year Name
+
+				annotation SummarizationSetBy = Automatic
+
+			column DateWithSales
+				dataType: boolean
+				formatString: """TRUE"";""TRUE"";""FALSE"""
+				lineageTag: 77778888-9999-aaaa-bbbb-cccccccccccc
+				summarizeBy: none
+				sourceColumn: DateWithSales
+
+				annotation SummarizationSetBy = Automatic
+
+			partition DimDate = m
+				mode: import
+				queryGroup: Dimensions
+				source =
+						let
+						    Source = Snowflake.Databases(HostName, WarehouseName, [Role=RoleName]),
+						    Result = Table.TransformColumnNames(
+						        Source{[Name=DbName]}[Data]{[Name=SchemaName]}[Data]{[Name="DIM_DATE"]}[Data],
+						        each Text.Proper(Text.Trim(Text.Replace(_, "_", " ")))
+						    )
+						in
+						    Result
+
+		table _DatasetRefreshDate
+			lineageTag: 74d40537-6138-4104-8e54-860d54aa63f6
+
+			/// Displays the date and time of the most recent data refresh.
+			measure 'Dataset Last Refreshed' =
+
+					"Dataset Last Refreshed: " & MAX ( _DatasetRefreshDate[now] )
+				lineageTag: a31e76d2-2f54-4762-9712-ee5e0329c4d3
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column NOW
+				dataType: dateTime
+				formatString: m/d/yyyy h:nn AM/PM
+				lineageTag: 5630aa77-1df2-4eb7-be1e-ddc140c314ee
+				summarizeBy: none
+				sourceColumn: NOW
+
+				annotation SummarizationSetBy = Automatic
+				annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+			partition _DatasetRefreshDate = m
+				mode: import
+				source =
+						let
+						    Source = Snowflake.Databases(HostName, WarehouseName, [Role=RoleName]),
+						    Database = Source{[Name=DbName,Kind="Database"]}[Data],
+						    CustomQuery = Value.NativeQuery(Database, "select current_timestamp() as now", null, [EnableFolding=true]),
+						    #"Changed Type" = Table.TransformColumnTypes(CustomQuery,{{"NOW", type datetimezone}})
+						in
+						    #"Changed Type"
+
+			annotation PBI_ResultType = Table
+
+		table _PrmDateHierarchy
+			lineageTag: 0b2ba43e-4dcc-42a0-9b8f-9e5d7e9ac3cb
+
+			column 'Date Hierarchy'
+				lineageTag: dea8f460-adf9-4839-bdb6-d236474b8dd8
+				summarizeBy: none
+				sourceColumn: [Value1]
+				sortByColumn: '_PrmDateHierarchy Order'
+
+				relatedColumnDetails
+					groupByColumn: '_PrmDateHierarchy Fields'
+
+				annotation SummarizationSetBy = Automatic
+
+			column '_PrmDateHierarchy Fields'
+				isHidden
+				lineageTag: f4cb6888-87ae-4bb3-9600-c295d45959b7
+				summarizeBy: none
+				sourceColumn: [Value2]
+				sortByColumn: '_PrmDateHierarchy Order'
+
+				extendedProperty ParameterMetadata = {"version":3,"kind":2}
+
+				annotation SummarizationSetBy = Automatic
+
+			column '_PrmDateHierarchy Order'
+				isHidden
+				formatString: 0
+				lineageTag: c8bf4d7a-3ef5-4e99-9cc0-8b3361ebf78e
+				summarizeBy: sum
+				sourceColumn: [Value3]
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Date Hierarchy Short'
+				lineageTag: 72258a0b-a44d-496f-9d49-14ad12877f0e
+				summarizeBy: none
+				sourceColumn: [Value4]
+				sortByColumn: '_PrmDateHierarchy Order'
+
+				annotation SummarizationSetBy = Automatic
+
+			column Divisor
+				formatString: 0
+				lineageTag: bd04930b-6e4c-403f-895d-9e092f2f82e0
+				summarizeBy: sum
+				sourceColumn: [Value5]
+
+				annotation SummarizationSetBy = Automatic
+
+			partition _PrmDateHierarchy = calculated
+				mode: import
+				source =
+						{
+						    ("Year", NAMEOF('DimDate'[Fiscal Year Name]), 1, "Y", 1),
+						    ("Quarter", NAMEOF('DimDate'[Fiscal Quarter Name]), 2, "Q", 4),
+						    ("Month", NAMEOF('DimDate'[Accounting Period Name]), 3, "M", 12),
+						    ("Week", NAMEOF('DimDate'[Week Start Date]), 7, "W", 52),
+						    ("Day", NAMEOF('DimDate'[Date Day]), 8, "D", 365)
+						}
+
+		table _CalcTimeIntelligence
+			lineageTag: 9d64aa1c-02fd-457f-b3fa-de2dae56e9bf
+
+			calculationGroup
+				precedence: 4
+
+				calculationItem CY = SELECTEDMEASURE ()
+
+				calculationItem PY =
+						IF (
+						    [ShowValueForDates],
+						    SUMX (
+						        VALUES ( DimDate[Fiscal Year Number] ),
+						        VAR CurrentFiscalYearNumber = DimDate[Fiscal Year Number]
+						        VAR DaysSelected =
+						            CALCULATETABLE (
+						                VALUES ( DimDate[Fiscal Day Of Year] ),
+						                REMOVEFILTERS (
+						                    DimDate[Day Of Week Name],
+						                    DimDate[Day Of Week Name Short],
+						                    DimDate[Day Of Week Iso]
+						                ),
+						                DimDate[DateWithSales] = TRUE
+						            )
+						        RETURN
+						            CALCULATE (
+						                SELECTEDMEASURE (),
+						                DimDate[Fiscal Year Number] = CurrentFiscalYearNumber - 1,
+						                DaysSelected,
+						                ALLEXCEPT (
+						                    DimDate,
+						                    DimDate[Day Of Week Name],
+						                    DimDate[Day Of Week Name Short]
+						                )
+						            )
+						    )
+						)
+
+				calculationItem YoY =
+						VAR ValueCurrentPeriod =
+						    SELECTEDMEASURE ()
+						VAR ValuePreviousPeriod =
+						    IF (
+						        [ShowValueForDates],
+						        SUMX (
+						            VALUES ( DimDate[Fiscal Year Number] ),
+						            VAR CurrentFiscalYearNumber = DimDate[Fiscal Year Number]
+						            VAR DaysSelected =
+						                CALCULATETABLE (
+						                    VALUES ( DimDate[Fiscal Day Of Year] ),
+						                    REMOVEFILTERS (
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short],
+						                        DimDate[Day Of Week Iso]
+						                    ),
+						                    DimDate[DateWithSales] = TRUE
+						                )
+						            RETURN
+						                CALCULATE (
+						                    SELECTEDMEASURE (),
+						                    DimDate[Fiscal Year Number] = CurrentFiscalYearNumber - 1,
+						                    DaysSelected,
+						                    ALLEXCEPT (
+						                        DimDate,
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short]
+						                    )
+						                )
+						        )
+						    )
+						VAR Result =
+						    IF (
+						        NOT ISBLANK ( ValueCurrentPeriod ) && NOT ISBLANK ( ValuePreviousPeriod ),
+						        ValueCurrentPeriod - ValuePreviousPeriod
+						    )
+						RETURN
+						    Result
+
+				calculationItem 'YoY %' =
+						VAR ValueCurrentPeriod =
+						    SELECTEDMEASURE ()
+						VAR ValuePreviousPeriod =
+						    IF (
+						        [ShowValueForDates],
+						        SUMX (
+						            VALUES ( DimDate[Fiscal Year Number] ),
+						            VAR CurrentFiscalYearNumber = DimDate[Fiscal Year Number]
+						            VAR DaysSelected =
+						                CALCULATETABLE (
+						                    VALUES ( DimDate[Fiscal Day Of Year] ),
+						                    REMOVEFILTERS (
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short],
+						                        DimDate[Day Of Week Iso]
+						                    ),
+						                    DimDate[DateWithSales] = TRUE
+						                )
+						            RETURN
+						                CALCULATE (
+						                    SELECTEDMEASURE (),
+						                    DimDate[Fiscal Year Number] = CurrentFiscalYearNumber - 1,
+						                    DaysSelected,
+						                    ALLEXCEPT (
+						                        DimDate,
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short]
+						                    )
+						                )
+						        )
+						    )
+						VAR Result =
+						    IF (
+						        NOT ISBLANK ( ValueCurrentPeriod ) && NOT ISBLANK ( ValuePreviousPeriod ),
+						        DIVIDE ( ValueCurrentPeriod - ValuePreviousPeriod, ABS ( ValuePreviousPeriod ) )
+						    )
+						RETURN
+						    Result
+
+					formatStringDefinition = "0.0%"
+
+				calculationItem YTD =
+						IF (
+						    [ShowValueForDates],
+						    VAR LastDayAvailable =
+						        MAX ( DimDate[Fiscal Day Of Year] )
+						    VAR LastFiscalYearAvailable =
+						        MAX ( DimDate[Fiscal Year Number] )
+						    VAR Result =
+						        CALCULATE (
+						            SELECTEDMEASURE (),
+						            ALLEXCEPT (
+						                DimDate,
+						                DimDate[Day Of Week Name],
+						                DimDate[Day Of Week Name Short]
+						            ),
+						            DimDate[Fiscal Day Of Year] <= LastDayAvailable,
+						            DimDate[Fiscal Year Number] = LastFiscalYearAvailable
+						        )
+						    RETURN
+						        Result
+						)
+
+				calculationItem PYTD =
+						IF (
+						    [ShowValueForDates],
+						    VAR PreviousFiscalYear =
+						        MAX ( DimDate[Fiscal Year Number] ) - 1
+						    VAR LastDayOfFiscalYearAvailable =
+						        CALCULATE (
+						            MAX ( DimDate[Fiscal Day Of Year] ),
+						            REMOVEFILTERS (
+						                DimDate[Day Of Week Name],
+						                DimDate[Day Of Week Name Short],
+						                DimDate[Day Of Week Iso]
+						            ),
+						            DimDate[DateWithSales] = TRUE
+						        )
+						    VAR Result =
+						        CALCULATE (
+						            SELECTEDMEASURE (),
+						            ALLEXCEPT (
+						                DimDate,
+						                DimDate[Day Of Week Name],
+						                DimDate[Day Of Week Name Short]
+						            ),
+						            DimDate[Fiscal Year Number] = PreviousFiscalYear,
+						            DimDate[Fiscal Day Of Year] <= LastDayOfFiscalYearAvailable,
+						            DimDate[DateWithSales] = TRUE
+						        )
+						    RETURN
+						        Result
+						)
+
+				calculationItem YoYTD =
+						VAR ValueCurrentPeriod =
+						    IF (
+						        [ShowValueForDates],
+						        VAR LastDayAvailable =
+						            MAX ( DimDate[Fiscal Day Of Year] )
+						        VAR LastFiscalYearAvailable =
+						            MAX ( DimDate[Fiscal Year Number] )
+						        VAR Result =
+						            CALCULATE (
+						                SELECTEDMEASURE (),
+						                ALLEXCEPT (
+						                    DimDate,
+						                    DimDate[Day Of Week Name],
+						                    DimDate[Day Of Week Name Short]
+						                ),
+						                DimDate[Fiscal Day Of Year] <= LastDayAvailable,
+						                DimDate[Fiscal Year Number] = LastFiscalYearAvailable
+						            )
+						        RETURN
+						            Result
+						    )
+						VAR ValuePreviousPeriod =
+						    IF (
+						        [ShowValueForDates],
+						        VAR PreviousFiscalYear =
+						            MAX ( DimDate[Fiscal Year Number] ) - 1
+						        VAR LastDayOfFiscalYearAvailable =
+						            CALCULATE (
+						                MAX ( DimDate[Fiscal Day Of Year] ),
+						                REMOVEFILTERS (
+						                    DimDate[Day Of Week Name],
+						                    DimDate[Day Of Week Name Short],
+						                    DimDate[Day Of Week Iso]
+						                ),
+						                DimDate[DateWithSales] = TRUE
+						            )
+						        VAR Result =
+						            CALCULATE (
+						                SELECTEDMEASURE (),
+						                ALLEXCEPT (
+						                    DimDate,
+						                    DimDate[Day Of Week Name],
+						                    DimDate[Day Of Week Name Short]
+						                ),
+						                DimDate[Fiscal Year Number] = PreviousFiscalYear,
+						                DimDate[Fiscal Day Of Year] <= LastDayOfFiscalYearAvailable,
+						                DimDate[DateWithSales] = TRUE
+						            )
+						        RETURN
+						            Result
+						    )
+						VAR Result =
+						    IF (
+						        NOT ISBLANK ( ValueCurrentPeriod ) && NOT ISBLANK ( ValuePreviousPeriod ),
+						        ValueCurrentPeriod - ValuePreviousPeriod
+						    )
+						RETURN
+						    Result
+
+				calculationItem 'YoYTD %' =
+						VAR ValueCurrentPeriod =
+						    IF (
+						        [ShowValueForDates],
+						        VAR LastDayAvailable =
+						            MAX ( DimDate[Fiscal Day Of Year] )
+						        VAR LastFiscalYearAvailable =
+						            MAX ( DimDate[Fiscal Year Number] )
+						        VAR Result =
+						            CALCULATE (
+						                SELECTEDMEASURE (),
+						                ALLEXCEPT (
+						                    DimDate,
+						                    DimDate[Day Of Week Name],
+						                    DimDate[Day Of Week Name Short]
+						                ),
+						                DimDate[Fiscal Day Of Year] <= LastDayAvailable,
+						                DimDate[Fiscal Year Number] = LastFiscalYearAvailable
+						            )
+						        RETURN
+						            Result
+						    )
+						VAR ValuePreviousPeriod =
+						    IF (
+						        [ShowValueForDates],
+						        VAR PreviousFiscalYear =
+						            MAX ( DimDate[Fiscal Year Number] ) - 1
+						        VAR LastDayOfFiscalYearAvailable =
+						            CALCULATE (
+						                MAX ( DimDate[Fiscal Day Of Year] ),
+						                REMOVEFILTERS (
+						                    DimDate[Day Of Week Name],
+						                    DimDate[Day Of Week Name Short],
+						                    DimDate[Day Of Week Iso]
+						                ),
+						                DimDate[DateWithSales] = TRUE
+						            )
+						        VAR Result =
+						            CALCULATE (
+						                SELECTEDMEASURE (),
+						                ALLEXCEPT (
+						                    DimDate,
+						                    DimDate[Day Of Week Name],
+						                    DimDate[Day Of Week Name Short]
+						                ),
+						                DimDate[Fiscal Year Number] = PreviousFiscalYear,
+						                DimDate[Fiscal Day Of Year] <= LastDayOfFiscalYearAvailable,
+						                DimDate[DateWithSales] = TRUE
+						            )
+						        RETURN
+						            Result
+						    )
+						VAR Result =
+						    IF (
+						        NOT ISBLANK ( ValueCurrentPeriod ) && NOT ISBLANK ( ValuePreviousPeriod ),
+						        DIVIDE ( ValueCurrentPeriod - ValuePreviousPeriod, ABS ( ValuePreviousPeriod ) )
+						    )
+						RETURN
+						    Result
+
+					formatStringDefinition = "0.0%"
+
+				calculationItem PP =
+
+						VAR _KPI_PD =
+						    CALCULATE ( SELECTEDMEASURE (), DATEADD ( DimDate[Date Day], -1, DAY ) )
+						VAR _KPI_PW =
+						    IF (
+						        [ShowValueForDates],
+						        SUMX (
+						            VALUES ( DimDate[Fiscal Year Week Number] ),
+						            VAR CurrentFiscalYearWeekNumber = DimDate[Fiscal Year Week Number]
+						            VAR DaysSelected =
+						                CALCULATETABLE (
+						                    VALUES ( DimDate[Day Of Week Iso] ),
+						                    REMOVEFILTERS (
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short],
+						                        DimDate[Day Of Week Iso]
+						                    ),
+						                    DimDate[DateWithSales] = TRUE
+						                )
+						            RETURN
+						                CALCULATE (
+						                    SELECTEDMEASURE (),
+						                    DimDate[Fiscal Year Week Number] = CurrentFiscalYearWeekNumber - 1,
+						                    KEEPFILTERS ( DaysSelected ),
+						                    ALLEXCEPT (
+						                        DimDate,
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short]
+						                    )
+						                )
+						        )
+						    )
+						VAR _KPI_PM =
+						    IF (
+						        [ShowValueForDates],
+						        SUMX (
+						            VALUES ( DimDate[Fiscal Year Period Number] ),
+						            VAR CurrentFiscalYearMonthNumber = DimDate[Fiscal Year Period Number]
+						            VAR DaysSelected =
+						                CALCULATETABLE (
+						                    VALUES ( DimDate[Fiscal Day of Period] ),
+						                    REMOVEFILTERS (
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short],
+						                        DimDate[Day Of Week Iso]
+						                    ),
+						                    DimDate[DateWithSales] = TRUE
+						                )
+						            RETURN
+						                CALCULATE (
+						                    SELECTEDMEASURE (),
+						                    DimDate[Fiscal Year Period Number] = CurrentFiscalYearMonthNumber - 1,
+						                    DaysSelected,
+						                    ALLEXCEPT (
+						                        DimDate,
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short]
+						                    )
+						                )
+						        )
+						    )
+						VAR _KPI_PQ =
+						    IF (
+						        [ShowValueForDates],
+						        SUMX (
+						            VALUES ( DimDate[Fiscal Year Quarter Number] ),
+						            VAR CurrentFiscalYearQuarterNumber = DimDate[Fiscal Year Quarter Number]
+						            VAR DaysSelected =
+						                CALCULATETABLE (
+						                    VALUES ( DimDate[Fiscal Day Of Quarter] ),
+						                    REMOVEFILTERS (
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short],
+						                        DimDate[Day Of Week Iso]
+						                    ),
+						                    DimDate[DateWithSales] = TRUE
+						                )
+						            RETURN
+						                CALCULATE (
+						                    SELECTEDMEASURE (),
+						                    DimDate[Fiscal Year Quarter Number] = CurrentFiscalYearQuarterNumber - 1,
+						                    DaysSelected,
+						                    ALLEXCEPT (
+						                        DimDate,
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short]
+						                    )
+						                )
+						        )
+						    )
+						VAR _KPI_PY =
+						    IF (
+						        [ShowValueForDates],
+						        SUMX (
+						            VALUES ( DimDate[Fiscal Year Number] ),
+						            VAR CurrentFiscalYearNumber = DimDate[Fiscal Year Number]
+						            VAR DaysSelected =
+						                CALCULATETABLE (
+						                    VALUES ( DimDate[Fiscal Day Of Year] ),
+						                    REMOVEFILTERS (
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short],
+						                        DimDate[Day Of Week Iso]
+						                    ),
+						                    DimDate[DateWithSales] = TRUE
+						                )
+						            RETURN
+						                CALCULATE (
+						                    SELECTEDMEASURE (),
+						                    DimDate[Fiscal Year Number] = CurrentFiscalYearNumber - 1,
+						                    DaysSelected,
+						                    ALLEXCEPT (
+						                        DimDate,
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short]
+						                    )
+						                )
+						        )
+						    )
+						RETURN
+						    SWITCH (
+						        TRUE (),
+						        ISINSCOPE ( DimDate[Date Day] ), _KPI_PD,
+						        ISINSCOPE ( DimDate[Week Start Date] ), _KPI_PW,
+						        ISINSCOPE ( DimDate[Accounting Period Name] ), _KPI_PM,
+						        ISINSCOPE ( DimDate[Fiscal Quarter Name] ), _KPI_PQ,
+						        ISINSCOPE ( DimDate[Fiscal Year Name] ), _KPI_PY
+						    )
+
+				calculationItem PoP =
+
+						VAR _ValueCurrentPeriod =
+						    SELECTEDMEASURE ()
+						VAR _KPI_PD =
+						    CALCULATE ( SELECTEDMEASURE (), DATEADD ( DimDate[Date Day], -1, DAY ) )
+						VAR _KPI_PW =
+						    IF (
+						        [ShowValueForDates],
+						        SUMX (
+						            VALUES ( DimDate[Fiscal Year Week Number] ),
+						            VAR CurrentFiscalYearWeekNumber = DimDate[Fiscal Year Week Number]
+						            VAR DaysSelected =
+						                CALCULATETABLE (
+						                    VALUES ( DimDate[Day Of Week Iso] ),
+						                    REMOVEFILTERS (
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short],
+						                        DimDate[Day Of Week Iso]
+						                    ),
+						                    DimDate[DateWithSales] = TRUE
+						                )
+						            RETURN
+						                CALCULATE (
+						                    SELECTEDMEASURE (),
+						                    DimDate[Fiscal Year Week Number] = CurrentFiscalYearWeekNumber - 1,
+						                    KEEPFILTERS ( DaysSelected ),
+						                    ALLEXCEPT (
+						                        DimDate,
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short]
+						                    )
+						                )
+						        )
+						    )
+						VAR _KPI_PM =
+						    IF (
+						        [ShowValueForDates],
+						        SUMX (
+						            VALUES ( DimDate[Fiscal Year Period Number] ),
+						            VAR CurrentFiscalYearMonthNumber = DimDate[Fiscal Year Period Number]
+						            VAR DaysSelected =
+						                CALCULATETABLE (
+						                    VALUES ( DimDate[Fiscal Day of Period] ),
+						                    REMOVEFILTERS (
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short],
+						                        DimDate[Day Of Week Iso]
+						                    ),
+						                    DimDate[DateWithSales] = TRUE
+						                )
+						            RETURN
+						                CALCULATE (
+						                    SELECTEDMEASURE (),
+						                    DimDate[Fiscal Year Period Number] = CurrentFiscalYearMonthNumber - 1,
+						                    DaysSelected,
+						                    ALLEXCEPT (
+						                        DimDate,
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short]
+						                    )
+						                )
+						        )
+						    )
+						VAR _KPI_PQ =
+						    IF (
+						        [ShowValueForDates],
+						        SUMX (
+						            VALUES ( DimDate[Fiscal Year Quarter Number] ),
+						            VAR CurrentFiscalYearQuarterNumber = DimDate[Fiscal Year Quarter Number]
+						            VAR DaysSelected =
+						                CALCULATETABLE (
+						                    VALUES ( DimDate[Fiscal Day Of Quarter] ),
+						                    REMOVEFILTERS (
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short],
+						                        DimDate[Day Of Week Iso]
+						                    ),
+						                    DimDate[DateWithSales] = TRUE
+						                )
+						            RETURN
+						                CALCULATE (
+						                    SELECTEDMEASURE (),
+						                    DimDate[Fiscal Year Quarter Number] = CurrentFiscalYearQuarterNumber - 1,
+						                    DaysSelected,
+						                    ALLEXCEPT (
+						                        DimDate,
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short]
+						                    )
+						                )
+						        )
+						    )
+						VAR _KPI_PY =
+						    IF (
+						        [ShowValueForDates],
+						        SUMX (
+						            VALUES ( DimDate[Fiscal Year Number] ),
+						            VAR CurrentFiscalYearNumber = DimDate[Fiscal Year Number]
+						            VAR DaysSelected =
+						                CALCULATETABLE (
+						                    VALUES ( DimDate[Fiscal Day Of Year] ),
+						                    REMOVEFILTERS (
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short],
+						                        DimDate[Day Of Week Iso]
+						                    ),
+						                    DimDate[DateWithSales] = TRUE
+						                )
+						            RETURN
+						                CALCULATE (
+						                    SELECTEDMEASURE (),
+						                    DimDate[Fiscal Year Number] = CurrentFiscalYearNumber - 1,
+						                    DaysSelected,
+						                    ALLEXCEPT (
+						                        DimDate,
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short]
+						                    )
+						                )
+						        )
+						    )
+						VAR _ValuePreviousPeriod =
+						    SWITCH (
+						        TRUE (),
+						        ISINSCOPE ( DimDate[Date Day] ), _KPI_PD,
+						        ISINSCOPE ( DimDate[Week Start Date] ), _KPI_PW,
+						        ISINSCOPE ( DimDate[Accounting Period Name] ), _KPI_PM,
+						        ISINSCOPE ( DimDate[Fiscal Quarter Name] ), _KPI_PQ,
+						        ISINSCOPE ( DimDate[Fiscal Year Name] ), _KPI_PY
+						    )
+						VAR _Result =
+						    IF (
+						        NOT ISBLANK ( _ValueCurrentPeriod ) && NOT ISBLANK ( _ValuePreviousPeriod ),
+						        _ValueCurrentPeriod - _ValuePreviousPeriod
+						    )
+						RETURN
+						    _Result
+
+				calculationItem 'PoP %' =
+
+						VAR _ValueCurrentPeriod =
+						    SELECTEDMEASURE ()
+						VAR _KPI_PD =
+						    CALCULATE ( SELECTEDMEASURE (), DATEADD ( DimDate[Date Day], -1, DAY ) )
+						VAR _KPI_PW =
+						    IF (
+						        [ShowValueForDates],
+						        SUMX (
+						            VALUES ( DimDate[Fiscal Year Week Number] ),
+						            VAR CurrentFiscalYearWeekNumber = DimDate[Fiscal Year Week Number]
+						            VAR DaysSelected =
+						                CALCULATETABLE (
+						                    VALUES ( DimDate[Day Of Week Iso] ),
+						                    REMOVEFILTERS (
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short],
+						                        DimDate[Day Of Week Iso]
+						                    ),
+						                    DimDate[DateWithSales] = TRUE
+						                )
+						            RETURN
+						                CALCULATE (
+						                    SELECTEDMEASURE (),
+						                    DimDate[Fiscal Year Week Number] = CurrentFiscalYearWeekNumber - 1,
+						                    KEEPFILTERS ( DaysSelected ),
+						                    ALLEXCEPT (
+						                        DimDate,
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short]
+						                    )
+						                )
+						        )
+						    )
+						VAR _KPI_PM =
+						    IF (
+						        [ShowValueForDates],
+						        SUMX (
+						            VALUES ( DimDate[Fiscal Year Period Number] ),
+						            VAR CurrentFiscalYearMonthNumber = DimDate[Fiscal Year Period Number]
+						            VAR DaysSelected =
+						                CALCULATETABLE (
+						                    VALUES ( DimDate[Fiscal Day of Period] ),
+						                    REMOVEFILTERS (
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short],
+						                        DimDate[Day Of Week Iso]
+						                    ),
+						                    DimDate[DateWithSales] = TRUE
+						                )
+						            RETURN
+						                CALCULATE (
+						                    SELECTEDMEASURE (),
+						                    DimDate[Fiscal Year Period Number] = CurrentFiscalYearMonthNumber - 1,
+						                    DaysSelected,
+						                    ALLEXCEPT (
+						                        DimDate,
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short]
+						                    )
+						                )
+						        )
+						    )
+						VAR _KPI_PQ =
+						    IF (
+						        [ShowValueForDates],
+						        SUMX (
+						            VALUES ( DimDate[Fiscal Year Quarter Number] ),
+						            VAR CurrentFiscalYearQuarterNumber = DimDate[Fiscal Year Quarter Number]
+						            VAR DaysSelected =
+						                CALCULATETABLE (
+						                    VALUES ( DimDate[Fiscal Day Of Quarter] ),
+						                    REMOVEFILTERS (
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short],
+						                        DimDate[Day Of Week Iso]
+						                    ),
+						                    DimDate[DateWithSales] = TRUE
+						                )
+						            RETURN
+						                CALCULATE (
+						                    SELECTEDMEASURE (),
+						                    DimDate[Fiscal Year Quarter Number] = CurrentFiscalYearQuarterNumber - 1,
+						                    DaysSelected,
+						                    ALLEXCEPT (
+						                        DimDate,
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short]
+						                    )
+						                )
+						        )
+						    )
+						VAR _KPI_PY =
+						    IF (
+						        [ShowValueForDates],
+						        SUMX (
+						            VALUES ( DimDate[Fiscal Year Number] ),
+						            VAR CurrentFiscalYearNumber = DimDate[Fiscal Year Number]
+						            VAR DaysSelected =
+						                CALCULATETABLE (
+						                    VALUES ( DimDate[Fiscal Day Of Year] ),
+						                    REMOVEFILTERS (
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short],
+						                        DimDate[Day Of Week Iso]
+						                    ),
+						                    DimDate[DateWithSales] = TRUE
+						                )
+						            RETURN
+						                CALCULATE (
+						                    SELECTEDMEASURE (),
+						                    DimDate[Fiscal Year Number] = CurrentFiscalYearNumber - 1,
+						                    DaysSelected,
+						                    ALLEXCEPT (
+						                        DimDate,
+						                        DimDate[Day Of Week Name],
+						                        DimDate[Day Of Week Name Short]
+						                    )
+						                )
+						        )
+						    )
+						VAR _ValuePreviousPeriod =
+						    SWITCH (
+						        TRUE (),
+						        ISINSCOPE ( DimDate[Date Day] ), _KPI_PD,
+						        ISINSCOPE ( DimDate[Week Start Date] ), _KPI_PW,
+						        ISINSCOPE ( DimDate[Accounting Period Name] ), _KPI_PM,
+						        ISINSCOPE ( DimDate[Fiscal Quarter Name] ), _KPI_PQ,
+						        ISINSCOPE ( DimDate[Fiscal Year Name] ), _KPI_PY
+						    )
+						VAR _Result =
+						    IF (
+						        NOT ISBLANK ( _ValueCurrentPeriod ) && NOT ISBLANK ( _ValuePreviousPeriod ),
+						        DIVIDE ( _ValueCurrentPeriod - _ValuePreviousPeriod, _ValuePreviousPeriod )
+						    )
+						RETURN
+						    _Result
+
+					formatStringDefinition = "0.0%"
+
+			column 'Time Intelligence'
+				dataType: string
+				lineageTag: b80c93ec-f1a4-4f9a-8459-7261d63c28c1
+				summarizeBy: none
+				sourceColumn: Name
+				sortByColumn: Ordinal
+
+				annotation SummarizationSetBy = Automatic
+
+			column Ordinal
+				dataType: int64
+				isHidden
+				lineageTag: 05ebee41-f3f6-468b-a740-e791600694b4
+				summarizeBy: sum
+				sourceColumn: Ordinal
+
+				annotation SummarizationSetBy = Automatic
+
+		table _MdlColumns
+			lineageTag: 6feacd7a-13b1-46d3-8c48-d55a78409ab3
+
+			column ID
+				formatString: 0
+				lineageTag: b93f6e5c-de92-42af-9968-e4f38663e5a7
+				summarizeBy: count
+				isNameInferred
+				sourceColumn: [ID]
+
+			column Name
+				lineageTag: 90513deb-41c5-4307-8f72-6ca49a0aac4d
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [Name]
+
+			column Table
+				lineageTag: d6b586db-d941-4318-b15f-b003653b766a
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [Table]
+
+			column DataType
+				lineageTag: 710ad279-887f-4b62-8470-35089218c866
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [DataType]
+
+			column Description
+				lineageTag: 7e044c6f-ea7d-4b7d-a1c2-307e0c1a91fa
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [Description]
+
+			column IsHidden
+				formatString: """TRUE"";""TRUE"";""FALSE"""
+				lineageTag: 43f1608a-69d8-4473-ab65-2c2f184c77b3
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [IsHidden]
+
+			partition _MdlColumns = calculated
+				mode: import
+				source = INFO.VIEW.COLUMNS()
+
+		table _MdlTables
+			lineageTag: aa888221-bd66-48e3-bb42-9dcf4c7561a0
+
+			column ID
+				formatString: 0
+				lineageTag: 4354e313-9873-4a05-ac7f-feba5ad9cee8
+				summarizeBy: count
+				isNameInferred
+				sourceColumn: [ID]
+
+			column Name
+				lineageTag: a4cea7b2-c9c3-473e-99cc-dc521fb1c486
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [Name]
+
+			column Description
+				lineageTag: 6077e529-9303-4bcd-b949-cf67626a8ead
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [Description]
+
+			column IsHidden
+				formatString: """TRUE"";""TRUE"";""FALSE"""
+				lineageTag: e15d3b6b-5b1b-463f-bde2-dc6c9933907a
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [IsHidden]
+
+			partition _MdlTables = calculated
+				mode: import
+				source = INFO.VIEW.TABLES()
+
+		table _MdlMeasures
+			lineageTag: 732ea9d6-d0d7-4c65-ab84-e1992a878de4
+
+			column ID
+				formatString: 0
+				lineageTag: dcd27862-fb85-4e65-90d0-5f31078edc27
+				summarizeBy: count
+				isNameInferred
+				sourceColumn: [ID]
+
+			column Name
+				lineageTag: 8d962967-6e72-404f-a358-d5dd38315083
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [Name]
+
+			column Table
+				lineageTag: 89c64694-b5a9-4dac-a0d2-aa8c4dd0d2b7
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [Table]
+
+			column Description
+				lineageTag: 5be92741-4a51-401d-8fee-97dd4bdb420d
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [Description]
+
+			column Expression
+				lineageTag: 0b5f09d7-ecd7-42f7-962b-2da74f43857c
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [Expression]
+
+			partition _MdlMeasures = calculated
+				mode: import
+				source = INFO.VIEW.MEASURES()
+
+		table _MdlRelationships
+			lineageTag: 4ef416fe-c6b1-4c3a-96f3-4583a1a3472a
+
+			column ID
+				formatString: 0
+				lineageTag: 5cc3145f-2362-47ae-aaca-4611205f8b5b
+				summarizeBy: count
+				isNameInferred
+				sourceColumn: [ID]
+
+			column Relationship
+				lineageTag: e1010f88-bb67-499c-88f2-4729d0879304
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [Relationship]
+
+			column IsActive
+				formatString: """TRUE"";""TRUE"";""FALSE"""
+				lineageTag: 507fd1f9-59c7-4cb9-b969-13219dacd9c0
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [IsActive]
+
+			column CrossFilteringBehavior
+				lineageTag: 65314e1d-dfc9-4c9f-9f08-0d9b82be561e
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [CrossFilteringBehavior]
+
+			column FromTable
+				lineageTag: abafb591-d915-4007-8598-0d092ffd1b9a
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [FromTable]
+
+			column FromColumn
+				lineageTag: f411c2fc-5d57-4fb7-8598-edcb25f80a00
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [FromColumn]
+
+			column ToTable
+				lineageTag: c4850b64-3639-4cc3-b96a-537ce147a7d0
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [ToTable]
+
+			column ToColumn
+				lineageTag: 52087f6f-0ded-4d6f-82b2-75228e78d31d
+				summarizeBy: none
+				isNameInferred
+				sourceColumn: [ToColumn]
+
+			partition _MdlRelationships = calculated
+				mode: import
+				source = INFO.VIEW.RELATIONSHIPS()
+
+		table FctOrders
+			lineageTag: 38d607a7-3f0c-46df-9af7-7c699ec3153b
+
+			column 'Order Key'
+				dataType: string
+				isHidden
+				displayFolder: _hidden
+				lineageTag: dc2537ae-85b9-431f-8e81-03166121ad8b
+				summarizeBy: none
+				sourceColumn: Order Key
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Customer Key'
+				dataType: string
+				isHidden
+				displayFolder: _hidden
+				lineageTag: acf8300a-7a2b-45a4-a61a-a5cccf63975f
+				summarizeBy: none
+				sourceColumn: Customer Key
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Company Key'
+				dataType: string
+				isHidden
+				displayFolder: _hidden
+				lineageTag: f39ca59e-c643-4d4a-b8f9-ed3936006ecd
+				summarizeBy: none
+				sourceColumn: Company Key
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Product Key'
+				dataType: string
+				isHidden
+				displayFolder: _hidden
+				lineageTag: e59aa692-10da-40bb-8dbe-223957de4136
+				summarizeBy: none
+				sourceColumn: Product Key
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Order Date Dt'
+				dataType: dateTime
+				isHidden
+				formatString: Short Date
+				displayFolder: _hidden
+				lineageTag: 6cb1ece9-47c4-4db7-b456-8ac2398f5a6c
+				summarizeBy: none
+				sourceColumn: Order Date Dt
+
+				annotation SummarizationSetBy = Automatic
+				annotation UnderlyingDateTimeDataType = Date
+
+			column 'Ship Date Dt'
+				dataType: dateTime
+				isHidden
+				formatString: Short Date
+				displayFolder: _hidden
+				lineageTag: 1c5948a0-badc-439c-bb69-8aac147a9252
+				summarizeBy: none
+				sourceColumn: Ship Date Dt
+
+				annotation SummarizationSetBy = Automatic
+				annotation UnderlyingDateTimeDataType = Date
+
+			column 'Order Amount'
+				dataType: double
+				isHidden
+				displayFolder: _hidden
+				lineageTag: 9fe6a88b-84ea-4516-8fa3-b7870c55ecac
+				summarizeBy: sum
+				sourceColumn: Order Amount
+
+				annotation SummarizationSetBy = Automatic
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column 'Cost Amount'
+				dataType: double
+				isHidden
+				displayFolder: _hidden
+				lineageTag: 77eaf20e-c401-410d-a76a-0a32bbd47a40
+				summarizeBy: sum
+				sourceColumn: Cost Amount
+
+				annotation SummarizationSetBy = Automatic
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column 'Operating Expense Amount'
+				dataType: double
+				isHidden
+				displayFolder: _hidden
+				lineageTag: bcd964ac-bde6-478f-a307-bcd10fff2f6f
+				summarizeBy: sum
+				sourceColumn: Operating Expense Amount
+
+				annotation SummarizationSetBy = Automatic
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			partition FctOrders = m
+				mode: import
+				queryGroup: Facts
+				source =
+						let
+						    Source = Snowflake.Databases(HostName, WarehouseName, [Role=RoleName]),
+						    Result = Table.TransformColumnNames(
+						        Source{[Name=DbName]}[Data]{[Name=SchemaName]}[Data]{[Name="FCT_ORDERS"]}[Data],
+						        each Text.Proper(Text.Trim(Text.Replace(_, "_", " ")))
+						    )
+						in
+						    Result
+
+		table FctOrderLineItems
+			lineageTag: 15ca0aae-2978-4da3-98c2-6174743846ac
+
+			column 'Order Line Item Key'
+				dataType: string
+				isHidden
+				displayFolder: _hidden
+				lineageTag: dddddddd-dddd-dddd-dddd-dddddddddddd
+				summarizeBy: none
+				sourceColumn: Order Line Item Key
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Order Key'
+				dataType: string
+				isHidden
+				displayFolder: _hidden
+				lineageTag: eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee
+				summarizeBy: none
+				sourceColumn: Order Key
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'Product Key'
+				dataType: string
+				isHidden
+				displayFolder: _hidden
+				lineageTag: ffffffff-ffff-ffff-ffff-ffffffffffff
+				summarizeBy: none
+				sourceColumn: Product Key
+
+				annotation SummarizationSetBy = Automatic
+
+			column Quantity
+				dataType: double
+				isHidden
+				displayFolder: _hidden
+				lineageTag: 11111111-2222-3333-4444-555555555555
+				summarizeBy: sum
+				sourceColumn: Quantity
+
+				annotation SummarizationSetBy = Automatic
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column 'Unit Price'
+				dataType: double
+				isHidden
+				displayFolder: _hidden
+				lineageTag: 22222222-3333-4444-5555-666666666666
+				summarizeBy: sum
+				sourceColumn: Unit Price
+
+				annotation SummarizationSetBy = Automatic
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column 'Line Total'
+				dataType: double
+				isHidden
+				displayFolder: _hidden
+				lineageTag: 33333333-4444-5555-6666-777777777777
+				summarizeBy: sum
+				sourceColumn: Line Total
+
+				annotation SummarizationSetBy = Automatic
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			partition FctOrderLineItems = m
+				mode: import
+				queryGroup: Facts
+				source =
+						let
+						    Source = Snowflake.Databases(HostName, WarehouseName, [Role=RoleName]),
+						    Result = Table.TransformColumnNames(
+						        Source{[Name=DbName]}[Data]{[Name=SchemaName]}[Data]{[Name="FCT_ORDER_LINE_ITEMS"]}[Data],
+						        each Text.Proper(Text.Trim(Text.Replace(_, "_", " ")))
+						    )
+						in
+						    Result
+
+		table DimCustomer
+			lineageTag: 9419419a-9419-9419-9419-941994199419
+
+			column 'Customer Key'
+				dataType: string
+				isHidden
+				displayFolder: _hidden
+				lineageTag: aabbccdd-1111-2222-3333-444455556666
+				summarizeBy: none
+				sourceColumn: Customer Key
+
+				annotation SummarizationSetBy = Automatic
+
+			/// The full name of the customer.
+			column 'Customer Name'
+				dataType: string
+				lineageTag: aabbccdd-2222-3333-4444-555566667777
+				summarizeBy: none
+				sourceColumn: Customer Name
+
+				annotation SummarizationSetBy = Automatic
+
+			/// The customer's email address.
+			column Email
+				dataType: string
+				lineageTag: aabbccdd-3333-4444-5555-666677778888
+				summarizeBy: none
+				sourceColumn: Email
+
+				annotation SummarizationSetBy = Automatic
+
+			/// The city where the customer is located.
+			column City
+				dataType: string
+				lineageTag: aabbccdd-4444-5555-6666-777788889999
+				summarizeBy: none
+				sourceColumn: City
+
+				annotation SummarizationSetBy = Automatic
+
+			/// The state or province where the customer is located.
+			column State
+				dataType: string
+				lineageTag: aabbccdd-5555-6666-7777-888899990000
+				summarizeBy: none
+				sourceColumn: State
+
+				annotation SummarizationSetBy = Automatic
+
+			/// The customer segment classification.
+			column Segment
+				dataType: string
+				lineageTag: aabbccdd-6666-7777-8888-999900001111
+				summarizeBy: none
+				sourceColumn: Segment
+
+				annotation SummarizationSetBy = Automatic
+
+			partition DimCustomer = m
+				mode: import
+				queryGroup: Dimensions
+				source =
+						let
+						    Source = Snowflake.Databases(HostName, WarehouseName, [Role=RoleName]),
+						    Result = Table.TransformColumnNames(
+						        Source{[Name=DbName]}[Data]{[Name=SchemaName]}[Data]{[Name="DIM_CUSTOMER"]}[Data],
+						        each Text.Proper(Text.Trim(Text.Replace(_, "_", " ")))
+						    )
+						in
+						    Result
+
+		table DimProduct
+			lineageTag: 10757107-5710-7571-0757-107571075710
+
+			column 'Product Key'
+				dataType: string
+				isHidden
+				displayFolder: _hidden
+				lineageTag: bbccddee-1111-2222-3333-444455556666
+				summarizeBy: none
+				sourceColumn: Product Key
+
+				annotation SummarizationSetBy = Automatic
+
+			/// The display name of the product.
+			column 'Product Name'
+				dataType: string
+				lineageTag: bbccddee-2222-3333-4444-555566667777
+				summarizeBy: none
+				sourceColumn: Product Name
+
+				annotation SummarizationSetBy = Automatic
+
+			/// The product category.
+			column Category
+				dataType: string
+				lineageTag: bbccddee-3333-4444-5555-666677778888
+				summarizeBy: none
+				sourceColumn: Category
+
+				annotation SummarizationSetBy = Automatic
+
+			/// The product subcategory.
+			column Subcategory
+				dataType: string
+				lineageTag: bbccddee-4444-5555-6666-777788889999
+				summarizeBy: none
+				sourceColumn: Subcategory
+
+				annotation SummarizationSetBy = Automatic
+
+			partition DimProduct = m
+				mode: import
+				queryGroup: Dimensions
+				source =
+						let
+						    Source = Snowflake.Databases(HostName, WarehouseName, [Role=RoleName]),
+						    Result = Table.TransformColumnNames(
+						        Source{[Name=DbName]}[Data]{[Name=SchemaName]}[Data]{[Name="DIM_PRODUCT"]}[Data],
+						        each Text.Proper(Text.Trim(Text.Replace(_, "_", " ")))
+						    )
+						in
+						    Result
+
+		table DimCompany
+			lineageTag: 92179217-9217-9217-9217-921792179217
+
+			column 'Company Key'
+				dataType: string
+				isHidden
+				displayFolder: _hidden
+				lineageTag: ccddee11-1111-2222-3333-444455556666
+				summarizeBy: none
+				sourceColumn: Company Key
+
+				annotation SummarizationSetBy = Automatic
+
+			/// The company name.
+			column 'Company Name'
+				dataType: string
+				lineageTag: ccddee11-2222-3333-4444-555566667777
+				summarizeBy: none
+				sourceColumn: Company Name
+
+				annotation SummarizationSetBy = Automatic
+
+			/// The parent company (for multi-location businesses).
+			column 'Parent Company Name'
+				dataType: string
+				lineageTag: ccddee11-3333-4444-5555-666677778888
+				summarizeBy: none
+				sourceColumn: Parent Company Name
+
+				annotation SummarizationSetBy = Automatic
+
+			/// The region this company operates in.
+			column Region
+				dataType: string
+				lineageTag: ccddee11-4444-5555-6666-777788889999
+				summarizeBy: none
+				sourceColumn: Region
+
+				annotation SummarizationSetBy = Automatic
+
+			partition DimCompany = m
+				mode: import
+				queryGroup: Dimensions
+				source =
+						let
+						    Source = Snowflake.Databases(HostName, WarehouseName, [Role=RoleName]),
+						    Result = Table.TransformColumnNames(
+						        Source{[Name=DbName]}[Data]{[Name=SchemaName]}[Data]{[Name="DIM_COMPANY"]}[Data],
+						        each Text.Proper(Text.Trim(Text.Replace(_, "_", " ")))
+						    )
+						in
+						    Result
+
+		table _PrmDimension
+			lineageTag: ebb52a5a-5aea-4217-b694-ec7ff426e3e5
+
+			column Dimension
+				lineageTag: 35c71501-0ab7-4d1b-9071-ac8b1a039139
+				summarizeBy: none
+				sourceColumn: [Value1]
+				sortByColumn: '_PrmDimension Order'
+
+				relatedColumnDetails
+					groupByColumn: '_PrmDimension Fields'
+
+				annotation SummarizationSetBy = Automatic
+
+			column '_PrmDimension Fields'
+				isHidden
+				lineageTag: 263f3da0-69a7-4eb7-bd2e-4be61cc9dc8b
+				summarizeBy: none
+				sourceColumn: [Value2]
+				sortByColumn: '_PrmDimension Order'
+
+				extendedProperty ParameterMetadata = {"version":3,"kind":2}
+
+				annotation SummarizationSetBy = Automatic
+
+			column '_PrmDimension Order'
+				isHidden
+				formatString: 0
+				lineageTag: c7eb7629-7dd3-4908-8fb1-41a5b5f056d2
+				summarizeBy: sum
+				sourceColumn: [Value3]
+
+				annotation SummarizationSetBy = Automatic
+
+			partition _PrmDimension = calculated
+				mode: import
+				source = ```
+						{
+						    // Company & Location context
+						    ("Company", NAMEOF('DimCompany'[Company Name]), 0),
+						    ("Parent Company", NAMEOF('DimCompany'[Parent Company Name]), 1),
+						    ("Region", NAMEOF('DimCompany'[Region]), 2),
+
+						    // Customer context
+						    ("Customer", NAMEOF('DimCustomer'[Customer Name]), 3),
+						    ("Customer Segment", NAMEOF('DimCustomer'[Segment]), 4),
+						    ("Customer City", NAMEOF('DimCustomer'[City]), 5),
+						    ("Customer State", NAMEOF('DimCustomer'[State]), 6),
+
+						    // Product context
+						    ("Product", NAMEOF('DimProduct'[Product Name]), 7),
+						    ("Product Category", NAMEOF('DimProduct'[Category]), 8),
+						    ("Product Subcategory", NAMEOF('DimProduct'[Subcategory]), 9)
+						}
+
+						```
+
+		table _PrmKPI
+			lineageTag: 74f0666c-9592-4b64-8649-6f7d35969485
+
+			column KPI
+				lineageTag: 59e8dd99-7cfc-4927-8351-44542778de8c
+				summarizeBy: none
+				sourceColumn: [Value1]
+				sortByColumn: '_PrmKPI Order'
+
+				relatedColumnDetails
+					groupByColumn: '_PrmKPI Fields'
+
+				annotation SummarizationSetBy = Automatic
+
+			column '_PrmKPI Fields'
+				isHidden
+				lineageTag: 03039c59-4985-4e72-ac80-a2114182a974
+				summarizeBy: none
+				sourceColumn: [Value2]
+				sortByColumn: '_PrmKPI Order'
+
+				extendedProperty ParameterMetadata = {"version":3,"kind":2}
+
+				annotation SummarizationSetBy = Automatic
+
+			column '_PrmKPI Order'
+				isHidden
+				formatString: 0
+				lineageTag: d9ae0f03-76e7-41f7-8ea5-dc97f287b4d9
+				summarizeBy: sum
+				sourceColumn: [Value3]
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'KPI Category'
+				lineageTag: 57224576-f946-4f59-8b8d-7a43119259a7
+				summarizeBy: none
+				sourceColumn: [Value4]
+				sortByColumn: 'KPI Category Order'
+
+				annotation SummarizationSetBy = Automatic
+
+			column 'KPI Category Order'
+				isHidden
+				formatString: 0
+				lineageTag: b03d53a1-2307-46f2-8bd5-0f15eb5b9835
+				summarizeBy: sum
+				sourceColumn: [Value5]
+
+				annotation SummarizationSetBy = Automatic
+
+			partition _PrmKPI = calculated
+				mode: import
+				source = ```
+						{
+						    // Revenue
+						    ("Total Revenue", NAMEOF('_Measures'[Total Revenue]), 0, "Revenue", 0),
+						    ("Average Order Value", NAMEOF('_Measures'[Average Order Value]), 1, "Revenue", 0),
+						    ("Average Daily Revenue", NAMEOF('_Measures'[Average Daily Revenue]), 2, "Revenue", 0),
+
+						    // Orders
+						    ("Order Count", NAMEOF('_Measures'[Order Count]), 3, "Orders", 1),
+						    ("Units Sold", NAMEOF('_Measures'[Units Sold]), 4, "Orders", 1),
+
+						    // Customers
+						    ("Active Customer Count", NAMEOF('_Measures'[Active Customer Count]), 5, "Customers", 2),
+						    ("New Customer Count", NAMEOF('_Measures'[New Customer Count]), 6, "Customers", 2),
+						    ("Customer Retention Rate", NAMEOF('_Measures'[Customer Retention Rate]), 7, "Customers", 2),
+
+						    // Profitability
+						    ("Gross Profit", NAMEOF('_Measures'[Gross Profit]), 8, "Profitability", 3),
+						    ("Gross Margin %", NAMEOF('_Measures'[Gross Margin %]), 9, "Profitability", 3),
+						    ("Net Profit", NAMEOF('_Measures'[Net Profit]), 10, "Profitability", 3),
+						    ("Net Margin %", NAMEOF('_Measures'[Net Margin %]), 11, "Profitability", 3)
+						}
+
+						```
+
+		table _PrmReferenceDate
+			lineageTag: 9dc46da5-1c68-437d-a350-acc8b42a40eb
+
+			column 'Reference Date'
+				lineageTag: 54aca622-0ede-4ad7-ad9e-ce9ddeadc3be
+				summarizeBy: none
+				sourceColumn: [Value1]
+				sortByColumn: '_PrmReferenceDate Order'
+
+				relatedColumnDetails
+					groupByColumn: '_PrmReferenceDate Fields'
+
+				annotation SummarizationSetBy = Automatic
+
+			column '_PrmReferenceDate Fields'
+				isHidden
+				lineageTag: 7344fc8e-ee80-453c-81f5-6ea475d3f9ce
+				summarizeBy: none
+				sourceColumn: [Value2]
+				sortByColumn: '_PrmReferenceDate Order'
+
+				extendedProperty ParameterMetadata = {"version":3,"kind":2}
+
+				annotation SummarizationSetBy = Automatic
+
+			column '_PrmReferenceDate Order'
+				isHidden
+				formatString: 0
+				lineageTag: 7642d266-18a2-43aa-8dba-81e966bd1c20
+				summarizeBy: sum
+				sourceColumn: [Value3]
+
+				annotation SummarizationSetBy = Automatic
+
+			partition _PrmReferenceDate = calculated
+				mode: import
+				source =
+						{
+						    ("Order Date", NAMEOF('FctOrders'[Order Date Dt]), 0),
+						    ("Ship Date", NAMEOF('FctOrders'[Ship Date Dt]), 1)
+						}
+
+		relationship de59d46f-a2ca-7599-fe49-2169a6c81537
+			fromColumn: FctOrders.'Customer Key'
+			toColumn: DimCustomer.'Customer Key'
+
+		relationship 94d58a6e-5301-bd1f-9532-5bb99f3fb25f
+			fromColumn: FctOrders.'Company Key'
+			toColumn: DimCompany.'Company Key'
+
+		relationship 61ef2fa5-87b1-5ee2-dd05-d9a3f00496d7
+			fromColumn: FctOrders.'Product Key'
+			toColumn: DimProduct.'Product Key'
+
+		relationship 8d84d91c-650c-efde-7339-5845bb12cf5b
+			fromColumn: FctOrderLineItems.'Product Key'
+			toColumn: DimProduct.'Product Key'
+
+		relationship 2bc9ed0f-5539-3564-73e0-59fb643e1079
+			fromColumn: FctOrderLineItems.'Order Key'
+			toColumn: FctOrders.'Order Key'
+
+		relationship 4a332ae4-3395-e962-9971-1daae761448f
+			fromColumn: FctOrders.'Order Date Dt'
+			toColumn: DimDate.'Date Day'
+
+		relationship 740b5a48-2e64-4fbd-349b-5a1bfd73d050
+			isActive: false
+			fromColumn: FctOrders.'Ship Date Dt'
+			toColumn: DimDate.'Date Day'
+
+		expression HostName = "account.snowflakecomputing.com" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+			lineageTag: 1948be46-cc94-465f-954c-0b514cf312bb
+			queryGroup: Parameters
+
+			annotation PBI_ResultType = Text
+
+		expression DbName = "ANALYTICS" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+			lineageTag: 5e8dca1f-e496-46b3-97bb-b8eaf7e3dc53
+			queryGroup: Parameters
+
+			annotation PBI_ResultType = Text
+
+		expression SchemaName = "MARTS" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+			lineageTag: 31a12663-8de3-4237-9d03-0761a23ff6e4
+			queryGroup: Parameters
+
+			annotation PBI_ResultType = Text
+
+		expression WarehouseName = "DEVELOPER_WH" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+			lineageTag: 48916d87-e3fa-485a-8026-4445d3a7fb91
+			queryGroup: Parameters
+
+			annotation PBI_ResultType = Text
+
+		expression RoleName = "DEVELOPER" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+			lineageTag: 9c133c9f-8ad1-428a-8fda-07f07bb64a9d
+			queryGroup: Parameters
+
+			annotation PBI_NavigationStepName = Navigation
