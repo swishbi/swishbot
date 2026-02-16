@@ -1,6 +1,6 @@
 ---
 name: analytics-architecture
-description: "Design analytics reference architectures. Use when planning the overall data platform — choosing components, defining data flow, establishing environments, and making build-vs-buy decisions."
+description: "Design analytics reference architectures. Use when a user asks to plan a data platform, choose between warehouse options, define data flow across layers, establish dev/staging/prod environments, or make build-vs-buy decisions for analytics tooling."
 ---
 
 # Analytics Reference Architecture

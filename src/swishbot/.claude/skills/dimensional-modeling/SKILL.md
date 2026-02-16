@@ -1,11 +1,7 @@
 ---
 name: dimensional-modeling
-description: "Apply dimensional modeling best practices. Use when designing fact and dimension tables, choosing grain, handling slowly changing dimensions, or structuring a star/snowflake schema."
-workflows:
-  - name: design-star-schema
-    trigger: "When designing new fact and dimension tables from scratch"
-  - name: conform-cross-system-data
-    trigger: "When the same entity exists in multiple source systems and needs conforming"
+description: "Apply dimensional modeling best practices. Use when a user asks to design a star schema, choose grain for a fact table, handle slowly changing dimensions, conform dimensions across sources, or structure a bus matrix."
+argument-hint: "[business-process]"
 ---
 
 # Dimensional Modeling

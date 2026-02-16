@@ -1,6 +1,7 @@
 ---
 name: dbt-staging-model
-description: "Conventions for writing a dbt staging model SQL file. Covers SQL structure, column casting, naming, ordering, and metadata handling."
+description: "Conventions for writing a dbt staging model SQL file. Use when a user asks to write a staging model, cast columns, rename fields, order CTEs, or handle metadata columns in a stg_ model. Covers SQL structure, casting, naming, ordering, and metadata."
+argument-hint: "[model-name]"
 ---
 
 # dbt-staging-model

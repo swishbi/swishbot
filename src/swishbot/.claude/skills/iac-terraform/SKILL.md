@@ -1,6 +1,6 @@
 ---
 name: iac-terraform
-description: "Deploy data infrastructure using Terraform/IaC. Use when provisioning cloud resources for analytics workloads — warehouses, storage, networking, IAM, and supporting services."
+description: "Deploy data infrastructure using Terraform/IaC. Use when a user asks to provision cloud resources, set up a warehouse, configure storage buckets, manage IAM roles, or automate infrastructure for analytics workloads."
 ---
 
 # Infrastructure as Code — Terraform

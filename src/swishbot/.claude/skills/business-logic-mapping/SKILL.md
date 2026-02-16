@@ -1,11 +1,7 @@
 ---
 name: business-logic-mapping
-description: "Map tribal knowledge from subject matter experts into implementation-ready business logic tied to staging columns. Use after requirements discovery to bridge human understanding and SQL implementation."
-workflows:
-  - name: run-sme-interview
-    trigger: "When you need to extract tribal knowledge from subject matter experts"
-  - name: create-logic-map
-    trigger: "When documented knowledge needs to be translated into column-level business logic"
+description: "Map tribal knowledge from subject matter experts into implementation-ready business logic tied to staging columns. Use when a user asks to interview SMEs, extract business rules, document column-level logic, or translate domain knowledge into SQL-ready specifications."
+argument-hint: "[domain]"
 ---
 
 # Business Logic Mapping

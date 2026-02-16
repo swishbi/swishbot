@@ -1,6 +1,6 @@
 ---
 name: dbt-mcp
-description: "Configure and use the dbt MCP server with Claude. Use when setting up the dbt MCP integration or when deciding which MCP tools to use for dbt development workflows."
+description: "Configure and use the dbt MCP server with Claude. Use when a user asks to set up the dbt MCP integration, choose which MCP tools to enable, run dbt commands through MCP, or query the semantic layer via MCP."
 ---
 
 # dbt MCP Server Integration

@@ -1,11 +1,7 @@
 ---
 name: dbt-marts
-description: "Build the mart/gold layer in dbt. Use when creating final business-facing models — fact tables, dimension tables, wide denormalized tables, or aggregated metrics. The last transformation before consumption by BI tools or the semantic layer."
-workflows:
-  - name: create-mart-model
-    trigger: "When building a new mart model from scratch"
-  - name: create-incremental-mart
-    trigger: "When converting a table mart to incremental for performance"
+description: "Build the mart/gold layer in dbt. Use when a user asks to create a fact table, dimension table, wide denormalized model, aggregated metrics, or convert a mart to incremental. The last transformation before BI tools or the semantic layer."
+argument-hint: "[model-name]"
 ---
 
 # dbt Mart Layer

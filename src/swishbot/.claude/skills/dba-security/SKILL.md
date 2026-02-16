@@ -1,11 +1,6 @@
 ---
 name: dba-security
-description: "Apply DBA security best practices. Use when configuring warehouse roles, access controls, row-level security, data masking, or audit policies."
-workflows:
-  - name: setup-warehouse-security
-    trigger: "When setting up warehouse security from scratch — databases, environments, roles"
-  - name: configure-dbt-security
-    trigger: "When configuring dbt grants, schema resolution, and profiles for the security model"
+description: "Apply DBA security best practices. Use when a user asks to set up warehouse roles, configure access controls, create database environments, set up dbt grants, implement row-level security, or audit permissions. Applies to Snowflake, BigQuery, Databricks, Postgres, and DuckDB."
 ---
 
 # DBA Security Practices

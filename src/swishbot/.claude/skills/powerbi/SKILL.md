@@ -1,6 +1,6 @@
 ---
 name: powerbi
-description: "Apply Power BI best practices. Use when building reports, designing data models in Power BI, writing DAX, configuring refresh schedules, or setting up workspaces and governance."
+description: "Apply Power BI best practices. Use when a user asks to build a report, design a Power BI data model, write DAX measures, configure refresh schedules, set up workspaces, or implement row-level security in Power BI."
 ---
 
 # Power BI Best Practices

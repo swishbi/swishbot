@@ -19,8 +19,7 @@ DEFAULT_AGENT_INSTALL_PATH = Path.home() / ".claude" / "agents"
 SKILL_TEMPLATE = """\
 ---
 name: {name}
-description: "[TODO: Describe when to use this skill and what it does.]"
-workflows: []
+description: "[TODO: Describe when to use this skill. Include trigger phrases users would say.]"
 ---
 
 # {title}
@@ -28,15 +27,6 @@ workflows: []
 ## Overview
 
 [TODO: What this skill does and the methodology behind it.]
-
-## Workflows
-
-[TODO: Add workflow files in the `workflows/` subdirectory and
-reference them here. Each workflow is a focused, step-by-step
-procedure for a specific task within this skill.]
-
-| Workflow | When to Use |
-|----------|-------------|
 
 ## Methodology
 

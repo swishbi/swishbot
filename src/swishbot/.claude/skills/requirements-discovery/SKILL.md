@@ -1,11 +1,7 @@
 ---
 name: requirements-discovery
-description: "Act as a business analyst to guide stakeholders from idea to implementation-ready requirements. Use when a stakeholder brings a report, dashboard, or data request that needs scoping before development."
-workflows:
-  - name: run-discovery-session
-    trigger: "When a stakeholder brings a vague idea that needs scoping"
-  - name: produce-developer-requirements
-    trigger: "When a scoped deliverable needs to be translated into a technical specification"
+description: "Act as a business analyst to guide stakeholders from idea to implementation-ready requirements. Use when a user asks to scope a report, run a discovery session, gather requirements for a dashboard, or produce a developer specification from stakeholder input."
+argument-hint: "[deliverable]"
 ---
 
 # Requirements Discovery

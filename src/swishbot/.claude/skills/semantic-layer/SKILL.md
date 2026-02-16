@@ -1,6 +1,6 @@
 ---
 name: semantic-layer
-description: "Build the semantic layer using the Boring Semantic Layer or similar tools. Use when defining metrics, dimensions, entities, and business logic that sits between the mart layer and BI consumption."
+description: "Build the semantic layer using the Boring Semantic Layer or similar tools. Use when a user asks to define metrics, create dimensions, configure entities, or add business logic between the mart layer and BI consumption tools."
 ---
 
 # Semantic Layer

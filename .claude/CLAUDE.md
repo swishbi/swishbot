@@ -43,11 +43,13 @@ The source tree under `src/swishbot/.claude/` mirrors the install target `~/.cla
 
 ## Skills
 
-Each skill lives in `src/swishbot/.claude/skills/<skill-name>/` with a mandatory `SKILL.md` containing YAML frontmatter (`name`, `description`, optional `workflows`) and methodology content. Optional subdirectories: `workflows/`, `examples/`, `scripts/`.
+Each skill lives in `src/swishbot/.claude/skills/<skill-name>/` with a mandatory `SKILL.md` containing YAML frontmatter and methodology content. Optional subdirectories: `workflows/`, `examples/`, `scripts/`.
 
-Skills with workflows use SKILL.md as a **router** that maps user intents to specific workflow files. Each workflow is a focused, step-by-step procedure in `workflows/<workflow-name>.md`. Skills without workflows continue to work as flat methodology guides.
+Recognized Claude Code frontmatter fields: `name`, `description`, `user-invocable`, `disable-model-invocation`, `allowed-tools`, `argument-hint`, `model`, `context`, `agent`, `hooks`. Only use these in the `---` block — custom fields are ignored by Claude Code.
 
-The `description` field is extracted via regex (`description:\s*"?([^"\n]+)"?`) — keep it on one line.
+Skills with workflows use SKILL.md as a **router** that maps user intents to specific workflow files in the markdown body (not frontmatter). Each workflow is a focused, step-by-step procedure in `workflows/<workflow-name>.md`. Skills without workflows continue to work as flat methodology guides.
+
+The `description` field is extracted via regex (`description:\s*"?([^"\n]+)"?`) — keep it on one line. Write descriptions as implicit triggers: include natural-language phrases users would say when they need this skill.
 
 ## Agents
 
@@ -69,10 +71,10 @@ Agents are authored by swishbot maintainers (no `init` scaffold). The `descripti
 When adding a new skill, complete every step:
 
 1. Scaffold the skill directory: `swishbot init <skill-name>` (creates `SKILL.md` + `workflows/`)
-2. Write `SKILL.md` with YAML frontmatter (`name`, `description`, optional `workflows`) and methodology content
-   - `description` must be a single line (extracted via regex)
+2. Write `SKILL.md` with YAML frontmatter (`name`, `description`, optional `argument-hint`) and methodology content
+   - `description` must be a single line (extracted via regex); include natural-language trigger phrases
    - End file with copyright footer: `*Copyright (c) 2026 Swish BI Limited. All rights reserved.*`
-   - For skills with workflows: add `workflows` list to frontmatter and use SKILL.md as a router
+   - For skills with workflows: add a routing table in the markdown body (not frontmatter) that maps intents to workflow files
 3. Add optional subdirectories if needed: `examples/`, `scripts/`
    - Add workflow files in `workflows/` if the skill has multi-step procedures
 4. Add cross-references to related skills in a `## Related Skills` section

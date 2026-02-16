@@ -1,11 +1,7 @@
 ---
 name: dlt-pipelines
-description: "Write dlt/Python data ingestion pipelines. Use when building extract-load pipelines from APIs, databases, files, or other sources into a data warehouse."
-workflows:
-  - name: create-pipeline
-    trigger: "When building a new dlt pipeline from scratch"
-  - name: debug-pipeline
-    trigger: "When a dlt pipeline is failing or producing unexpected results"
+description: "Write dlt/Python data ingestion pipelines. Use when a user asks to ingest data from an API, database, or file into a warehouse, create a new EL pipeline, debug a failing pipeline, or set up dlt sources and resources."
+argument-hint: "[source-name]"
 ---
 
 # dlt Pipelines

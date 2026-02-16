@@ -1,11 +1,7 @@
 ---
 name: dbt-intermediate
-description: "Build the intermediate/silver layer in dbt. Use when staged data needs to be joined, filtered, or reshaped before being served to marts. Handles cross-source integration, business logic application, and data quality enforcement."
-workflows:
-  - name: create-intermediate-model
-    trigger: "When building a new intermediate model from scratch"
-  - name: refactor-to-intermediate
-    trigger: "When extracting complex logic from an existing mart into intermediate"
+description: "Build the intermediate/silver layer in dbt. Use when a user asks to join staged models, apply business logic between staging and marts, create cross-source integrations, or refactor complex mart logic into intermediate models."
+argument-hint: "[model-name]"
 ---
 
 # dbt Intermediate Layer

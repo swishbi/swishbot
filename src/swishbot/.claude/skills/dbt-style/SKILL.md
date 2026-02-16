@@ -1,6 +1,6 @@
 ---
 name: dbt-style
-description: "Cross-cutting dbt style, naming, and project structure conventions. Use as the foundational reference for all dbt work — SQL formatting, model naming, folder organization, and materialization strategy. References official dbt best practices."
+description: "Cross-cutting dbt style, naming, and project structure conventions. Use when a user asks about SQL formatting, model naming, folder organization, materialization strategy, Jinja style, or YAML conventions in dbt. The foundational reference for all dbt work."
 ---
 
 # dbt Style & Structure

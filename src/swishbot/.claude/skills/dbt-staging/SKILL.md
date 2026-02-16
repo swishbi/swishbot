@@ -1,13 +1,7 @@
 ---
 name: dbt-staging
-description: "Build the staging/bronze layer in dbt. Use when a source system needs to be staged with consistent naming, typing, and light transformations. Applies regardless of warehouse platform or ingestion tool."
-workflows:
-  - name: create-staging-source
-    trigger: "When a new source system needs to be staged"
-  - name: transform-staging-models
-    trigger: "When base models need casting, renaming, complex structure handling"
-  - name: validate-staging-models
-    trigger: "When staging models are ready for testing and validation"
+description: "Build the staging/bronze layer in dbt. Use when a user asks to stage a source, create base models, add a new source system, or set up initial dbt models from raw data. Applies regardless of warehouse platform or ingestion tool."
+argument-hint: "[source-name]"
 ---
 
 # dbt Staging Layer
