@@ -41,7 +41,7 @@ This project uses [swishbot](https://github.com/swishbi/swishbot) skills to guid
 ### Analytics & Presentation
 | Skill | Description | Status |
 |-------|-------------|--------|
-| powerbi | Power BI best practices | :x: |
+| powerbi | Power BI best practices | :white_check_mark: |
 | semantic-layer | Building the semantic layer | :x: |
 
 ## Installed Agents

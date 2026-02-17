@@ -57,6 +57,7 @@ Each pattern has a corresponding example file in the [examples/](examples/) dire
 - **[dbt-intermediate](../dbt-intermediate/SKILL.md)** — Where cross-reference models and grain-changing transformations live
 - **[dbt-marts](../dbt-marts/SKILL.md)** — Where final fact and dimension tables are materialized
 - **[dbt-style](../dbt-style/SKILL.md)** — Naming, SQL style, and project structure conventions applied to dimensional models
+- **[powerbi](../powerbi/SKILL.md)** — Power BI semantic models that consume the star schemas designed here
 
 ---
 

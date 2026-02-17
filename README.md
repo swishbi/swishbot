@@ -78,7 +78,7 @@ swishbot init-memory
 ### Analytics & Presentation
 | Skill | Description | Status |
 |-------|-------------|--------|
-| `powerbi` | Power BI best practices | :x: |
+| `powerbi` | Power BI best practices | :white_check_mark: |
 | `semantic-layer` | Building the semantic layer | :x: |
 
 ## Available Agents
@@ -175,7 +175,15 @@ swishbot/
 │               ├── semantic-layer/
 │               │   └── SKILL.md
 │               └── powerbi/
-│                   └── SKILL.md
+│                   ├── SKILL.md         # Router: tenets + workflow index
+│                   ├── workflows/       # Step-by-step procedures
+│                   │   ├── design-semantic-model.md
+│                   │   ├── build-semantic-model.md
+│                   │   ├── build-report.md
+│                   │   ├── deploy-and-publish.md
+│                   │   └── connect-and-consume.md
+│                   └── examples/
+│                       └── semantic_model.tmdl
 └── tests/
     └── test_cli.py              # CLI test suite
 ```
