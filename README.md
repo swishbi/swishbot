@@ -64,6 +64,11 @@ swishbot init-memory
 |-------|-------------|--------|
 | `dlt-pipelines` | Writing dlt/Python ingestion pipelines | :white_check_mark: |
 
+### Orchestration
+| Skill | Description | Status |
+|-------|-------------|--------|
+| `dagster` | Orchestrate data pipelines with Dagster and Dagster+ | :white_check_mark: |
+
 ### Transformation (dbt)
 | Skill | Description | Status |
 |-------|-------------|--------|
@@ -152,6 +157,14 @@ swishbot/
 │               │   └── SKILL.md
 │               ├── dbt-mcp/
 │               │   └── SKILL.md
+│               ├── dagster/
+│               │   ├── SKILL.md         # Router: project setup + component workflows
+│               │   ├── workflows/
+│               │   │   ├── setup-project.md
+│               │   │   ├── add-dlt-component.md
+│               │   │   ├── add-dbt-component.md
+│               │   │   └── add-custom-component.md
+│               │   └── examples/
 │               ├── dlt-pipelines/
 │               │   ├── SKILL.md
 │               │   └── scripts/

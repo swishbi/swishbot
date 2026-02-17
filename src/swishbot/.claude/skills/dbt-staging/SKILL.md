@@ -169,6 +169,7 @@ See [examples/](examples/) for reference files:
 - **[dbt-mcp](../dbt-mcp/SKILL.md)** — Use `show` to inspect source data and preview model results
 - **[dlt-pipelines](../dlt-pipelines/SKILL.md)** — Build dlt ingestion pipelines that feed into staging models
 - **[dba-security](../dba-security/SKILL.md)** — Database separation strategy that determines where raw and staging data live
+- **[dagster](../dagster/SKILL.md)** — Orchestrate dbt models as Dagster assets
 
 ---
 

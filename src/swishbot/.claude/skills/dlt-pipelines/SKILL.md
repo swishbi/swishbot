@@ -111,6 +111,7 @@ Add to `.mcp.json`:
 - **[dbt-mcp](../dbt-mcp/SKILL.md)** — Explore loaded schemas from the dbt side
 - **[analytics-architecture](../analytics-architecture/SKILL.md)** — Where dlt fits in the overall platform
 - **[dba-security](../dba-security/SKILL.md)** — Loader role permissions and raw database access controls
+- **[dagster](../dagster/SKILL.md)** — Orchestrate dlt pipelines as Dagster assets
 
 ---
 
