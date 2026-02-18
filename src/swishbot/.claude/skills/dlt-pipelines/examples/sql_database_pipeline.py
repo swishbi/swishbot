@@ -13,8 +13,9 @@ Covers two patterns for loading data from SQL databases:
 
 import logging
 import os
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional
+from typing import Any
 
 import dlt
 from dlt.sources.helpers.requests import Response
@@ -144,7 +145,7 @@ class RowNumPaginator(BasePaginator):
         request.params["offset"] = self._offset
         request.params["limit"] = self.page_size
 
-    def update_state(self, response: Response, data: Optional[List[Any]] = None) -> None:
+    def update_state(self, response: Response, data: list[Any] | None = None) -> None:
         if not data or len(data) < self.page_size:
             self._has_next_page = False
         else:
@@ -155,7 +156,7 @@ class RowNumPaginator(BasePaginator):
         request.params["limit"] = self.page_size
 
 
-def read_sql_files(sql_dir: Path) -> Dict[str, str]:
+def read_sql_files(sql_dir: Path) -> dict[str, str]:
     """Read all .sql files from a directory and return {table_name: sql_query}.
 
     Convention: filename (without extension) becomes the resource/table name.
@@ -215,7 +216,7 @@ def sql_over_rest_source(
             _query: str = query,
             _client: RESTClient = client,
             _paginator: RowNumPaginator = paginator,
-        ) -> Iterator[List[Dict[str, Any]]]:
+        ) -> Iterator[list[dict[str, Any]]]:
             """Execute a SQL query against the API and yield paginated results."""
             offset = 0
             page_size = _paginator.page_size

@@ -11,8 +11,8 @@ Patterns: Incremental loading, metadata injection, chunked reading, backfill
 
 import logging
 import os
-from datetime import datetime
-from typing import Any, Dict, Iterator, List, Optional
+from collections.abc import Iterator
+from typing import Any
 
 import dlt
 from dlt.common import pendulum
@@ -28,7 +28,7 @@ logger = logging.getLogger("dlt")
 # filesystem reader (globs, incremental tracking), and pipe_hints configure
 # the destination table (write disposition, primary key, column types).
 
-TABLES_CONFIG: List[Dict[str, Any]] = [
+TABLES_CONFIG: list[dict[str, Any]] = [
     {
         "file_glob": "sales/*.csv",
         "table_name": "sales",
@@ -144,7 +144,7 @@ def read_json(items):
 
 
 @dlt.transformer(name="read_excel")
-def read_excel(items, sheet_name: Optional[str] = None):
+def read_excel(items, sheet_name: str | None = None):
     """Read Excel files with optional sheet selection.
 
     Uses pandas for reading. If sheet_name is None, reads the first sheet.
@@ -192,7 +192,7 @@ READERS = {
 @dlt.source(name="filesystem_example", max_table_nesting=0)
 def filesystem_source(
     bucket_url: str = dlt.config.value,
-    tables_config: Optional[List[Dict[str, Any]]] = None,
+    tables_config: list[dict[str, Any]] | None = None,
 ) -> Iterator[Any]:
     """Cloud file storage source.
 
@@ -207,7 +207,7 @@ def filesystem_source(
             - Local: "/path/to/directory" or "file:///path/to/directory"
         tables_config: List of table configuration dicts. Defaults to TABLES_CONFIG.
     """
-    from dlt.sources.filesystem import filesystem, read_csv as dlt_read_csv
+    from dlt.sources.filesystem import filesystem
 
     config = tables_config or TABLES_CONFIG
 

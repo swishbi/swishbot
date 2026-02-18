@@ -10,7 +10,7 @@ Synthesized from production patterns across multiple REST API sources.
 import argparse
 import logging
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import dlt
 from dlt.common import pendulum
@@ -27,7 +27,7 @@ logger = logging.getLogger("dlt")
 # Authentication helpers
 # ---------------------------------------------------------------------------
 
-def get_auth_config(auth_type: str, **kwargs) -> Dict[str, Any]:
+def get_auth_config(auth_type: str, **kwargs) -> dict[str, Any]:
     """Return the right dlt auth config based on the API's auth method.
 
     Args:
@@ -113,7 +113,7 @@ class PageNumberTotalCountPaginator(BasePaginator):
     def init_request(self, request) -> None:
         request.params[self.page_param] = self._page
 
-    def update_state(self, response: Response, data: Optional[List[Any]] = None) -> None:
+    def update_state(self, response: Response, data: list[Any] | None = None) -> None:
         total = response.json().get(self.total_path, 0)
         current_count = self._page * self.page_size
         if not data or len(data) < self.page_size or current_count >= total:
@@ -141,13 +141,13 @@ class CursorPaginator(BasePaginator):
         super().__init__()
         self.cursor_path = cursor_path
         self.cursor_param = cursor_param
-        self._cursor: Optional[str] = None
+        self._cursor: str | None = None
 
     def init_request(self, request) -> None:
         if self._cursor:
             request.params[self.cursor_param] = self._cursor
 
-    def update_state(self, response: Response, data: Optional[List[Any]] = None) -> None:
+    def update_state(self, response: Response, data: list[Any] | None = None) -> None:
         self._cursor = response.json().get(self.cursor_path)
         if not self._cursor or not data:
             self._has_next_page = False
@@ -168,7 +168,7 @@ register_paginator("cursor", CursorPaginator)
 # string like "100.00" inferred as text, or a date field stored as text).
 # Define per-resource and reference in the resource config's "columns" key.
 
-RESOURCE_COLUMNS: Dict[str, Dict[str, Dict[str, Any]]] = {
+RESOURCE_COLUMNS: dict[str, dict[str, dict[str, Any]]] = {
     "invoices": {
         "total_amount": {"data_type": "double", "nullable": True},
         "balance": {"data_type": "double", "nullable": True},
@@ -186,7 +186,7 @@ RESOURCE_COLUMNS: Dict[str, Dict[str, Dict[str, Any]]] = {
 }
 
 
-def _build_column_definitions(resource_name: str) -> Dict[str, Dict[str, Any]]:
+def _build_column_definitions(resource_name: str) -> dict[str, dict[str, Any]]:
     """Return column type hints for a resource, or empty dict if none defined."""
     return RESOURCE_COLUMNS.get(resource_name, {})
 
@@ -200,7 +200,7 @@ def _build_incremental_config(
     initial_value: str = "2020-01-01T00:00:00Z",
     lag_days: int = 0,
     convert=None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Build an incremental loading config for a resource endpoint.
 
     Args:
@@ -211,7 +211,7 @@ def _build_incremental_config(
         convert: Optional callable to normalize the cursor value
                  (e.g. parse ISO date to YYYY-MM-DD).
     """
-    config: Dict[str, Any] = {
+    config: dict[str, Any] = {
         "cursor_path": cursor_path,
         "initial_value": initial_value,
     }
@@ -232,7 +232,7 @@ def add_tenant_metadata(tenant_id: str, tenant_name: str):
     Use for multi-tenant pipelines where data from different tenants is loaded
     into the same table. Add as a processing step or via resource.add_map().
     """
-    def _add_metadata(record: Dict[str, Any]) -> Dict[str, Any]:
+    def _add_metadata(record: dict[str, Any]) -> dict[str, Any]:
         record["_tenant_id"] = tenant_id
         record["_tenant_name"] = tenant_name
         return record

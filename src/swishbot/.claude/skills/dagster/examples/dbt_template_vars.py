@@ -8,8 +8,10 @@ Seeds and root nodes (no upstream deps) run on a cron schedule.
 Everything else runs eagerly when dependencies complete.
 """
 
+from collections.abc import Callable, Mapping
+from typing import Any
+
 import dagster as dg
-from typing import Any, Callable, Mapping
 
 
 @dg.template_var
