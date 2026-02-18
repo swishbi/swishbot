@@ -86,6 +86,7 @@ TABLES_CONFIG: list[dict[str, Any]] = [
 # Transformer functions (one per file type)
 # ---------------------------------------------------------------------------
 
+
 @dlt.transformer(name="read_csv")
 def read_csv(items, chunksize: int = 10000):
     """Read CSV files with chunked pandas reader for memory efficiency.
@@ -189,6 +190,7 @@ READERS = {
 # Source definition
 # ---------------------------------------------------------------------------
 
+
 @dlt.source(name="filesystem_example", max_table_nesting=0)
 def filesystem_source(
     bucket_url: str = dlt.config.value,
@@ -242,6 +244,7 @@ def filesystem_source(
 # ---------------------------------------------------------------------------
 # Backfill pattern (date-partitioned directories)
 # ---------------------------------------------------------------------------
+
 
 def generate_months(start: str, end: str) -> Iterator[str]:
     """Generate YYYY-MM strings for each month in the range (inclusive).
@@ -309,6 +312,7 @@ def backfill_by_month(
 # ---------------------------------------------------------------------------
 # Pipeline runner
 # ---------------------------------------------------------------------------
+
 
 def load_filesystem() -> None:
     bucket_url = os.getenv("BUCKET_URL", "")

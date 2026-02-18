@@ -27,6 +27,7 @@ logger = logging.getLogger("dlt")
 # Authentication helpers
 # ---------------------------------------------------------------------------
 
+
 def get_auth_config(auth_type: str, **kwargs) -> dict[str, Any]:
     """Return the right dlt auth config based on the API's auth method.
 
@@ -95,6 +96,7 @@ def get_auth_config(auth_type: str, **kwargs) -> dict[str, Any]:
 # Custom paginators
 # ---------------------------------------------------------------------------
 
+
 class PageNumberTotalCountPaginator(BasePaginator):
     """Page-number paginator that stops when current_count >= total_count.
 
@@ -102,8 +104,7 @@ class PageNumberTotalCountPaginator(BasePaginator):
     than a next-page link. Pattern extracted from AccuLynx, CenterPoint.
     """
 
-    def __init__(self, page_size: int = 50, page_param: str = "page",
-                 total_path: str = "count"):
+    def __init__(self, page_size: int = 50, page_param: str = "page", total_path: str = "count"):
         super().__init__()
         self.page_size = page_size
         self.page_param = page_param
@@ -136,8 +137,7 @@ class CursorPaginator(BasePaginator):
     in the response body. Pattern extracted from JobNimbus.
     """
 
-    def __init__(self, cursor_path: str = "nextCursor",
-                 cursor_param: str = "cursor"):
+    def __init__(self, cursor_path: str = "nextCursor", cursor_param: str = "cursor"):
         super().__init__()
         self.cursor_path = cursor_path
         self.cursor_param = cursor_param
@@ -195,6 +195,7 @@ def _build_column_definitions(resource_name: str) -> dict[str, dict[str, Any]]:
 # Incremental loading helpers
 # ---------------------------------------------------------------------------
 
+
 def _build_incremental_config(
     cursor_path: str,
     initial_value: str = "2020-01-01T00:00:00Z",
@@ -226,16 +227,19 @@ def _build_incremental_config(
 # Processing steps (metadata injection, filtering, transformation)
 # ---------------------------------------------------------------------------
 
+
 def add_tenant_metadata(tenant_id: str, tenant_name: str):
     """Return a map function that injects tenant context into each record.
 
     Use for multi-tenant pipelines where data from different tenants is loaded
     into the same table. Add as a processing step or via resource.add_map().
     """
+
     def _add_metadata(record: dict[str, Any]) -> dict[str, Any]:
         record["_tenant_id"] = tenant_id
         record["_tenant_name"] = tenant_name
         return record
+
     return _add_metadata
 
 
@@ -252,6 +256,7 @@ def add_tenant_metadata(tenant_id: str, tenant_name: str):
 # ---------------------------------------------------------------------------
 # Source definition
 # ---------------------------------------------------------------------------
+
 
 @dlt.source(name="rest_api_example", root_key=True, max_table_nesting=0)
 def rest_api_source(
@@ -383,6 +388,7 @@ def rest_api_source(
 # ---------------------------------------------------------------------------
 # Pipeline runner with CLI args and multi-tenant support
 # ---------------------------------------------------------------------------
+
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="REST API pipeline")

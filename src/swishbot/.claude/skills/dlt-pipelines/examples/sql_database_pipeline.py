@@ -28,6 +28,7 @@ logger = logging.getLogger("dlt")
 # Pattern 1: Direct Database Connection
 # ===========================================================================
 
+
 def direct_db_source() -> None:
     """Load tables directly from a SQL database using dlt's sql_database source.
 
@@ -245,6 +246,7 @@ def sql_over_rest_source(
 # ---------------------------------------------------------------------------
 # Pipeline runner
 # ---------------------------------------------------------------------------
+
 
 def load_sql_over_rest() -> None:
     source = sql_over_rest_source()

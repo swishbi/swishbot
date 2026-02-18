@@ -38,8 +38,7 @@ class CustomDltLoadCollectionComponent(DltLoadCollectionComponent):
             timezone: str = "UTC",
         ) -> dg.AutomationCondition:
             return (
-                dg.AutomationCondition.cron_tick_passed(cron_schedule, timezone)
-                & ~dg.AutomationCondition.in_progress()
+                dg.AutomationCondition.cron_tick_passed(cron_schedule, timezone) & ~dg.AutomationCondition.in_progress()
             )
 
         return {"cron_not_in_progress": _cron_not_in_progress}
