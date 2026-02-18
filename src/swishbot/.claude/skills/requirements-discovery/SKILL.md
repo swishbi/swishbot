@@ -38,7 +38,6 @@ This is phase 0. No code gets written, no models get built, until discovery is c
 - **[dbt-intermediate](../dbt-intermediate/SKILL.md)** — Building the intermediate/silver layer for complex transformations
 - **[dbt-marts](../dbt-marts/SKILL.md)** — Building the mart/gold layer that produces the stakeholder's output
 - **[dimensional-modeling](../dimensional-modeling/SKILL.md)** — Designing fact and dimension tables identified during scope narrowing
-- **[analytics-architecture](../analytics-architecture/SKILL.md)** — Overall platform design when discovery reveals infrastructure gaps
 
 ---
 

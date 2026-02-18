@@ -16,6 +16,7 @@ AGENTS_DIR = CLAUDE_DIR / "agents"
 CLAUDE_MD = CLAUDE_DIR / "CLAUDE.md"
 SECURITY_MD = CLAUDE_DIR / "SECURITY.md"
 MEMORY_TEMPLATES_DIR = Path(__file__).parent / "memory_templates"
+SCAFFOLD_TEMPLATES_DIR = Path(__file__).parent / "scaffold_templates"
 DEFAULT_INSTALL_PATH = Path.home() / ".claude" / "skills"
 DEFAULT_AGENT_INSTALL_PATH = Path.home() / ".claude" / "agents"
 
@@ -370,6 +371,122 @@ def cmd_init_memory(args: argparse.Namespace) -> None:
     print("\nClaude will update these files as decisions are made during sessions.\n")
 
 
+def _to_snake_case(name: str) -> str:
+    """Convert a kebab-case name to snake_case."""
+    return name.replace("-", "_").replace(" ", "_").lower()
+
+
+# File renames: template filename -> target filename
+_SCAFFOLD_RENAMES = {
+    "gitignore": ".gitignore",
+    "env.example": ".env.example",
+}
+
+# Directory renames: template dir name -> target dir name
+_SCAFFOLD_DIR_RENAMES = {
+    "devcontainer": ".devcontainer",
+    "github": ".github",
+}
+
+# Directories that get an __init__.py
+_INIT_PY_DIRS = [
+    "ingestion",
+    "orchestration",
+    "orchestration/defs",
+    "orchestration/defs/ingestion",
+    "orchestration/defs/ingestion/dlt",
+    "orchestration/defs/reporting",
+    "orchestration/defs/reporting/powerbi",
+    "orchestration/defs/transformation",
+    "orchestration/defs/transformation/dbt",
+    "orchestration/utils",
+    "tests",
+]
+
+# Empty directories to create
+_EMPTY_DIRS = [
+    "transformation/models/staging",
+    "transformation/models/intermediate",
+    "transformation/models/marts",
+    "transformation/seeds",
+    "transformation/macros",
+    "transformation/tests",
+]
+
+
+def cmd_scaffold(args: argparse.Namespace) -> None:
+    """Scaffold a new analytics project."""
+    project_name = args.name
+    project_name_snake = _to_snake_case(project_name)
+    target = Path(args.path or ".") / project_name
+
+    if target.exists():
+        if not args.force:
+            print(f"Error: {target} already exists. Use --force to overwrite.", file=sys.stderr)
+            sys.exit(1)
+        shutil.rmtree(target)
+
+    # Walk templates and copy with placeholder replacement
+    for src_path in sorted(SCAFFOLD_TEMPLATES_DIR.rglob("*")):
+        if src_path.is_dir():
+            continue
+
+        # Skip __pycache__, .pyc, and hidden directories (e.g. .ruff_cache)
+        if any(p.startswith(".") or p == "__pycache__" for p in src_path.relative_to(SCAFFOLD_TEMPLATES_DIR).parts):
+            continue
+
+        rel = src_path.relative_to(SCAFFOLD_TEMPLATES_DIR)
+        # Apply directory and file renames
+        rel_parts = [_SCAFFOLD_DIR_RENAMES.get(p, p) for p in rel.parent.parts]
+        dest_name = _SCAFFOLD_RENAMES.get(rel.name, rel.name)
+        dest_path = target / Path(*rel_parts) / dest_name if rel_parts else target / dest_name
+
+        dest_path.parent.mkdir(parents=True, exist_ok=True)
+        content = src_path.read_text()
+        content = content.replace("{project_name}", project_name)
+        content = content.replace("{project_name_snake}", project_name_snake)
+        dest_path.write_text(content)
+
+    # Create __init__.py files
+    for d in _INIT_PY_DIRS:
+        init_dir = target / d
+        init_dir.mkdir(parents=True, exist_ok=True)
+        (init_dir / "__init__.py").write_text("")
+
+    # Create empty directories with .gitkeep so git tracks them
+    for d in _EMPTY_DIRS:
+        (target / d).mkdir(parents=True, exist_ok=True)
+        (target / d / ".gitkeep").write_text("")
+
+    # Copy skills
+    claude_dir = target / ".claude"
+    skills_dest = claude_dir / "skills"
+    for skill in sorted(SKILLS_DIR.iterdir()):
+        if skill.is_dir() and (skill / "SKILL.md").exists():
+            shutil.copytree(skill, skills_dest / skill.name)
+
+    # Copy agents
+    agents_dest = claude_dir / "agents"
+    for agent in sorted(AGENTS_DIR.iterdir()):
+        if agent.is_dir() and (agent / "AGENT.md").exists():
+            shutil.copytree(agent, agents_dest / agent.name)
+
+    # Copy CLAUDE.md and SECURITY.md
+    shutil.copy2(CLAUDE_MD, claude_dir / "CLAUDE.md")
+    if SECURITY_MD.exists():
+        shutil.copy2(SECURITY_MD, claude_dir / "SECURITY.md")
+
+    print(f"\n  ✓ Scaffolded project: {target}")
+    print("    - ingestion/           dlt pipelines")
+    print("    - transformation/      dbt project")
+    print("    - orchestration/       Dagster orchestration")
+    print("    - .claude/             Skills, agents, project config")
+    print("\n  Next steps:")
+    print(f"    cd {project_name}")
+    print("    uv sync")
+    print("    dagster dev\n")
+
+
 # ─── Entry ───────────────────────────────────────────────────────────
 
 
@@ -408,6 +525,12 @@ def main() -> None:
     init_memory_parser.add_argument("--path", type=str, help="Target directory (default: current directory)")
     init_memory_parser.add_argument("--force", action="store_true", help="Overwrite existing memory directory")
 
+    # scaffold
+    scaffold_parser = subparsers.add_parser("scaffold", help="Scaffold a new analytics project")
+    scaffold_parser.add_argument("name", help="Project name (kebab-case)")
+    scaffold_parser.add_argument("--path", type=str, help="Parent directory (default: current directory)")
+    scaffold_parser.add_argument("--force", action="store_true", help="Overwrite existing directory")
+
     args = parser.parse_args()
 
     match args.command:
@@ -423,6 +546,8 @@ def main() -> None:
             cmd_hooks(args)
         case "init-memory":
             cmd_init_memory(args)
+        case "scaffold":
+            cmd_scaffold(args)
         case _:
             parser.print_help()
 

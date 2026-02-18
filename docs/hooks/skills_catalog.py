@@ -13,7 +13,7 @@ AGENTS_PLACEHOLDER = "<!-- AGENTS_CATALOG -->"
 
 CATEGORIES = {
     "Discovery & Planning": ["business-logic-mapping", "requirements-discovery"],
-    "Infrastructure": ["analytics-architecture", "dba-security", "iac-terraform"],
+    "Infrastructure": ["dba-security", "iac-terraform"],
     "Ingestion": ["dlt-pipelines"],
     "Orchestration": ["dagster"],
     "Transformation (dbt)": [

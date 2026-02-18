@@ -31,6 +31,9 @@ swishbot install --agent data-modeler
 # Install all agents
 swishbot install --agent --all
 
+# Scaffold a new analytics project
+swishbot scaffold my-client-project
+
 # Add a starter CLAUDE.md to your project
 swishbot init-project
 
@@ -55,7 +58,6 @@ swishbot init-memory
 ### Infrastructure
 | Skill | Description | Status |
 |-------|-------------|--------|
-| `analytics-architecture` | Analytics reference architecture | :x: |
 | `dba-security` | DBA security practices | :white_check_mark: |
 | `iac-terraform` | Deploying infrastructure using Terraform/IaC | :x: |
 
@@ -96,7 +98,7 @@ Agents are persona definitions that compose multiple skills into roles. Install 
 | `business-analyst` | Guides stakeholders from idea to implementation-ready spec | requirements-discovery, business-logic-mapping |
 | `data-engineer` | Builds ingestion pipelines with proper security | dlt-pipelines, dba-security |
 | `data-modeler` | Designs and builds dimensional models across the full dbt DAG | dbt-staging, dbt-staging-model, dbt-intermediate, dbt-marts, dbt-style, dimensional-modeling |
-| `platform-engineer` | Sets up infrastructure, security, and platform architecture | analytics-architecture, iac-terraform, dba-security |
+| `platform-engineer` | Sets up infrastructure, security, and platform architecture | dagster, iac-terraform, dba-security |
 
 ## How It Works
 
@@ -117,6 +119,7 @@ swishbot/
 │   └── swishbot/
 │       ├── __init__.py
 │       ├── cli.py               # CLI logic
+│       ├── scaffold_templates/  # Templates for scaffold command
 │       ├── memory_templates/    # Templates for init-memory
 │       │   ├── MEMORY.md
 │       │   ├── conventions.md
@@ -175,8 +178,6 @@ swishbot/
 │               ├── business-logic-mapping/
 │               │   └── SKILL.md
 │               ├── requirements-discovery/
-│               │   └── SKILL.md
-│               ├── analytics-architecture/
 │               │   └── SKILL.md
 │               ├── dba-security/
 │               │   ├── SKILL.md

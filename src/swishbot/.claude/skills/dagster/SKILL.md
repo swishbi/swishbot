@@ -128,7 +128,6 @@ def get_env() -> str:
 
 - **[dlt-pipelines](../dlt-pipelines/SKILL.md)** — Build the dlt sources that Dagster orchestrates
 - **[dbt-staging](../dbt-staging/SKILL.md)** — Build the dbt models that Dagster orchestrates
-- **[analytics-architecture](../analytics-architecture/SKILL.md)** — Where Dagster fits in the overall platform
 - **[powerbi](../powerbi/SKILL.md)** — Power BI semantic models that Dagster can refresh
 
 ---

@@ -47,7 +47,6 @@ As mart complexity grows, split into domain-specific schemas (e.g., `mrt_finance
 
 ## Related Skills
 
-- **[analytics-architecture](../analytics-architecture/SKILL.md)** — Platform decisions that inform security setup
 - **[dlt-pipelines](../dlt-pipelines/SKILL.md)** — Loader role and raw database permissions
 - **[dbt-staging](../dbt-staging/SKILL.md)** — Staging layer references raw database, first transformed layer in analytics
 

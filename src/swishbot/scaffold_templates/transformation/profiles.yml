@@ -1,0 +1,26 @@
+{project_name_snake}:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "target/dev.duckdb"
+
+    ci:
+      type: snowflake
+      account: "{{ env_var('DESTINATION__SNOWFLAKE__CREDENTIALS__ACCOUNT') }}"
+      database: "{{ env_var('DESTINATION__SNOWFLAKE__CREDENTIALS__DATABASE') }}"
+      warehouse: "{{ env_var('DESTINATION__SNOWFLAKE__CREDENTIALS__WAREHOUSE') }}"
+      role: "{{ env_var('DESTINATION__SNOWFLAKE__CREDENTIALS__ROLE') }}"
+      user: "{{ env_var('DESTINATION__SNOWFLAKE__CREDENTIALS__USER') }}"
+      password: "{{ env_var('DESTINATION__SNOWFLAKE__CREDENTIALS__PASSWORD') }}"
+      schema: dbt_ci
+
+    prod:
+      type: snowflake
+      account: "{{ env_var('DESTINATION__SNOWFLAKE__CREDENTIALS__ACCOUNT') }}"
+      database: "{{ env_var('DESTINATION__SNOWFLAKE__CREDENTIALS__DATABASE') }}"
+      warehouse: "{{ env_var('DESTINATION__SNOWFLAKE__CREDENTIALS__WAREHOUSE') }}"
+      role: "{{ env_var('DESTINATION__SNOWFLAKE__CREDENTIALS__ROLE') }}"
+      user: "{{ env_var('DESTINATION__SNOWFLAKE__CREDENTIALS__USER') }}"
+      password: "{{ env_var('DESTINATION__SNOWFLAKE__CREDENTIALS__PASSWORD') }}"
+      schema: analytics

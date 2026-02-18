@@ -484,6 +484,119 @@ def test_cmd_install_copies_scripts(tmp_path):
 # ─── main (argparse integration) ────────────────────────────────────
 
 
+# ─── cmd_scaffold ───────────────────────────────────────────────────
+
+
+def test_cmd_scaffold_creates_structure(tmp_path):
+    args = argparse.Namespace(name="test-project", path=str(tmp_path), force=False)
+    cli.cmd_scaffold(args)
+
+    project = tmp_path / "test-project"
+    assert project.is_dir()
+    assert (project / "pyproject.toml").exists()
+    assert (project / "dagster_cloud.yaml").exists()
+    assert (project / ".devcontainer" / "Dockerfile").exists()
+    assert (project / ".devcontainer" / "devcontainer.json").exists()
+    assert (project / ".gitignore").exists()
+    assert (project / ".env.example").exists()
+    assert (project / "ingestion").is_dir()
+    assert (project / "transformation").is_dir()
+    assert (project / "orchestration").is_dir()
+    assert (project / "orchestration" / "definitions.py").exists()
+    assert (project / "orchestration" / "defs" / "ingestion" / "dlt" / "component.py").exists()
+    assert (project / "orchestration" / "defs" / "transformation" / "dbt" / "defs.yaml").exists()
+    assert (project / "orchestration" / "utils" / "environment_helpers.py").exists()
+    assert (project / "transformation" / "dbt_project.yml").exists()
+    assert (project / "transformation" / "profiles.yml").exists()
+    assert (project / "transformation" / "packages.yml").exists()
+    assert (project / ".github" / "workflows" / "deploy.yml").exists()
+    assert (project / ".github" / "workflows" / "branch_deployments.yml").exists()
+
+
+def test_cmd_scaffold_replaces_project_name(tmp_path):
+    args = argparse.Namespace(name="my-client", path=str(tmp_path), force=False)
+    cli.cmd_scaffold(args)
+
+    project = tmp_path / "my-client"
+    pyproject = (project / "pyproject.toml").read_text()
+    assert 'name = "my-client"' in pyproject
+
+    dbt_project = (project / "transformation" / "dbt_project.yml").read_text()
+    assert "name: my_client" in dbt_project
+
+    dagster_cloud = (project / "dagster_cloud.yaml").read_text()
+    assert "location_name: my-client" in dagster_cloud
+
+    devcontainer = (project / ".devcontainer" / "devcontainer.json").read_text()
+    assert '"name": "my-client"' in devcontainer
+
+    deploy = (project / ".github" / "workflows" / "deploy.yml").read_text()
+    assert "my-client.dagster.plus" in deploy
+
+    branch_deploy = (project / ".github" / "workflows" / "branch_deployments.yml").read_text()
+    assert "my-client.dagster.plus" in branch_deploy
+
+
+def test_cmd_scaffold_creates_init_files(tmp_path):
+    args = argparse.Namespace(name="test-project", path=str(tmp_path), force=False)
+    cli.cmd_scaffold(args)
+
+    project = tmp_path / "test-project"
+    expected_inits = [
+        "ingestion/__init__.py",
+        "orchestration/__init__.py",
+        "orchestration/defs/__init__.py",
+        "orchestration/defs/ingestion/__init__.py",
+        "orchestration/defs/ingestion/dlt/__init__.py",
+        "orchestration/defs/transformation/__init__.py",
+        "orchestration/defs/transformation/dbt/__init__.py",
+        "orchestration/utils/__init__.py",
+        "tests/__init__.py",
+    ]
+    for init_path in expected_inits:
+        assert (project / init_path).exists(), f"Missing __init__.py at {init_path}"
+
+
+def test_cmd_scaffold_installs_skills_and_agents(tmp_path):
+    args = argparse.Namespace(name="test-project", path=str(tmp_path), force=False)
+    cli.cmd_scaffold(args)
+
+    project = tmp_path / "test-project"
+    skills_dir = project / ".claude" / "skills"
+    agents_dir = project / ".claude" / "agents"
+    assert skills_dir.is_dir()
+    assert agents_dir.is_dir()
+    # At least some skills and agents were copied
+    assert len(list(skills_dir.iterdir())) > 0
+    assert len(list(agents_dir.iterdir())) > 0
+    # CLAUDE.md was copied
+    assert (project / ".claude" / "CLAUDE.md").exists()
+
+
+def test_cmd_scaffold_existing_errors(tmp_path):
+    target = tmp_path / "test-project"
+    target.mkdir()
+    args = argparse.Namespace(name="test-project", path=str(tmp_path), force=False)
+    with pytest.raises(SystemExit, match="1"):
+        cli.cmd_scaffold(args)
+
+
+def test_cmd_scaffold_force_overwrites(tmp_path):
+    target = tmp_path / "test-project"
+    target.mkdir()
+    (target / "old-file.txt").write_text("old")
+
+    args = argparse.Namespace(name="test-project", path=str(tmp_path), force=True)
+    cli.cmd_scaffold(args)
+
+    project = tmp_path / "test-project"
+    assert (project / "pyproject.toml").exists()
+    assert not (project / "old-file.txt").exists()
+
+
+# ─── main (argparse integration) ────────────────────────────────────
+
+
 def test_main_no_args_prints_help(capsys, monkeypatch):
     monkeypatch.setattr("sys.argv", ["swishbot"])
     cli.main()
