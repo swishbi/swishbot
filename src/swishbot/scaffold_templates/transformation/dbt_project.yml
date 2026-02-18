@@ -1,0 +1,20 @@
+name: {project_name_snake}
+version: "1.0.0"
+
+profile: {project_name_snake}
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  {project_name_snake}:
+    staging:
+      +materialized: view
+    intermediate:
+      +materialized: view
+    marts:
+      +materialized: table

@@ -1,0 +1,32 @@
+# dbt Component Definition
+# Place at: orchestration/defs/transformation/dbt/defs.yaml
+#
+# References:
+#   - project_dir: path to dbt project relative to project root
+#   - target: dynamically selected based on Dagster Cloud environment
+#   - key: source assets use schema/name (to match dlt asset keys); models use name
+#   - get_automation_condition: template variable from template_vars.py
+
+type: dagster_dbt.DbtProjectComponent
+
+template_vars_module: .template_vars
+
+attributes:
+  project:
+    project_dir: "{{ project_root }}/transformation"
+    target: >-
+      {%- if env('DAGSTER_CLOUD_IS_BRANCH_DEPLOYMENT','') == '1' -%}ci
+      {%- elif env('DAGSTER_CLOUD_DEPLOYMENT_NAME','') == 'prod' -%}prod
+      {%- else -%}dev
+      {%- endif -%}
+  translation:
+    key: |
+      {%- if node.resource_type == 'source' -%}
+        {{ node.schema }}/{{ node.name }}
+      {%- else -%}
+        {{ node.name }}
+      {%- endif -%}
+    automation_condition: "{{ get_automation_condition(node) }}"
+  translation_settings:
+    enable_code_references: true
+    enable_source_tests_as_checks: true

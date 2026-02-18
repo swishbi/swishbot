@@ -18,7 +18,6 @@ This project uses [swishbot](https://github.com/swishbi/swishbot) skills to guid
 ### Infrastructure
 | Skill | Description | Status |
 |-------|-------------|--------|
-| analytics-architecture | Analytics reference architecture | :x: |
 | dba-security | DBA security practices | :white_check_mark: |
 | iac-terraform | Deploying infrastructure using Terraform/IaC | :x: |
 
@@ -26,6 +25,11 @@ This project uses [swishbot](https://github.com/swishbi/swishbot) skills to guid
 | Skill | Description | Status |
 |-------|-------------|--------|
 | dlt-pipelines | Writing dlt/Python ingestion pipelines | :white_check_mark: |
+
+### Orchestration
+| Skill | Description | Status |
+|-------|-------------|--------|
+| dagster | Orchestrate data pipelines with Dagster and Dagster+ | :white_check_mark: |
 
 ### Transformation (dbt)
 | Skill | Description | Status |
@@ -69,25 +73,36 @@ See [SECURITY.md](SECURITY.md) for security guidelines covering SQL safety, cred
 - Every dbt model must have a corresponding YAML file with at minimum a description.
 - Write idempotent, incremental-friendly transformations where applicable.
 
+## Stack Philosophy
+
+This project follows a code-first approach using open-source technologies:
+
+- **Ingestion:** dlt — Python pipelines, not GUI ETL tools
+- **Transformation:** dbt — SQL models with version control, testing, and documentation
+- **Orchestration:** Dagster+ Serverless — asset-based orchestration with automation conditions
+- **Presentation:** Power BI — semantic models backed by warehouse star schemas
+
+Everything is backed by code. No drag-and-drop, no GUI-configured pipelines, no manual deployments. Changes flow through version control with clean separation of dev/CI/prod environments.
+
 ## Project Structure
 
-<!-- Describe your project layout here so Claude understands the codebase. -->
-<!--
 ```
-├── dbt/              # dbt project
-├── pipelines/        # dlt ingestion pipelines
-├── infra/            # Terraform infrastructure
-├── dashboards/       # Power BI / reporting
-└── ...
+├── ingestion/              # dlt pipelines (independently runnable)
+├── transformation/         # dbt project (independently runnable)
+├── orchestration/          # Dagster orchestration layer
+│   ├── definitions.py      # Single entry point
+│   └── defs/               # Component definitions (YAML + Python)
+│       ├── ingestion/dlt/  # dlt components
+│       ├── transformation/ # dbt component
+│       └── reporting/      # Power BI component
+├── tests/
+├── pyproject.toml
+├── dagster_cloud.yaml
+└── .claude/                # Skills, agents, memory
 ```
--->
 
 ## Platform & Environment
 
-<!-- Uncomment and fill in the details for your stack: -->
-<!--
-- Warehouse: Snowflake / BigQuery / Databricks / Postgres
-- Orchestrator: Dagster / Airflow / Prefect
-- BI Tool: Power BI / Looker / Tableau
-- Python: 3.12
--->
+<!-- Fill in for your project: -->
+<!-- - Warehouse: Snowflake / BigQuery / Databricks / Postgres -->
+<!-- - Python: 3.12+ -->

@@ -1,0 +1,33 @@
+# dlt Component Definition
+# Place at: orchestration/defs/ingestion/dlt/<source>/defs.yaml
+#
+# References:
+#   - type: your custom component (or dagster_dlt.DltLoadCollectionComponent)
+#   - .loads: dot-relative import from the same directory
+#   - cron_not_in_progress: custom automation condition from component.py
+
+type: orchestration.defs.ingestion.dlt.component.CustomDltLoadCollectionComponent
+
+attributes:
+  loads:
+    - source: .loads.dlthub_dlt_my_source_source
+      pipeline: .loads.dlthub_dlt_my_source_pipeline
+      translation:
+        automation_condition: "{{ cron_not_in_progress('0 5 * * *', 'America/New_York') }}"
+        group_name: "{{ resource.source_name }}"
+        description: "Loads data from the {{ resource.name }} table using the My Source API."
+        key: "{{ resource.source_name }}/{{ resource.name }}"
+        deps: []
+        metadata:
+          resource_name: "{{ resource.name }}"
+          pipeline_name: "{{ pipeline.pipeline_name }}"
+
+requirements:
+  env:
+    - SOURCES__MY_SOURCE_PIPELINE__API_KEY
+    - DESTINATION__SNOWFLAKE__CREDENTIALS__ACCOUNT
+    - DESTINATION__SNOWFLAKE__CREDENTIALS__DATABASE
+    - DESTINATION__SNOWFLAKE__CREDENTIALS__WAREHOUSE
+    - DESTINATION__SNOWFLAKE__CREDENTIALS__ROLE
+    - DESTINATION__SNOWFLAKE__CREDENTIALS__USER
+    - DESTINATION__SNOWFLAKE__CREDENTIALS__PASSWORD

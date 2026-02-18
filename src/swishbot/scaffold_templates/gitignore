@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+.venv/
+
+# dbt
+transformation/target/
+transformation/dbt_packages/
+transformation/logs/
+
+# dlt
+ingestion/.dlt/pipelines/
+
+# Dagster
+.dagster/
+storage/
+
+# Environment
+.env
+*.local
+
+# IDE
+.vscode/
+.idea/

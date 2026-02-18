@@ -15,7 +15,6 @@ Example output:
 ```
 Available skills:
 
-  analytics-architecture  Analytics reference architecture
   dba-security            DBA security practices
   dbt-intermediate        Building the intermediate/silver layer
   dbt-marts               Building the mart/gold layer
@@ -67,6 +66,65 @@ swishbot install --agent --all
 | `--path` | Custom install directory (default: `~/.claude/skills/` or `~/.claude/agents/`) |
 
 If a skill or agent is already installed, it will be overwritten.
+
+## `swishbot scaffold`
+
+Scaffold a complete analytics project with ingestion, transformation, orchestration, and CI/CD.
+
+```bash
+# Scaffold in current directory
+swishbot scaffold my-client
+
+# Scaffold in a specific directory
+swishbot scaffold my-client --path ~/projects
+
+# Overwrite existing project
+swishbot scaffold my-client --force
+```
+
+| Option | Description |
+|--------|-------------|
+| `name` | Project name (kebab-case) |
+| `--path` | Parent directory (default: current directory) |
+| `--force` | Overwrite an existing directory |
+
+### What gets created
+
+```
+my-client/
+  ingestion/              # dlt pipelines
+  transformation/         # dbt project (models, seeds, macros, tests)
+  orchestration/          # Dagster orchestration with dlt/dbt/Power BI components
+  tests/                  # Project tests
+  .claude/                # Skills, agents, CLAUDE.md, SECURITY.md
+  .devcontainer/          # VS Code Dev Container for local development
+  .github/workflows/      # Dagster Cloud deployment workflows (disabled by default)
+  pyproject.toml          # Project config with all dependencies
+  dagster_cloud.yaml      # Dagster Cloud location config
+```
+
+The project name is substituted throughout — `pyproject.toml`, `dbt_project.yml`, `dagster_cloud.yaml`, deployment workflows, and the Dev Container config all use the name you provide.
+
+### Dev Container
+
+The scaffolded project includes a `.devcontainer/` directory for VS Code Dev Containers. Open the project in VS Code and select **Reopen in Container** to get a fully configured development environment with Python, uv, Dagster, dbt, and dlt ready to go.
+
+Pre-installed VS Code extensions: Claude Code, Python, Pylance, Ruff, YAML, dbt Power User, Better Jinja, TMDL.
+
+### Dagster Cloud deployments
+
+The `.github/workflows/` directory includes two GitHub Actions workflows for Dagster Cloud:
+
+- **`deploy.yml`** — Deploys to production on push to `main`
+- **`branch_deployments.yml`** — Creates branch deployments on pull requests
+
+Both workflows are **disabled by default**. They will skip until you enable them:
+
+1. Set up your [Dagster Cloud](https://dagster.io/cloud) organization
+2. Add the following GitHub repository secrets: `DAGSTER_CLOUD_API_TOKEN`, `ORGANIZATION_ID`
+3. Add a GitHub repository variable: `DAGSTER_CLOUD_ENABLED` = `true`
+
+The `DAGSTER_CLOUD_URL` in each workflow is set to `http://<project-name>.dagster.plus` — update this if your Dagster Cloud organization name differs from the project name.
 
 ## `swishbot init-project`
 
