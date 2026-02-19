@@ -320,7 +320,10 @@ def _parse_hooks_from_frontmatter(skill_name: str, frontmatter: str, hooks_found
 
 
 def _scaffold_memory(dest: Path) -> None:
-    """Create .claude/memory/ templates and settings.json Stop hook. Idempotent — skips settings.json if it already exists."""
+    """Create .claude/memory/ templates and settings.json Stop hook.
+
+    Idempotent — skips settings.json if it already exists.
+    """
     memory_dir = dest / ".claude" / "memory"
     memory_dir.mkdir(parents=True, exist_ok=True)
     for template in sorted(MEMORY_TEMPLATES_DIR.iterdir()):
