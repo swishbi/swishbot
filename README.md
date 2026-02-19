@@ -17,10 +17,10 @@ pip install swishbot
 swishbot list
 
 # Install a skill into your Claude project
-swishbot install dbt-staging
+swishbot install dbt
 
 # Install a skill to a custom path
-swishbot install dbt-staging --path ~/.claude/skills
+swishbot install dbt --path ~/.claude/skills
 
 # Install all skills
 swishbot install --all
@@ -74,12 +74,7 @@ swishbot init-memory
 ### Transformation (dbt)
 | Skill | Description | Status |
 |-------|-------------|--------|
-| `dbt-intermediate` | Building the intermediate/silver layer | :white_check_mark: |
-| `dbt-marts` | Building the mart/gold layer | :white_check_mark: |
-| `dbt-mcp` | Configure and use the dbt MCP server with Claude | :white_check_mark: |
-| `dbt-staging` | Building the staging/bronze layer | :white_check_mark: |
-| `dbt-staging-model` | Conventions for writing a dbt staging model SQL file | :white_check_mark: |
-| `dbt-style` | Cross-cutting dbt style, naming, and project structure conventions | :white_check_mark: |
+| `dbt` | All dbt layers — staging, intermediate, marts, SQL conventions, MCP tooling | :white_check_mark: |
 | `dimensional-modeling` | Dimensional modeling best practices | :white_check_mark: |
 
 ### Analytics & Presentation
@@ -94,10 +89,10 @@ Agents are persona definitions that compose multiple skills into roles. Install 
 
 | Agent | Description | Skills Composed |
 |-------|-------------|-----------------|
-| `analytics-engineer` | Builds dbt models across all layers with MCP tooling | dbt-staging, dbt-staging-model, dbt-intermediate, dbt-marts, dbt-style, dbt-mcp |
+| `analytics-engineer` | Builds dbt models across all layers with MCP tooling | dbt |
 | `business-analyst` | Guides stakeholders from idea to implementation-ready spec | requirements-discovery, business-logic-mapping |
 | `data-engineer` | Builds ingestion pipelines with proper security | dlt-pipelines, dba-security |
-| `data-modeler` | Designs and builds dimensional models across the full dbt DAG | dbt-staging, dbt-staging-model, dbt-intermediate, dbt-marts, dbt-style, dimensional-modeling |
+| `data-modeler` | Designs and builds dimensional models across the full dbt DAG | dbt, dimensional-modeling |
 | `platform-engineer` | Sets up infrastructure, security, and platform architecture | dagster, iac-terraform, dba-security |
 
 ## How It Works
@@ -140,26 +135,27 @@ swishbot/
 │           │   └── platform-engineer/
 │           │       └── AGENT.md
 │           └── skills/
-│               ├── dbt-staging/
-│               │   ├── SKILL.md         # Router: overview + workflow index
+│               ├── dbt/
+│               │   ├── SKILL.md         # Behavioral guide + router
 │               │   ├── workflows/       # Step-by-step procedures
-│               │   │   ├── create-staging-source.md
-│               │   │   ├── transform-staging-models.md
-│               │   │   └── validate-staging-models.md
+│               │   │   ├── staging/
+│               │   │   │   ├── create-staging-source.md
+│               │   │   │   ├── transform-staging-models.md
+│               │   │   │   └── validate-staging-models.md
+│               │   │   ├── intermediate/
+│               │   │   │   ├── create-intermediate-model.md
+│               │   │   │   └── refactor-to-intermediate.md
+│               │   │   └── marts/
+│               │   │       ├── create-mart-model.md
+│               │   │       └── create-incremental-mart.md
+│               │   ├── references/      # Reference documentation
+│               │   │   ├── style-and-conventions.md
+│               │   │   ├── mcp-setup-and-tools.md
+│               │   │   ├── loader-metadata.md
+│               │   │   └── staging-sql-conventions.md
 │               │   ├── scripts/         # Hook scripts
 │               │   │   └── check-source-yaml.sh
 │               │   └── examples/
-│               ├── dbt-staging-model/
-│               │   ├── SKILL.md
-│               │   └── examples/
-│               ├── dbt-style/
-│               │   └── SKILL.md
-│               ├── dbt-intermediate/
-│               │   └── SKILL.md
-│               ├── dbt-marts/
-│               │   └── SKILL.md
-│               ├── dbt-mcp/
-│               │   └── SKILL.md
 │               ├── dagster/
 │               │   ├── SKILL.md         # Router: project setup + component workflows
 │               │   ├── workflows/

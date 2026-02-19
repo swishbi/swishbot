@@ -61,6 +61,20 @@ def test_get_available_agents_empty_dir(monkeypatch, tmp_path):
     assert cli.get_available_agents() == []
 
 
+def test_agent_skills_documented_in_body():
+    available_skills = {s["name"] for s in cli.get_available_skills()}
+    for d in sorted(cli.AGENTS_DIR.iterdir()):
+        agent_md = d / "AGENT.md"
+        if not (d.is_dir() and agent_md.exists()):
+            continue
+        content = agent_md.read_text()
+        assert "## Skills" in content, f"Agent {d.name} missing '## Skills' section in body"
+        # Validate any skill links in the body point to existing skill dirs
+        skill_refs = re.findall(r"\(../../skills/([^/]+)/SKILL\.md\)", content)
+        for skill in skill_refs:
+            assert skill in available_skills, f"Agent {d.name} references unknown skill '{skill}'"
+
+
 def test_agent_frontmatter_has_skills_list():
     available_skills = {s["name"] for s in cli.get_available_skills()}
     for d in sorted(cli.AGENTS_DIR.iterdir()):
@@ -68,14 +82,15 @@ def test_agent_frontmatter_has_skills_list():
         if not (d.is_dir() and agent_md.exists()):
             continue
         content = agent_md.read_text()
-        # Extract only the YAML frontmatter between --- markers
-        fm_match = re.match(r"^---\n(.+?)\n---", content, re.DOTALL)
+        # Extract frontmatter block (between opening and closing ---)
+        fm_match = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
         assert fm_match, f"Agent {d.name} missing YAML frontmatter"
         frontmatter = fm_match.group(1)
-        skills = re.findall(r"^\s+-\s+(\S+)", frontmatter, re.MULTILINE)
-        assert len(skills) > 0, f"Agent {d.name} has no skills listed in frontmatter"
-        for skill in skills:
-            assert skill in available_skills, f"Agent {d.name} references unknown skill '{skill}'"
+        # Must declare skills in frontmatter (block sequence) so Claude Code injects them at startup
+        skills_match = re.search(r"^skills:\n((?:[ \t]+-[ \t]+\S+\n?)+)", frontmatter, re.MULTILINE)
+        assert skills_match, f"Agent {d.name} missing 'skills:' block list in frontmatter"
+        for skill in re.findall(r"[ \t]+-[ \t]+(\S+)", skills_match.group(1)):
+            assert skill in available_skills, f"Agent {d.name} frontmatter references unknown skill '{skill}'"
 
 
 def test_agent_descriptions_are_single_line():
@@ -222,15 +237,15 @@ def test_cmd_install_no_skill_no_all(tmp_path):
 
 
 def test_cmd_install_copies_workflows(tmp_path):
-    args = argparse.Namespace(skills=["dbt-staging"], all=False, agent=False, path=str(tmp_path))
+    args = argparse.Namespace(skills=["dbt"], all=False, agent=False, path=str(tmp_path))
     cli.cmd_install(args)
 
-    installed = tmp_path / "dbt-staging"
+    installed = tmp_path / "dbt"
     assert installed.is_dir()
     assert (installed / "SKILL.md").exists()
     assert (installed / "workflows").is_dir()
-    # Verify at least one workflow file was copied
-    workflow_files = list((installed / "workflows").glob("*.md"))
+    # Verify at least one workflow file was copied (may be in subdirectories)
+    workflow_files = list((installed / "workflows").rglob("*.md"))
     assert len(workflow_files) > 0
 
 
@@ -363,13 +378,13 @@ def test_cmd_init_project_copies_security_md(tmp_path):
 
 def test_cmd_hooks_lists_installed_hooks(capsys, tmp_path):
     # Install skills with hooks to tmp_path
-    args = argparse.Namespace(skills=["dbt-style"], all=False, agent=False, path=str(tmp_path))
+    args = argparse.Namespace(skills=["dbt"], all=False, agent=False, path=str(tmp_path))
     cli.cmd_install(args)
 
     hook_args = argparse.Namespace(path=str(tmp_path))
     cli.cmd_hooks(hook_args)
     out = capsys.readouterr().out
-    assert "dbt-style" in out
+    assert "dbt" in out
     assert "PreToolUse" in out
 
 
@@ -394,16 +409,15 @@ def test_cmd_hooks_no_hooks_found(capsys, tmp_path):
 
 def test_cmd_hooks_multiple_skills(capsys, tmp_path):
     # Install multiple skills with hooks
-    skills = ["dbt-style", "dba-security", "dbt-staging"]
+    skills = ["dbt", "dba-security"]
     args = argparse.Namespace(skills=skills, all=False, agent=False, path=str(tmp_path))
     cli.cmd_install(args)
 
     hook_args = argparse.Namespace(path=str(tmp_path))
     cli.cmd_hooks(hook_args)
     out = capsys.readouterr().out
-    assert "dbt-style" in out
+    assert "dbt" in out
     assert "dba-security" in out
-    assert "dbt-staging" in out
 
 
 # ─── cmd_init_memory ─────────────────────────────────────────────────
@@ -511,6 +525,9 @@ def test_cmd_scaffold_creates_structure(tmp_path):
     assert (project / "transformation" / "packages.yml").exists()
     assert (project / ".github" / "workflows" / "deploy.yml").exists()
     assert (project / ".github" / "workflows" / "branch_deployments.yml").exists()
+    assert (project / ".mcp.json").exists()
+    assert (project / ".claude" / "memory" / "MEMORY.md").exists()
+    assert (project / ".claude" / "settings.json").exists()
 
 
 def test_cmd_scaffold_replaces_project_name(tmp_path):

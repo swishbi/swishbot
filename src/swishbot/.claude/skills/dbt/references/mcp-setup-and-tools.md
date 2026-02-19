@@ -1,15 +1,10 @@
----
-name: dbt-mcp
-description: "Configure and use the dbt MCP server with Claude. Use when a user asks to set up the dbt MCP integration, choose which MCP tools to enable, run dbt commands through MCP, or query the semantic layer via MCP."
----
-
 # dbt MCP Server Integration
 
 ## Overview
 
 The dbt MCP server bridges Claude with dbt infrastructure, exposing dbt Core, dbt Cloud, and dbt Fusion capabilities as MCP tools. It gives Claude the ability to run dbt commands, explore project metadata, query the semantic layer, and generate code — all within the conversation.
 
-**This skill covers setup and tool usage patterns.** For methodology on *what* to build and *how* to structure it, see the layer-specific skills (`dbt-staging`, `dbt-intermediate`, `dbt-marts`) and `dbt-style`.
+**This reference covers setup and tool usage patterns.** For methodology on *what* to build and *how* to structure it, see the workflow files in the `dbt` skill routing table.
 
 References:
 - Repository: https://github.com/dbt-labs/dbt-mcp
@@ -151,7 +146,7 @@ Manage dbt Cloud jobs and runs.
 1. Use `get_all_sources` to check if the source already exists
 2. Use `generate_source` to scaffold source YAML from the database (if codegen enabled)
 3. Use `generate_staging_model` to scaffold staging SQL (if codegen enabled)
-4. Follow the `dbt-staging` skill methodology for the full workflow
+4. Follow the staging workflows for the full workflow
 5. Use `run` and `test` to validate
 
 ### Exploring an Existing Project
@@ -173,7 +168,7 @@ Manage dbt Cloud jobs and runs.
 
 1. Use `get_lineage` to understand what staging models are available
 2. Use `get_model_details` on upstream models to understand their columns
-3. Build the model following `dbt-intermediate` or `dbt-marts` skill methodology
+3. Build the model following the relevant workflow in this skill
 4. Use `run` and `test` to validate
 5. Use `get_model_children` to verify downstream impact
 
@@ -206,14 +201,6 @@ The dbt MCP server can modify data models, sources, and warehouse objects. Only 
 | `DBT_MCP_LOG_LEVEL` | `INFO` | `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL` |
 | `DBT_MCP_SERVER_FILE_LOGGING` | `false` | Set to `true` to log to `./dbt-mcp.log` |
 | `DBT_CLI_TIMEOUT` | `60` | Seconds before CLI command timeout |
-
-## Related Skills
-
-- **[dbt-style](../dbt-style/SKILL.md)** — Foundational conventions (the "what" and "how")
-- **[dbt-staging](../dbt-staging/SKILL.md)** — Staging layer workflow
-- **[dbt-intermediate](../dbt-intermediate/SKILL.md)** — Intermediate layer methodology
-- **[dbt-marts](../dbt-marts/SKILL.md)** — Mart layer methodology
-- **[dlt-pipelines](../dlt-pipelines/SKILL.md)** — Build dlt ingestion pipelines upstream of dbt
 
 ---
 

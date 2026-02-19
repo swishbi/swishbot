@@ -38,14 +38,14 @@ select * from renamed
 
 ## Step 2: Transform Each Staging Model
 
-After inspecting the source data, update each active staging SQL file to follow the **dbt-staging-model** skill conventions. Use the sample data from Step 1 to make informed decisions about column casting and naming. This includes:
+After inspecting the source data, update each active staging SQL file to follow the **staging SQL conventions**. Use the sample data from Step 1 to make informed decisions about column casting and naming. This includes:
 
 - SQL CTE structure (`source` -> `renamed` -> `select *`)
 - Column casting with dbt type macros
 - camelCase to snake_case renaming
 - Grouped column ordering (primary key, identifiable info, relationships, strings, integers, numerics, booleans, dates, timestamps, nested objects, loader metadata)
 
-See the [dbt-staging-model](../../dbt-staging-model/SKILL.md) skill for the full reference on casting rules, naming conventions, column ordering, and SQL structure.
+See [references/staging-sql-conventions.md](../../references/staging-sql-conventions.md) for the full reference on casting rules, naming conventions, column ordering, and SQL structure.
 
 ## Step 3: Handle Complex Data Structures
 
@@ -155,7 +155,7 @@ Create a `.yml` file for each flattened model as well.
 
 - [ ] Source data inspected with dbt MCP `show` tool for each table
 - [ ] Empty tables identified and disabled (`config: enabled: false` + stub SQL)
-- [ ] Each active staging model transformed to follow dbt-staging-model conventions
+- [ ] Each active staging model transformed to follow staging SQL conventions (see references/staging-sql-conventions.md)
 - [ ] Complex structures handled (same-grain unnested, arrays get flattened models)
 - [ ] Flattened models created for array columns (`stg_<source>__<parent>__<array>`)
 - [ ] Column casting, renaming, and ordering applied
