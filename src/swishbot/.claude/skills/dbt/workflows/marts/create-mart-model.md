@@ -23,22 +23,20 @@ Organize by **department** or business area. Each department gets its own schema
 models/marts/
 ├── finance/
 │   ├── _finance__models.yml
-│   ├── orders.sql
-│   └── payments.sql
+│   ├── fct_orders.sql
+│   └── fct_payments.sql
 ├── marketing/
 │   ├── _marketing__models.yml
-│   └── customers.sql
+│   └── dim_customers.sql
 └── operations/
     ├── _operations__models.yml
-    └── work_orders.sql
+    └── fct_work_orders.sql
 ```
 
-Use **plain entity names** — no prefix, no layer indicator:
+Prefix mart models to indicate their type:
 
-- `customers` (not `mart_customers` or `fct_customers`)
-- `orders`
-- `invoices`
-- `work_orders`
+- **`fct_`** for fact tables — event streams, transactions, measurements (`fct_orders`, `fct_payments`, `fct_sessions`)
+- **`dim_`** for dimension tables — descriptive entities, people, places, things (`dim_customers`, `dim_products`, `dim_accounts`)
 
 Avoid subfolders within a department until you have 10+ marts in that department.
 

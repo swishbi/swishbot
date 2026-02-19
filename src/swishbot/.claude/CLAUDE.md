@@ -4,6 +4,20 @@
 
 This project uses [swishbot](https://github.com/swishbi/swishbot) skills to guide Claude through data engineering and analytics work. Skills are installed to `~/.claude/skills/` and encode opinionated methodology for each layer of the data stack.
 
+## Quick Start
+
+Start each session by invoking the agent for your work type. Agents load all relevant skills simultaneously and apply role-specific behavioral rules.
+
+| Work Type | Agent | How to Invoke |
+|-----------|-------|---------------|
+| dbt models (any layer) | `analytics-engineer` | "Act as the analytics-engineer agent" |
+| Dimensional schema design | `data-modeler` | "Act as the data-modeler agent" |
+| Data pipelines (dlt/APIs) | `data-engineer` | "Act as the data-engineer agent" |
+| Requirements / discovery | `business-analyst` | "Act as the business-analyst agent" |
+| Infrastructure / security | `platform-engineer` | "Act as the platform-engineer agent" |
+
+For ad-hoc tasks that don't fit an agent, reference the relevant skill directly: "Use the dbt skill to..."
+
 ## Installed Skills
 
 <!-- Run `swishbot list` to see available skills. -->
@@ -34,12 +48,7 @@ This project uses [swishbot](https://github.com/swishbi/swishbot) skills to guid
 ### Transformation (dbt)
 | Skill | Description | Status |
 |-------|-------------|--------|
-| dbt-intermediate | Building the intermediate/silver layer | :white_check_mark: |
-| dbt-marts | Building the mart/gold layer | :white_check_mark: |
-| dbt-mcp | Configure and use the dbt MCP server with Claude | :white_check_mark: |
-| dbt-staging | Building the staging/bronze layer | :white_check_mark: |
-| dbt-staging-model | Conventions for writing a dbt staging model SQL file | :white_check_mark: |
-| dbt-style | Cross-cutting dbt style, naming, and project structure conventions | :white_check_mark: |
+| dbt | All dbt layers — staging, intermediate, marts, SQL conventions, MCP tooling | :white_check_mark: |
 | dimensional-modeling | Dimensional modeling best practices | :white_check_mark: |
 
 ### Analytics & Presentation

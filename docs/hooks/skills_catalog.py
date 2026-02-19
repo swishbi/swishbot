@@ -17,12 +17,7 @@ CATEGORIES = {
     "Ingestion": ["dlt-pipelines"],
     "Orchestration": ["dagster"],
     "Transformation (dbt)": [
-        "dbt-intermediate",
-        "dbt-marts",
-        "dbt-mcp",
-        "dbt-staging",
-        "dbt-staging-model",
-        "dbt-style",
+        "dbt",
         "dimensional-modeling",
     ],
     "Analytics & Presentation": ["powerbi", "semantic-layer"],

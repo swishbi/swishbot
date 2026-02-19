@@ -1,22 +1,8 @@
----
-name: dbt-style
-description: "Cross-cutting dbt style, naming, and project structure conventions. Use when a user asks about SQL formatting, model naming, folder organization, materialization strategy, Jinja style, or YAML conventions in dbt. The foundational reference for all dbt work."
-hooks:
-  PreToolUse:
-    - matcher: "Write|Edit"
-      hooks:
-        - type: prompt
-          prompt: "Check if the file being written follows dbt naming conventions (stg_, int_, fct_, dim_ prefixes) and SQL style rules from this skill. If violations found, list them. $ARGUMENTS"
-          timeout: 15
----
-
 # dbt Style & Structure
 
 ## Overview
 
-This skill defines the foundational conventions for all dbt work. It covers project structure, naming, SQL style, Jinja style, and YAML style. Rather than duplicating dbt's official guidance, this skill **references the authoritative sources** and layers on opinionated defaults for consistency.
-
-Install this skill alongside any layer-specific skill (`dbt-staging`, `dbt-intermediate`, `dbt-marts`). It provides the "how things should look and where things go" foundation that layer skills build on.
+This reference defines the foundational conventions for all dbt work. It covers project structure, naming, SQL style, Jinja style, and YAML style. Rather than duplicating dbt's official guidance, this reference **references the authoritative sources** and layers on opinionated defaults for consistency.
 
 ## Authoritative References
 
@@ -68,7 +54,7 @@ models/
 |-------|--------|-------------|-----------------|-----------------|
 | **Staging** | `stg_<source>__<entity>` | Source system | `view` | No |
 | **Intermediate** | `int_<entity>s_<verb>ed` | Business concern | `ephemeral` | No |
-| **Marts** | `<entity>` (plain name) | Department | `table` / `incremental` | Yes |
+| **Marts** | `fct_<entity>` / `dim_<entity>` | Department | `table` / `incremental` | Yes |
 
 Reference: https://docs.getdbt.com/best-practices/how-we-structure/1-guide-overview
 
@@ -313,14 +299,6 @@ Every model must have a corresponding YAML file with at minimum:
 - **Bare `join`**: Always specify `inner join`, `left join`, etc.
 - **Time dimensions in model names**: Use `orders` not `orders_per_day`. Use metrics for time-based aggregation.
 - **Department-specific variants**: Do not create `finance_orders` and `marketing_orders`. Build one `orders` mart.
-
-## Related Skills
-
-- **[dbt-staging](../dbt-staging/SKILL.md)** — Staging layer workflow (Step 1-11)
-- **[dbt-staging-model](../dbt-staging-model/SKILL.md)** — Staging model SQL conventions
-- **[dbt-intermediate](../dbt-intermediate/SKILL.md)** — Intermediate layer methodology
-- **[dbt-marts](../dbt-marts/SKILL.md)** — Mart layer methodology
-- **[dbt-mcp](../dbt-mcp/SKILL.md)** — dbt MCP server setup and tool usage
 
 ---
 

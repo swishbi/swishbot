@@ -319,24 +319,13 @@ def _parse_hooks_from_frontmatter(skill_name: str, frontmatter: str, hooks_found
             )
 
 
-def cmd_init_memory(args: argparse.Namespace) -> None:
-    """Scaffold project memory directory with templates."""
-    dest = Path(args.path) if args.path else Path.cwd()
+def _scaffold_memory(dest: Path) -> None:
+    """Create .claude/memory/ templates and settings.json Stop hook. Idempotent — skips settings.json if it already exists."""
     memory_dir = dest / ".claude" / "memory"
-
-    if memory_dir.exists() and not args.force:
-        print(f"Error: {memory_dir} already exists. Use --force to overwrite.", file=sys.stderr)
-        sys.exit(1)
-
     memory_dir.mkdir(parents=True, exist_ok=True)
-
-    # Copy template files
     for template in sorted(MEMORY_TEMPLATES_DIR.iterdir()):
         if template.is_file():
-            target = memory_dir / template.name
-            shutil.copy2(template, target)
-
-    # Scaffold settings.json with session capture hook if it doesn't exist
+            shutil.copy2(template, memory_dir / template.name)
     settings_path = dest / ".claude" / "settings.json"
     if not settings_path.exists():
         settings = {
@@ -360,9 +349,26 @@ def cmd_init_memory(args: argparse.Namespace) -> None:
             }
         }
         settings_path.write_text(json.dumps(settings, indent=2) + "\n")
-        print(f"  ✓ {settings_path} (session capture hook)")
-    else:
+
+
+def cmd_init_memory(args: argparse.Namespace) -> None:
+    """Scaffold project memory directory with templates."""
+    dest = Path(args.path) if args.path else Path.cwd()
+    memory_dir = dest / ".claude" / "memory"
+
+    if memory_dir.exists() and not args.force:
+        print(f"Error: {memory_dir} already exists. Use --force to overwrite.", file=sys.stderr)
+        sys.exit(1)
+
+    settings_path = dest / ".claude" / "settings.json"
+    settings_existed = settings_path.exists()
+
+    _scaffold_memory(dest)
+
+    if settings_existed:
         print(f"  ⟳ {settings_path} already exists — add the Stop hook manually if desired")
+    else:
+        print(f"  ✓ {settings_path} (session capture hook)")
 
     print(f"\n  ✓ Memory templates → {memory_dir}")
     files = sorted(f.name for f in memory_dir.iterdir() if f.is_file())
@@ -380,6 +386,7 @@ def _to_snake_case(name: str) -> str:
 _SCAFFOLD_RENAMES = {
     "gitignore": ".gitignore",
     "env.example": ".env.example",
+    "mcp.json": ".mcp.json",
 }
 
 # Directory renames: template dir name -> target dir name
@@ -476,11 +483,14 @@ def cmd_scaffold(args: argparse.Namespace) -> None:
     if SECURITY_MD.exists():
         shutil.copy2(SECURITY_MD, claude_dir / "SECURITY.md")
 
+    # Scaffold shared memory directory and session capture hook
+    _scaffold_memory(target)
+
     print(f"\n  ✓ Scaffolded project: {target}")
     print("    - ingestion/           dlt pipelines")
     print("    - transformation/      dbt project")
     print("    - orchestration/       Dagster orchestration")
-    print("    - .claude/             Skills, agents, project config")
+    print("    - .claude/             Skills, agents, memory, project config")
     print("\n  Next steps:")
     print(f"    cd {project_name}")
     print("    uv sync")

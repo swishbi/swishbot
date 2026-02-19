@@ -71,7 +71,7 @@ Every source table needs at minimum:
               - unique
 ```
 
-For sources with SCD2 / versioned rows, see the [Loader-Specific Considerations](#loader-specific-considerations) section in the main SKILL.md for adapted test patterns.
+For sources with SCD2 / versioned rows, see [loader-metadata.md](../../references/loader-metadata.md) for adapted test patterns.
 
 ## Step 3: Generate Base Staging Models
 

@@ -1,10 +1,4 @@
----
-name: dbt-staging-model
-description: "Conventions for writing a dbt staging model SQL file. Use when a user asks to write a staging model, cast columns, rename fields, order CTEs, or handle metadata columns in a stg_ model. Covers SQL structure, casting, naming, ordering, and metadata."
-argument-hint: "[model-name]"
----
-
-# dbt-staging-model
+# Staging Model SQL Conventions
 
 Conventions for writing a dbt staging model SQL file. Covers SQL structure, column casting, naming, ordering, and metadata handling.
 
@@ -51,7 +45,7 @@ The `source` CTE selects from the raw source. The `renamed` CTE applies all cast
 
 ### Column Casting Rules
 
-Use dbt type macros for casting. Access JSON/variant fields using your warehouse's native syntax (see [dbt-staging](../dbt-staging/SKILL.md) for warehouse-specific syntax).
+Use dbt type macros for casting. Access JSON/variant fields using your warehouse's native syntax (see [`transform-staging-models.md`](../workflows/staging/transform-staging-models.md) for warehouse-specific syntax).
 
 | Data Type | dbt Macro | Example |
 |-----------|-----------|---------|
@@ -121,11 +115,11 @@ custom_with_labels as custom_with_labels,
 options as options,
 ```
 
-For guidance on when to unnest objects inline vs. create separate flattened models, see [dbt-staging](../dbt-staging/SKILL.md) Step 6.
+For guidance on when to unnest objects inline vs. create separate flattened models, see [`transform-staging-models.md`](../workflows/staging/transform-staging-models.md).
 
 ### Loader Metadata Block
 
-Always include loader-specific metadata columns at the end of the select, after nested objects. The exact columns depend on your ingestion tool. See the [Loader-Specific Considerations](../dbt-staging/SKILL.md#loader-specific-considerations) section in the dbt-staging skill for details on each loader's metadata pattern.
+Always include loader-specific metadata columns at the end of the select, after nested objects. The exact columns depend on your ingestion tool. See [loader-metadata.md](loader-metadata.md) for details on each loader's metadata pattern.
 
 ### Quick Example
 
@@ -159,13 +153,7 @@ options as options,
 
 ### Full Example
 
-See [examples/stg_source__entities.sql](examples/stg_source__entities.sql) for a complete staging model with all column groups.
-
-## Related Skills
-
-- **[dbt-style](../dbt-style/SKILL.md)** — Foundational naming, SQL style, and structure conventions
-- **[dbt-staging](../dbt-staging/SKILL.md)** — Full staging workflow including complex structure handling and loader-specific metadata
-- **[dbt-mcp](../dbt-mcp/SKILL.md)** — Use `compile` to verify Jinja rendering, `show` to preview results
+See [examples/stg_source__entities.sql](../examples/stg_source__entities.sql) for a complete staging model with all column groups.
 
 ---
 

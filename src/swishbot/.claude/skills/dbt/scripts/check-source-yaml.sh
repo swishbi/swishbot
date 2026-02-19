@@ -28,7 +28,7 @@ DIR=$(dirname "$FILE_PATH")
 if ! ls "$DIR"/*_sources.yml "$DIR"/*_sources.yaml 2>/dev/null | head -1 > /dev/null 2>&1; then
     echo "WARNING: No _sources.yml found in $DIR"
     echo "Staging models should have a corresponding source YAML file."
-    echo "Run the dbt-staging 'Create Staging Source' workflow to generate one."
+    echo "Run the dbt 'Create Staging Source' workflow to generate one."
 fi
 
 exit 0

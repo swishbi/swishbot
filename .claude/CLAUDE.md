@@ -28,12 +28,15 @@ uv run pre-commit install && uv run pre-commit install --hook-type pre-push
 
 ## Architecture
 
-Single-module CLI (`src/swishbot/cli.py`) with four subcommands routed via `match` statement:
+Single-module CLI (`src/swishbot/cli.py`) with seven subcommands routed via `match` statement:
 
 - **`list`** — Discovers skills and agents by scanning `*/SKILL.md` and `*/AGENT.md`, extracts metadata from YAML frontmatter via regex
 - **`install`** — Copies skill directories to `~/.claude/skills/` (or `--path`). With `--agent`, copies agent directories to `~/.claude/agents/`
 - **`init`** — Scaffolds a new skill directory with `workflows/` subdir from `SKILL_TEMPLATE`
-- **`init-project`** — Copies `src/swishbot/.claude/CLAUDE.md` (the user-facing template) into a target project
+- **`init-project`** — Copies `src/swishbot/.claude/CLAUDE.md` and `SECURITY.md` into a target project's root
+- **`hooks`** — Reads installed skills at a given path and prints a merged `hooks:` block from all SKILL.md frontmatter, suitable for pasting into `settings.json`
+- **`init-memory`** — Creates `.claude/memory/` with shared project memory templates (`MEMORY.md`, `conventions.md`, `modeling-decisions.md`, `source-catalog.md`) and writes `.claude/settings.json` with a `Stop` hook that prompts Claude to update memory files after each session
+- **`scaffold`** — Full project scaffold: copies all skills and agents, project template files (from `scaffold_templates/`), CLAUDE.md, SECURITY.md, and calls `_scaffold_memory()` to set up shared memory. Produces a complete `ingestion/` + `transformation/` + `orchestration/` project layout
 
 Key constants: `CLAUDE_DIR`, `SKILLS_DIR`, `AGENTS_DIR`, `DEFAULT_INSTALL_PATH`, `DEFAULT_AGENT_INSTALL_PATH`, `CLAUDE_MD` (all `pathlib.Path`).
 
@@ -53,7 +56,14 @@ The `description` field is extracted via regex (`description:\s*"?([^"\n]+)"?`) 
 
 ## Agents
 
-Each agent lives in `src/swishbot/.claude/agents/<agent-name>/` with a mandatory `AGENT.md` containing YAML frontmatter (`name`, `description`, `skills` list) and persona content. Agents compose multiple skills into a role — they tell Claude "you are a [role], use these skills."
+Each agent lives in `src/swishbot/.claude/agents/<agent-name>/` with a mandatory `AGENT.md` containing YAML frontmatter (`name`, `description`, `model`, `color`, `skills`) and persona content. Agents compose multiple skills into a role — they tell Claude "you are a [role], use these skills."
+
+Recognized Claude Code agent frontmatter fields: `name`, `description`, `model`, `color`, `tools`, `disallowedTools`, `skills`, `mcpServers`, `memory`, `permissionMode`, `maxTurns`, `hooks`. The fields currently used by swishbot agents:
+- `skills` — injects full skill content at startup; subagents do NOT inherit parent skills, so this is essential
+- `mcpServers` — references already-configured MCP servers by name (e.g., `dbt`); makes them available inside the agent even if the parent conversation has a different MCP context
+- `memory` — `project` scope gives each agent a persistent `.claude/agent-memory/<name>/` directory for cross-session learning; auto-loads `MEMORY.md` into the system prompt
+- `disallowedTools` — used on business-analyst to block `Bash`; keeps the agent focused on spec authoring, not command execution
+The skills an agent uses are also documented in a `## Skills` table in the body for human readers.
 
 Agents are authored by swishbot maintainers (no `init` scaffold). The `description` field follows the same regex extraction as skills.
 
