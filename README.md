@@ -26,7 +26,7 @@ swishbot install dbt --path ~/.claude/skills
 swishbot install --all
 
 # Install an agent
-swishbot install --agent data-modeler
+swishbot install --agent analytics-engineer
 
 # Install all agents
 swishbot install --agent --all
@@ -89,10 +89,9 @@ Agents are persona definitions that compose multiple skills into roles. Install 
 
 | Agent | Description | Skills Composed |
 |-------|-------------|-----------------|
-| `analytics-engineer` | Builds dbt models across all layers with MCP tooling | dbt |
-| `business-analyst` | Guides stakeholders from idea to implementation-ready spec | requirements-discovery, business-logic-mapping |
+| `analytics-engineer` | Designs dimensional schemas and builds dbt models across all layers with MCP tooling | dbt, dimensional-modeling |
+| `business-analyst` | Guides stakeholders from idea to implementation-ready spec; validates sources with dbt MCP | requirements-discovery, business-logic-mapping, dbt |
 | `data-engineer` | Builds ingestion pipelines with proper security | dlt-pipelines, dba-security |
-| `data-modeler` | Designs and builds dimensional models across the full dbt DAG | dbt, dimensional-modeling |
 | `platform-engineer` | Sets up infrastructure, security, and platform architecture | dagster, iac-terraform, dba-security |
 
 ## How It Works
@@ -129,8 +128,6 @@ swishbot/
 │           │   ├── business-analyst/
 │           │   │   └── AGENT.md
 │           │   ├── data-engineer/
-│           │   │   └── AGENT.md
-│           │   ├── data-modeler/
 │           │   │   └── AGENT.md
 │           │   └── platform-engineer/
 │           │       └── AGENT.md

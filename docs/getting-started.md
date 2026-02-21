@@ -46,13 +46,13 @@ Agents compose multiple skills into a focused persona. Install one to give Claud
 
 ```bash
 # Install a single agent
-swishbot install --agent data-modeler
+swishbot install --agent analytics-engineer
 
 # Install all agents
 swishbot install --agent --all
 
 # Install to a custom path
-swishbot install --agent data-modeler --path ~/my-project/.claude/agents
+swishbot install --agent analytics-engineer --path ~/my-project/.claude/agents
 ```
 
 Agents are copied to `~/.claude/agents/` by default.
