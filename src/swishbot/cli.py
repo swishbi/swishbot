@@ -5,6 +5,7 @@
 
 import argparse
 import json
+import os
 import re
 import shutil
 import sys
@@ -19,6 +20,63 @@ MEMORY_TEMPLATES_DIR = Path(__file__).parent / "memory_templates"
 SCAFFOLD_TEMPLATES_DIR = Path(__file__).parent / "scaffold_templates"
 DEFAULT_INSTALL_PATH = Path.home() / ".claude" / "skills"
 DEFAULT_AGENT_INSTALL_PATH = Path.home() / ".claude" / "agents"
+
+# ─── Terminal styling ─────────────────────────────────────────────────
+
+_RESET = "\033[0m"
+_BOLD = "\033[1m"
+_DIM = "\033[2m"
+_RED = "\033[31m"
+_GREEN = "\033[32m"
+_YELLOW = "\033[33m"
+_CYAN = "\033[36m"
+
+
+def _tty() -> bool:
+    """True only when stdout is a color-capable interactive terminal."""
+    if os.environ.get("NO_COLOR"):
+        return False
+    if os.environ.get("TERM") == "dumb":
+        return False
+    return sys.stdout.isatty()
+
+
+def _c(code: str, text: str) -> str:
+    """Apply ANSI code; pass through unchanged when not a TTY."""
+    return f"{code}{text}{_RESET}" if _tty() else text
+
+
+def _bold(t: str) -> str:
+    return _c(_BOLD, t)
+
+
+def _dim(t: str) -> str:
+    return _c(_DIM, t)
+
+
+def _red(t: str) -> str:
+    return _c(_RED, t)
+
+
+def _green(t: str) -> str:
+    return _c(_GREEN, t)
+
+
+def _yellow(t: str) -> str:
+    return _c(_YELLOW, t)
+
+
+def _cyan(t: str) -> str:
+    return _c(_CYAN, t)
+
+
+def _header(title: str) -> str:
+    """Bold cyan section title with a dim horizontal rule below."""
+    if not _tty():
+        return f"\n{title}"
+    rule = _DIM + "─" * min(len(title) + 2, 72) + _RESET
+    return f"\n{_BOLD}{_CYAN}{title}{_RESET}\n{rule}"
+
 
 SKILL_TEMPLATE = """\
 ---
@@ -95,9 +153,9 @@ def get_available_agents() -> list[dict]:
 
 def _prompt_scope(project_path: Path, global_path: Path) -> Path:
     """Prompt user to choose project-local or global install."""
-    print("\nInstall to:")
-    print(f"  [P] Project  —  {project_path}")
-    print(f"  [G] Global   —  {global_path}")
+    print(f"\n{_bold('Install to:')}")
+    print(f"  {_cyan('[P]')} Project  {_dim(f'— {project_path}')}")
+    print(f"  {_cyan('[G]')} Global   {_dim(f'— {global_path}')}")
     while True:
         try:
             choice = input("Choice [P/G]: ").strip().upper()
@@ -122,17 +180,21 @@ def cmd_list(args: argparse.Namespace) -> None:
 
     if skills:
         max_name = max(len(s["name"]) for s in skills)
-        print("\nAvailable skills:\n")
+        print(_header("Available skills:"))
+        print()
         for s in skills:
-            print(f"  {s['name']:<{max_name + 2}} {s['description']}")
-        print("\nInstall with: swishbot install <skill-name>")
+            name_padded = f"{s['name']:<{max_name + 2}}"
+            print(f"  {_bold(name_padded)} {_dim(s['description'])}")
+        print(f"\n{_dim('Install with: swishbot install <skill-name>')}")
 
     if agents:
         max_name = max(len(a["name"]) for a in agents)
-        print("\nAvailable agents:\n")
+        print(_header("Available agents:"))
+        print()
         for a in agents:
-            print(f"  {a['name']:<{max_name + 2}} {a['description']}")
-        print("\nInstall agent: swishbot install --agent <agent-name>")
+            name_padded = f"{a['name']:<{max_name + 2}}"
+            print(f"  {_bold(name_padded)} {_dim(a['description'])}")
+        print(f"\n{_dim('Install agent: swishbot install --agent <agent-name>')}")
 
     print()
 
@@ -159,12 +221,12 @@ def _install_skills(args: argparse.Namespace) -> None:
     elif args.skills:
         names = args.skills
     else:
-        print("Error: specify a skill name or use --all", file=sys.stderr)
+        print(f"{_red('Error:')} specify a skill name or use --all", file=sys.stderr)
         sys.exit(1)
 
     for name in names:
         if name not in available:
-            print(f"Error: skill '{name}' not found.", file=sys.stderr)
+            print(f"{_red('Error:')} skill '{name}' not found.", file=sys.stderr)
             print(f"Available: {', '.join(sorted(available))}", file=sys.stderr)
             sys.exit(1)
 
@@ -172,13 +234,13 @@ def _install_skills(args: argparse.Namespace) -> None:
         skill_dest = dest / name
 
         if skill_dest.exists():
-            print(f"  ⟳ {name} — already installed, overwriting")
+            print(f"  {_yellow('⟳')} {_bold(name)} {_dim('— already installed, overwriting')}")
             shutil.rmtree(skill_dest)
 
         shutil.copytree(src, skill_dest)
-        print(f"  ✓ {name} → {skill_dest}")
+        print(f"  {_green('✓')} {_bold(name)} {_dim(f'→ {skill_dest}')}")
 
-    print(f"\nDone. Skills installed to {dest}")
+    print(f"\n{_bold('Done.')} {_dim(f'Skills installed to {dest}')}")
     print("Make sure your Claude project references this path.\n")
 
 
@@ -196,12 +258,12 @@ def _install_agents(args: argparse.Namespace) -> None:
     elif args.skills:
         names = args.skills
     else:
-        print("Error: specify an agent name or use --all", file=sys.stderr)
+        print(f"{_red('Error:')} specify an agent name or use --all", file=sys.stderr)
         sys.exit(1)
 
     for name in names:
         if name not in available:
-            print(f"Error: agent '{name}' not found.", file=sys.stderr)
+            print(f"{_red('Error:')} agent '{name}' not found.", file=sys.stderr)
             print(f"Available: {', '.join(sorted(available))}", file=sys.stderr)
             sys.exit(1)
 
@@ -209,13 +271,13 @@ def _install_agents(args: argparse.Namespace) -> None:
         agent_dest = dest / name
 
         if agent_dest.exists():
-            print(f"  ⟳ {name} — already installed, overwriting")
+            print(f"  {_yellow('⟳')} {_bold(name)} {_dim('— already installed, overwriting')}")
             shutil.rmtree(agent_dest)
 
         shutil.copytree(src, agent_dest)
-        print(f"  ✓ {name} → {agent_dest}")
+        print(f"  {_green('✓')} {_bold(name)} {_dim(f'→ {agent_dest}')}")
 
-    print(f"\nDone. Agents installed to {dest}")
+    print(f"\n{_bold('Done.')} {_dim(f'Agents installed to {dest}')}")
     print("Make sure your Claude project references this path.\n")
 
 
@@ -229,19 +291,19 @@ def cmd_init_project(args: argparse.Namespace) -> None:
     target = dest / "CLAUDE.md"
 
     if target.exists() and not args.force:
-        print(f"Error: {target} already exists. Use --force to overwrite.", file=sys.stderr)
+        print(f"{_red('Error:')} {target} already exists. Use --force to overwrite.", file=sys.stderr)
         sys.exit(1)
 
     shutil.copy2(CLAUDE_MD, target)
-    print(f"\n  ✓ CLAUDE.md → {target}")
+    print(f"\n  {_green('✓')} CLAUDE.md {_dim(f'→ {target}')}")
 
     # Copy SECURITY.md if available
     if SECURITY_MD.exists():
         security_target = dest / "SECURITY.md"
         shutil.copy2(SECURITY_MD, security_target)
-        print(f"  ✓ SECURITY.md → {security_target}")
+        print(f"  {_green('✓')} SECURITY.md {_dim(f'→ {security_target}')}")
 
-    print("\nEdit the file to uncomment your installed skills and fill in project details.\n")
+    print(f"\n{_dim('Edit the file to uncomment your installed skills and fill in project details.')}\n")
 
 
 def cmd_init(args: argparse.Namespace) -> None:
@@ -250,7 +312,7 @@ def cmd_init(args: argparse.Namespace) -> None:
     dest = SKILLS_DIR / name
 
     if dest.exists():
-        print(f"Error: skill '{name}' already exists at {dest}", file=sys.stderr)
+        print(f"{_red('Error:')} skill '{name}' already exists at {dest}", file=sys.stderr)
         sys.exit(1)
 
     dest.mkdir(parents=True)
@@ -258,8 +320,8 @@ def cmd_init(args: argparse.Namespace) -> None:
     title = " ".join(w.capitalize() for w in name.split("-"))
     (dest / "SKILL.md").write_text(SKILL_TEMPLATE.format(name=name, title=title))
 
-    print(f"\nScaffolded new skill: {dest}/SKILL.md")
-    print("Edit the SKILL.md to encode your methodology.\n")
+    print(f"\n  {_green('✓')} Scaffolded new skill: {_bold(str(dest / 'SKILL.md'))}")
+    print(f"{_dim('Edit the SKILL.md to encode your methodology.')}\n")
 
 
 def cmd_hooks(args: argparse.Namespace) -> None:
@@ -295,9 +357,13 @@ def cmd_hooks(args: argparse.Namespace) -> None:
     max_skill = max(len(h["skill"]) for h in hooks_found)
     max_event = max(len(h["event"]) for h in hooks_found)
 
-    print("\nInstalled hooks:\n")
+    print(_header("Installed hooks:"))
+    print()
     for h in hooks_found:
-        print(f"  {h['skill']:<{max_skill + 2}} {h['event']:<{max_event + 2}} ({h['matcher']})  {h['description']}")
+        name_padded = f"{h['skill']:<{max_skill + 2}}"
+        event_padded = f"{h['event']:<{max_event + 2}}"
+        matcher_str = f"({h['matcher']})"
+        print(f"  {_bold(name_padded)} {_cyan(event_padded)} {_dim(matcher_str)}  {h['description']}")
     print()
 
 
@@ -394,7 +460,7 @@ def cmd_init_memory(args: argparse.Namespace) -> None:
     memory_dir = dest / ".claude" / "memory"
 
     if memory_dir.exists() and not args.force:
-        print(f"Error: {memory_dir} already exists. Use --force to overwrite.", file=sys.stderr)
+        print(f"{_red('Error:')} {memory_dir} already exists. Use --force to overwrite.", file=sys.stderr)
         sys.exit(1)
 
     settings_path = dest / ".claude" / "settings.json"
@@ -403,15 +469,15 @@ def cmd_init_memory(args: argparse.Namespace) -> None:
     _scaffold_memory(dest)
 
     if settings_existed:
-        print(f"  ⟳ {settings_path} already exists — add the Stop hook manually if desired")
+        print(f"  {_yellow('⟳')} {_dim(str(settings_path))} already exists — add the Stop hook manually if desired")
     else:
-        print(f"  ✓ {settings_path} (session capture hook)")
+        print(f"  {_green('✓')} {_dim(str(settings_path))} (session capture hook)")
 
-    print(f"\n  ✓ Memory templates → {memory_dir}")
+    print(f"\n  {_green('✓')} Memory templates {_dim(f'→ {memory_dir}')}")
     files = sorted(f.name for f in memory_dir.iterdir() if f.is_file())
     for f in files:
-        print(f"    - {f}")
-    print("\nClaude will update these files as decisions are made during sessions.\n")
+        print(f"    {_dim('-')} {f}")
+    print(f"\n{_dim('Claude will update these files as decisions are made during sessions.')}\n")
 
 
 def _to_snake_case(name: str) -> str:
@@ -466,7 +532,7 @@ def cmd_scaffold(args: argparse.Namespace) -> None:
 
     if target.exists():
         if not args.force:
-            print(f"Error: {target} already exists. Use --force to overwrite.", file=sys.stderr)
+            print(f"{_red('Error:')} {target} already exists. Use --force to overwrite.", file=sys.stderr)
             sys.exit(1)
         shutil.rmtree(target)
 
@@ -523,15 +589,15 @@ def cmd_scaffold(args: argparse.Namespace) -> None:
     # Scaffold shared memory directory and session capture hook
     _scaffold_memory(target)
 
-    print(f"\n  ✓ Scaffolded project: {target}")
-    print("    - ingestion/           dlt pipelines")
-    print("    - transformation/      dbt project")
-    print("    - orchestration/       Dagster orchestration")
-    print("    - .claude/             Skills, agents, memory, project config")
-    print("\n  Next steps:")
-    print(f"    cd {project_name}")
-    print("    uv sync")
-    print("    dagster dev\n")
+    print(f"\n  {_green('✓')} Scaffolded project: {_bold(str(target))}")
+    print(f"    {_dim('- ingestion/           dlt pipelines')}")
+    print(f"    {_dim('- transformation/      dbt project')}")
+    print(f"    {_dim('- orchestration/       Dagster orchestration')}")
+    print(f"    {_dim('- .claude/             Skills, agents, memory, project config')}")
+    print(f"\n  {_bold('Next steps:')}")
+    print(f"    {_cyan(f'cd {project_name}')}")
+    print(f"    {_cyan('uv sync')}")
+    print(f"    {_cyan('dagster dev')}\n")
 
 
 # ─── Entry ───────────────────────────────────────────────────────────
