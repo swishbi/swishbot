@@ -126,7 +126,7 @@ def get_env() -> str:
 
 ## Related Skills
 
-- **[dlt-pipelines](../dlt-pipelines/SKILL.md)** — Build the dlt sources that Dagster orchestrates
+- **[dlt](../dlt/SKILL.md)** — Build the dlt sources that Dagster orchestrates
 - **[dbt-staging](../dbt-staging/SKILL.md)** — Build the dbt models that Dagster orchestrates
 - **[powerbi](../powerbi/SKILL.md)** — Power BI semantic models that Dagster can refresh
 

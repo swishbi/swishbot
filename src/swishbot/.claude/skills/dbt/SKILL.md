@@ -89,7 +89,7 @@ Find the right resource for your current task:
 ## Related Skills
 
 - **[dimensional-modeling](../dimensional-modeling/SKILL.md)** — Design-level decisions (star schema, grain, SCD, bus matrix) that drive what models are needed
-- **[dlt-pipelines](../dlt-pipelines/SKILL.md)** — Build dlt ingestion pipelines that feed into staging models
+- **[dlt](../dlt/SKILL.md)** — Build dlt ingestion pipelines that feed into staging models
 - **[dagster](../dagster/SKILL.md)** — Orchestrate dbt models as Dagster assets
 - **[dba-security](../dba-security/SKILL.md)** — Database separation strategy and access control for warehouse objects
 

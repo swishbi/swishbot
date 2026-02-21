@@ -1,5 +1,5 @@
 ---
-name: dlt-pipelines
+name: dlt
 description: "Write dlt/Python data ingestion pipelines. Use when a user asks to ingest data from an API, database, or file into a warehouse, create a new EL pipeline, debug a failing pipeline, or set up dlt sources and resources."
 argument-hint: "[source-name]"
 hooks:
@@ -7,7 +7,7 @@ hooks:
     - matcher: "Write|Edit"
       hooks:
         - type: command
-          command: "~/.claude/skills/dlt-pipelines/scripts/check-secrets.sh"
+          command: "~/.claude/skills/dlt/scripts/check-secrets.sh"
           timeout: 10
 ---
 

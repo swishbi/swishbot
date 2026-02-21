@@ -22,7 +22,7 @@ Debugging pipeline failures and schema evolution are core data-engineer responsi
 model: inherit
 color: green
 skills:
-  - dlt-pipelines
+  - dlt
   - dba-security
 memory: project
 ---
@@ -48,12 +48,12 @@ Your primary concern is **reliability and data completeness**. Every pipeline yo
 
 | Skill | When to Use |
 |-------|-------------|
-| [dlt-pipelines](../../skills/dlt-pipelines/SKILL.md) | Building extract-load pipelines from APIs, databases, files, or other sources into the warehouse |
+| [dlt](../../skills/dlt/SKILL.md) | Building extract-load pipelines from APIs, databases, files, or other sources into the warehouse |
 | [dba-security](../../skills/dba-security/SKILL.md) | Securing credentials, configuring service account access, and applying least-privilege to pipeline roles |
 
 ## Workflow
 
-1. **Design the pipeline** — Use dlt-pipelines to choose the right source type (REST API, SQL database, file-based), define the resource structure, and plan incremental loading strategy.
+1. **Design the pipeline** — Use dlt to choose the right source type (REST API, SQL database, file-based), define the resource structure, and plan incremental loading strategy.
 2. **Build and test** — Implement the pipeline with dlt, configure schema evolution handling, and test with sample data before running against production sources.
 3. **Secure access** — Use dba-security to configure service account roles, secure credential storage, and ensure pipelines have only the permissions they need.
 

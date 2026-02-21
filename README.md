@@ -63,7 +63,7 @@ swishbot init-memory
 ### Ingestion
 | Skill | Description | Status |
 |-------|-------------|--------|
-| `dlt-pipelines` | Writing dlt/Python ingestion pipelines | :white_check_mark: |
+| `dlt` | Writing dlt/Python ingestion pipelines | :white_check_mark: |
 
 ### Orchestration
 | Skill | Description | Status |
@@ -89,7 +89,7 @@ Agents are persona definitions that compose multiple skills into roles. Install 
 |-------|-------------|-----------------|
 | `analytics-engineer` | Designs dimensional schemas and builds dbt models across all layers with MCP tooling | dbt, dimensional-modeling |
 | `business-analyst` | Guides stakeholders from idea to implementation-ready spec; validates sources with dbt MCP | requirements-discovery, dbt |
-| `data-engineer` | Builds ingestion pipelines with proper security | dlt-pipelines, dba-security |
+| `data-engineer` | Builds ingestion pipelines with proper security | dlt, dba-security |
 | `platform-engineer` | Sets up infrastructure, security, and platform architecture | dagster, iac-terraform, dba-security |
 
 ## How It Works
@@ -161,7 +161,7 @@ swishbot/
 │               │   │   ├── add-dbt-component.md
 │               │   │   └── add-custom-component.md
 │               │   └── examples/
-│               ├── dlt-pipelines/
+│               ├── dlt/
 │               │   ├── SKILL.md
 │               │   └── scripts/
 │               │       └── check-secrets.sh

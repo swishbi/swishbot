@@ -36,7 +36,7 @@ For ad-hoc tasks that don't fit an agent, reference the relevant skill directly:
 ### Ingestion
 | Skill | Description | Status |
 |-------|-------------|--------|
-| dlt-pipelines | Writing dlt/Python ingestion pipelines | :white_check_mark: |
+| dlt | Writing dlt/Python ingestion pipelines | :white_check_mark: |
 
 ### Orchestration
 | Skill | Description | Status |
