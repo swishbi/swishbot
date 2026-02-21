@@ -1,6 +1,6 @@
 ---
 name: dbt
-description: "Build the dbt transformation layer. Use for any dbt work — staging sources, building intermediate models, creating marts, applying SQL conventions, setting up dbt MCP, debugging errors, or reviewing project structure."
+description: "Build the dbt transformation layer. Use for any dbt work — staging sources, building intermediate models, creating marts, defining MetricFlow semantic models and metrics, querying with mf CLI, applying SQL conventions, setting up dbt MCP, debugging errors, or reviewing project structure."
 argument-hint: "[source-name-or-model-name]"
 hooks:
   PreToolUse:
@@ -62,6 +62,8 @@ Find the right resource for your current task:
 | Extract complex mart logic to intermediate | [`workflows/intermediate/refactor-to-intermediate.md`](workflows/intermediate/refactor-to-intermediate.md) |
 | Build a mart model (fact, dim, wide) | [`workflows/marts/create-mart-model.md`](workflows/marts/create-mart-model.md) |
 | Convert a mart to incremental | [`workflows/marts/create-incremental-mart.md`](workflows/marts/create-incremental-mart.md) |
+| Define MetricFlow semantic model (entities, dimensions, measures) | [`workflows/semantic/define-semantic-model.md`](workflows/semantic/define-semantic-model.md) |
+| Define and query MetricFlow metrics (simple, ratio, derived, cumulative) | [`workflows/semantic/define-semantic-model.md`](workflows/semantic/define-semantic-model.md) |
 | SQL formatting, naming, folder structure | [`references/style-and-conventions.md`](references/style-and-conventions.md) |
 | dbt MCP server setup and tool usage | [`references/mcp-setup-and-tools.md`](references/mcp-setup-and-tools.md) |
 | Loader metadata (dlt, Fivetran, Airbyte) | [`references/loader-metadata.md`](references/loader-metadata.md) |

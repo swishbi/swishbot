@@ -81,7 +81,6 @@ swishbot init-memory
 | Skill | Description | Status |
 |-------|-------------|--------|
 | `powerbi` | Power BI best practices | :white_check_mark: |
-| `semantic-layer` | Building the semantic layer | :x: |
 
 ## Available Agents
 
@@ -142,9 +141,11 @@ swishbot/
 │               │   │   ├── intermediate/
 │               │   │   │   ├── create-intermediate-model.md
 │               │   │   │   └── refactor-to-intermediate.md
-│               │   │   └── marts/
-│               │   │       ├── create-mart-model.md
-│               │   │       └── create-incremental-mart.md
+│               │   │   ├── marts/
+│               │   │   │   ├── create-mart-model.md
+│               │   │   │   └── create-incremental-mart.md
+│               │   │   └── semantic/
+│               │   │       └── define-semantic-model.md
 │               │   ├── references/      # Reference documentation
 │               │   │   ├── style-and-conventions.md
 │               │   │   ├── mcp-setup-and-tools.md
@@ -178,8 +179,6 @@ swishbot/
 │               │   │   └── validate-sql.sh
 │               │   └── examples/
 │               ├── iac-terraform/
-│               │   └── SKILL.md
-│               ├── semantic-layer/
 │               │   └── SKILL.md
 │               └── powerbi/
 │                   ├── SKILL.md         # Router: tenets + workflow index

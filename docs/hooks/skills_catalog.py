@@ -20,7 +20,7 @@ CATEGORIES = {
         "dbt",
         "dimensional-modeling",
     ],
-    "Analytics & Presentation": ["powerbi", "semantic-layer"],
+    "Analytics & Presentation": ["powerbi"],
 }
 
 

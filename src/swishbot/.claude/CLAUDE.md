@@ -54,7 +54,6 @@ For ad-hoc tasks that don't fit an agent, reference the relevant skill directly:
 | Skill | Description | Status |
 |-------|-------------|--------|
 | powerbi | Power BI best practices | :white_check_mark: |
-| semantic-layer | Building the semantic layer | :x: |
 
 ## Installed Agents
 

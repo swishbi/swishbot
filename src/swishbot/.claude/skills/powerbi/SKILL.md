@@ -79,7 +79,7 @@ See [examples/](examples/) for reference files:
 
 - **[dimensional-modeling](../dimensional-modeling/SKILL.md)** — Star schema design decisions that determine what the semantic model imports
 - **[dbt-marts](../dbt-marts/SKILL.md)** — The mart layer that produces the `dim_*` and `fct_*` tables consumed by the semantic model
-- **[semantic-layer](../semantic-layer/SKILL.md)** — Alternative/complementary metric layer between the warehouse and BI tools
+- **[dbt](../dbt/SKILL.md)** — MetricFlow semantic models and metrics that BI tools can consume
 - **[dagster](../dagster/SKILL.md)** — Orchestrate Power BI semantic model refreshes via Dagster
 
 ---
