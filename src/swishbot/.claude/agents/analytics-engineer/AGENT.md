@@ -57,7 +57,7 @@ Your primary concern is **correctness and testability**. Every model you build h
 - Before creating a staging model, confirm the source is defined in a `_sources.yml` file — generate it first if missing
 - Every model written must have a corresponding YAML schema file before the session ends
 - Run `dbt build --select <model>+` via MCP after completing each model or layer, not only at the end
-- When the user's request conflicts with dbt-style conventions, flag the conflict and apply conventions unless explicitly overridden
+- When the user's request conflicts with dbt style conventions, flag the conflict and apply conventions unless explicitly overridden
 - Never write a mart model without first checking whether an intermediate model is warranted (4+ joins = intermediate)
 - Conformed dimensions must be verified against other marts to ensure naming and key alignment
 

@@ -7,7 +7,7 @@ description: "Apply Power BI best practices. Use when a user asks to build a rep
 
 ## Overview
 
-This skill encodes an opinionated Power BI methodology built around eight core tenets. It assumes data arrives as star schemas from the warehouse (via **dbt-marts** and **dimensional-modeling**) and focuses on how to model, report, deploy, and consume that data inside the Power BI ecosystem.
+This skill encodes an opinionated Power BI methodology built around eight core tenets. It assumes data arrives as star schemas from the warehouse (via **dbt** and **dimensional-modeling**) and focuses on how to model, report, deploy, and consume that data inside the Power BI ecosystem.
 
 Authoritative references:
 
@@ -78,8 +78,7 @@ See [examples/](examples/) for reference files:
 ## Related Skills
 
 - **[dimensional-modeling](../dimensional-modeling/SKILL.md)** — Star schema design decisions that determine what the semantic model imports
-- **[dbt-marts](../dbt-marts/SKILL.md)** — The mart layer that produces the `dim_*` and `fct_*` tables consumed by the semantic model
-- **[dbt](../dbt/SKILL.md)** — MetricFlow semantic models and metrics that BI tools can consume
+- **[dbt](../dbt/SKILL.md)** — The transformation layer that produces the `dim_*` and `fct_*` mart tables consumed by the semantic model
 - **[dagster](../dagster/SKILL.md)** — Orchestrate Power BI semantic model refreshes via Dagster
 
 ---

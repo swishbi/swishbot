@@ -26,16 +26,16 @@ Install the skills you need:
 
 ```bash
 # Install a single skill
-swishbot install dbt-staging
+swishbot install dbt
 
 # Install multiple skills
-swishbot install dbt-staging dbt-intermediate dbt-marts
+swishbot install dbt dimensional-modeling
 
 # Install everything
 swishbot install --all
 
 # Install to a custom path
-swishbot install dbt-staging --path ~/my-project/.claude/skills
+swishbot install dbt --path ~/my-project/.claude/skills
 ```
 
 Skills are copied to `~/.claude/skills/` by default.

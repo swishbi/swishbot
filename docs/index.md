@@ -8,7 +8,7 @@ swishbot distributes self-contained **skills** and **agents** for data engineeri
 
 **Skills** are opinionated methodology guides that Claude reads to understand how to execute specific tasks. Each skill encodes *how to think about the problem*, not platform-specific implementation details. Claude already knows the platforms (Snowflake, BigQuery, Databricks, etc.) — skills teach it how **you** think.
 
-**Agents** are persona definitions that compose multiple skills into a focused role (e.g., data-modeler, analytics-engineer). Install an agent to give Claude a specific identity for a type of work.
+**Agents** are persona definitions that compose multiple skills into a focused role (e.g., analytics-engineer, data-engineer). Install an agent to give Claude a specific identity for a type of work.
 
 ## Quick start
 
@@ -20,13 +20,13 @@ pip install swishbot
 swishbot list
 
 # Install a skill
-swishbot install dbt-staging
+swishbot install dbt
 
 # Install all skills
 swishbot install --all
 
 # Install an agent
-swishbot install --agent data-modeler
+swishbot install --agent analytics-engineer
 
 # Add a starter CLAUDE.md to your project
 swishbot init-project

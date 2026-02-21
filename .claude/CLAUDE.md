@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Project Is
 
-swishbot is a Python CLI that distributes "skills" and "agents" into `~/.claude/` for Claude Code to reference during data engineering work. Skills are opinionated methodology guides; agents are persona definitions that compose multiple skills into roles (e.g., data-modeler, analytics-engineer).
+swishbot is a Python CLI that distributes "skills" and "agents" into `~/.claude/` for Claude Code to reference during data engineering work. Skills are opinionated methodology guides; agents are persona definitions that compose multiple skills into roles (e.g., analytics-engineer, data-engineer).
 
 ## Commands
 

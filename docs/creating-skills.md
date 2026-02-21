@@ -74,14 +74,14 @@ Example frontmatter with a hook:
 
 ```yaml
 ---
-name: dbt-style
-description: "Cross-cutting dbt style conventions"
+name: dlt
+description: "Write dlt/Python data ingestion pipelines."
 hooks:
   PreToolUse:
     - matcher: "Write|Edit"
       hooks:
         - type: command
-          command: "~/.claude/skills/dbt-style/scripts/check-style.sh"
+          command: "~/.claude/skills/dlt/scripts/check-secrets.sh"
           timeout: 10
 ---
 ```

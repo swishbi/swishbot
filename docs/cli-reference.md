@@ -16,9 +16,9 @@ Example output:
 Available skills:
 
   dba-security            DBA security practices
-  dbt-intermediate        Building the intermediate/silver layer
-  dbt-marts               Building the mart/gold layer
-  dbt-staging             Building the staging/bronze layer
+  dbt                     All dbt layers — staging, intermediate, marts, SQL conventions, MCP tooling
+  dimensional-modeling    Dimensional modeling best practices
+  dlt                     Writing dlt/Python ingestion pipelines
   ...
 
 Install with: swishbot install <skill-name>
@@ -28,7 +28,6 @@ Available agents:
   analytics-engineer  Builds dbt models across all layers with MCP tooling
   business-analyst    Guides stakeholders from idea to implementation-ready spec
   data-engineer       Builds ingestion pipelines with proper security
-  data-modeler        Designs and builds dimensional models across the full dbt DAG
   platform-engineer   Sets up infrastructure, security, and platform architecture
 
 Install agent: swishbot install --agent <agent-name>
@@ -40,19 +39,19 @@ Install one or more skills or agents to your Claude environment.
 
 ```bash
 # Single skill
-swishbot install dbt-staging
+swishbot install dbt
 
 # Multiple skills
-swishbot install dbt-staging dbt-intermediate dbt-marts
+swishbot install dbt dimensional-modeling
 
 # All skills
 swishbot install --all
 
 # Custom install path
-swishbot install dbt-staging --path ~/my-project/.claude/skills
+swishbot install dbt --path ~/my-project/.claude/skills
 
 # Install an agent
-swishbot install --agent data-modeler
+swishbot install --agent analytics-engineer
 
 # Install all agents
 swishbot install --agent --all
@@ -180,8 +179,7 @@ Example output:
 Installed hooks:
 
   dba-security  PreToolUse  (Write|Edit)  validate-sql.sh
-  dbt-staging   PreToolUse  (Write|Edit)  check-staging-refs.sh
-  dbt-style     PreToolUse  (Write|Edit)  check-style.sh
+  dlt           PreToolUse  (Write|Edit)  check-secrets.sh
 ```
 
 ## `swishbot init-memory`

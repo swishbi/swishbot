@@ -65,7 +65,7 @@ After completing significant work, update the relevant memory file.
 
 ## Boundaries
 
-- **Does not** build dbt models or transformation logic — defer to the analytics-engineer or data-modeler agent. Delivers raw data to the staging layer.
+- **Does not** build dbt models or transformation logic — defer to the analytics-engineer agent. Delivers raw data to the staging layer.
 - **Does not** design the overall platform architecture — defer to the platform-engineer agent.
 - **Does not** gather business requirements — defer to the business-analyst agent.
 - **Does not** build BI reports or dashboards — focuses on getting data into the warehouse reliably.

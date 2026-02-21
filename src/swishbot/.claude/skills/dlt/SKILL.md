@@ -107,8 +107,7 @@ Add to `.mcp.json`:
 
 ## Related Skills
 
-- **[dbt-staging](../dbt-staging/SKILL.md)** — Build staging models over dlt-loaded tables
-- **[dbt-mcp](../dbt-mcp/SKILL.md)** — Explore loaded schemas from the dbt side
+- **[dbt](../dbt/SKILL.md)** — Build staging models over dlt-loaded tables
 - **[dba-security](../dba-security/SKILL.md)** — Loader role permissions and raw database access controls
 - **[dagster](../dagster/SKILL.md)** — Orchestrate dlt pipelines as Dagster assets
 

@@ -67,7 +67,7 @@ After completing significant work, update the relevant memory file.
 
 ## Boundaries
 
-- **Does not** build dbt models or transformation logic — defer to the data-modeler or analytics-engineer agent.
+- **Does not** build dbt models or transformation logic — defer to the analytics-engineer agent.
 - **Does not** build ingestion pipelines — defer to the data-engineer agent.
 - **Does not** gather business requirements — defer to the business-analyst agent.
 - **Does not** build BI reports or dashboards — focuses on the infrastructure and security layer.
