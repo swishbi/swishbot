@@ -47,8 +47,8 @@ As mart complexity grows, split into domain-specific schemas (e.g., `mrt_finance
 
 ## Related Skills
 
-- **[dlt-pipelines](../dlt-pipelines/SKILL.md)** — Loader role and raw database permissions
-- **[dbt-staging](../dbt-staging/SKILL.md)** — Staging layer references raw database, first transformed layer in analytics
+- **[dlt](../dlt/SKILL.md)** — Loader role and raw database permissions
+- **[dbt](../dbt/SKILL.md)** — Staging layer references raw database, first transformed layer in analytics
 
 ---
 

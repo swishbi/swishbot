@@ -12,27 +12,27 @@
 2. Install in dev mode with test dependencies:
 
     ```bash
-    pip install -e ".[test]"
+    uv sync --extra test
     ```
 
 3. Set up pre-commit hooks:
 
     ```bash
-    pre-commit install
-    pre-commit install --hook-type pre-push
+    uv run pre-commit install
+    uv run pre-commit install --hook-type pre-push
     ```
 
 ## Running checks
 
 ```bash
 # Lint
-ruff check src/ tests/
+uv run ruff check src/ tests/
 
 # Format
-ruff format src/ tests/
+uv run ruff format src/ tests/
 
 # Tests
-pytest -v
+uv run pytest -v
 ```
 
 If you installed the pre-commit hooks, lint and format run automatically on every commit, and tests run before every push. CI also runs all three on every PR.
@@ -47,8 +47,8 @@ CI runs on every push to `main` and on all pull requests. It tests against Pytho
 
 ## Commit checklist
 
-- [ ] `ruff check src/ tests/` and `ruff format src/ tests/` pass
-- [ ] `pytest -v` passes
+- [ ] `uv run ruff check src/ tests/` and `uv run ruff format src/ tests/` pass
+- [ ] `uv run pytest -v` passes
 - [ ] Version bumped in `pyproject.toml` if release-worthy
 - [ ] Skill tables updated in `README.md` and `CLAUDE.md` if skills changed
 - [ ] New skills have correct `name` and `description` in frontmatter

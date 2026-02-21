@@ -19,7 +19,7 @@ The `dba-security` skill enforces these rules via a `PreToolUse` hook on Bash co
 - **Warn if secrets are staged** — check `git diff --cached` for credential patterns before committing
 - **Use `dlt.secrets.value`** for dlt pipelines — dlt has built-in secrets resolution from environment, `.dlt/secrets.toml`, and vault providers
 
-The `dlt-pipelines` skill enforces this via a `PreToolUse` hook that scans for hardcoded credential patterns.
+The `dlt` skill enforces this via a `PreToolUse` hook that scans for hardcoded credential patterns.
 
 ## Prompt Injection Defense
 

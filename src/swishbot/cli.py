@@ -93,6 +93,24 @@ def get_available_agents() -> list[dict]:
 # ─── Commands ────────────────────────────────────────────────────────
 
 
+def _prompt_scope(project_path: Path, global_path: Path) -> Path:
+    """Prompt user to choose project-local or global install."""
+    print("\nInstall to:")
+    print(f"  [P] Project  —  {project_path}")
+    print(f"  [G] Global   —  {global_path}")
+    while True:
+        try:
+            choice = input("Choice [P/G]: ").strip().upper()
+        except (EOFError, KeyboardInterrupt):
+            print("\nAborted.", file=sys.stderr)
+            sys.exit(1)
+        if choice in ("P", "PROJECT"):
+            return project_path
+        if choice in ("G", "GLOBAL"):
+            return global_path
+        print("  Please enter P or G.", file=sys.stderr)
+
+
 def cmd_list(args: argparse.Namespace) -> None:
     """List available skills and agents."""
     skills = get_available_skills()
@@ -129,7 +147,11 @@ def cmd_install(args: argparse.Namespace) -> None:
 
 def _install_skills(args: argparse.Namespace) -> None:
     """Install one or more skills."""
-    dest = Path(args.path) if args.path else DEFAULT_INSTALL_PATH
+    if args.path:
+        dest = Path(args.path)
+    else:
+        dest = _prompt_scope(Path.cwd() / ".claude" / "skills", DEFAULT_INSTALL_PATH)
+    dest.mkdir(parents=True, exist_ok=True)
     available = {s["name"] for s in get_available_skills()}
 
     if args.all:
@@ -162,7 +184,11 @@ def _install_skills(args: argparse.Namespace) -> None:
 
 def _install_agents(args: argparse.Namespace) -> None:
     """Install one or more agents."""
-    dest = Path(args.path) if args.path else DEFAULT_AGENT_INSTALL_PATH
+    if args.path:
+        dest = Path(args.path)
+    else:
+        dest = _prompt_scope(Path.cwd() / ".claude" / "agents", DEFAULT_AGENT_INSTALL_PATH)
+    dest.mkdir(parents=True, exist_ok=True)
     available = {a["name"] for a in get_available_agents()}
 
     if args.all:
@@ -195,7 +221,11 @@ def _install_agents(args: argparse.Namespace) -> None:
 
 def cmd_init_project(args: argparse.Namespace) -> None:
     """Install a starter CLAUDE.md and SECURITY.md into a project."""
-    dest = Path(args.path) if args.path else Path.cwd()
+    if args.path:
+        dest = Path(args.path)
+    else:
+        dest = _prompt_scope(Path.cwd() / ".claude", Path.home() / ".claude")
+    dest.mkdir(parents=True, exist_ok=True)
     target = dest / "CLAUDE.md"
 
     if target.exists() and not args.force:
@@ -339,10 +369,11 @@ def _scaffold_memory(dest: Path) -> None:
                             {
                                 "type": "prompt",
                                 "prompt": (
-                                    "Review this session. If any data modeling decisions, "
-                                    "source configurations, or convention choices were made, "
-                                    "update the relevant files in .claude/memory/. Only update "
-                                    "if substantive decisions were made — skip routine coding sessions."
+                                    "Review this session. If cross-agent project decisions were made — "
+                                    "naming conventions, modeling choices, source configurations — "
+                                    "update the relevant files in .claude/memory/. "
+                                    "Do NOT update .claude/agent-memory/ here; agents manage that automatically. "
+                                    "Only update if substantive shared decisions were made."
                                 ),
                                 "timeout": 30,
                             }
@@ -356,7 +387,10 @@ def _scaffold_memory(dest: Path) -> None:
 
 def cmd_init_memory(args: argparse.Namespace) -> None:
     """Scaffold project memory directory with templates."""
-    dest = Path(args.path) if args.path else Path.cwd()
+    if args.path:
+        dest = Path(args.path)
+    else:
+        dest = _prompt_scope(Path.cwd(), Path.home())
     memory_dir = dest / ".claude" / "memory"
 
     if memory_dir.exists() and not args.force:

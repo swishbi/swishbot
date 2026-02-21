@@ -26,19 +26,19 @@ Install the skills you need:
 
 ```bash
 # Install a single skill
-swishbot install dbt-staging
+swishbot install dbt
 
 # Install multiple skills
-swishbot install dbt-staging dbt-intermediate dbt-marts
+swishbot install dbt dimensional-modeling
 
 # Install everything
 swishbot install --all
 
 # Install to a custom path
-swishbot install dbt-staging --path ~/my-project/.claude/skills
+swishbot install dbt --path ~/my-project/.claude/skills
 ```
 
-Skills are copied to `~/.claude/skills/` by default.
+Without `--path`, swishbot will prompt you to choose project-local (`.claude/skills/`) or global (`~/.claude/skills/`).
 
 ## Install agents
 
@@ -46,16 +46,16 @@ Agents compose multiple skills into a focused persona. Install one to give Claud
 
 ```bash
 # Install a single agent
-swishbot install --agent data-modeler
+swishbot install --agent analytics-engineer
 
 # Install all agents
 swishbot install --agent --all
 
 # Install to a custom path
-swishbot install --agent data-modeler --path ~/my-project/.claude/agents
+swishbot install --agent analytics-engineer --path ~/my-project/.claude/agents
 ```
 
-Agents are copied to `~/.claude/agents/` by default.
+Without `--path`, swishbot will prompt you to choose project-local (`.claude/agents/`) or global (`~/.claude/agents/`).
 
 ## Set up your project
 
@@ -99,7 +99,18 @@ Scaffold a memory directory so Claude can persist modeling decisions, source met
 swishbot init-memory
 ```
 
-This creates `.claude/memory/` with template files and a session-end hook. See the [CLI Reference](cli-reference.md#swishbot-init-memory) for details.
+This creates `.claude/memory/` with template files and a session-end hook. There are two distinct memory systems at work:
+
+- **Per-agent memory** — Each agent (analytics-engineer, data-engineer, etc.) automatically manages its own `.claude/agent-memory/<agent-name>/` directory via `memory: project`. No setup needed.
+- **Shared project memory** — `swishbot init-memory` creates `.claude/memory/` for cross-agent decisions (naming conventions, modeling choices, source quirks) that all agents read and contribute to.
+
+After running `init-memory`, uncomment the `@` import in your `CLAUDE.md` to also load shared memory into the main Claude session:
+
+```markdown
+@.claude/memory/MEMORY.md
+```
+
+See the [CLI Reference](cli-reference.md#swishbot-init-memory) for details.
 
 ## Verify it works
 

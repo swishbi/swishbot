@@ -5,6 +5,7 @@
 
 import argparse
 import re
+from pathlib import Path
 
 import pytest
 
@@ -609,6 +610,67 @@ def test_cmd_scaffold_force_overwrites(tmp_path):
     project = tmp_path / "test-project"
     assert (project / "pyproject.toml").exists()
     assert not (project / "old-file.txt").exists()
+
+
+# ─── _prompt_scope ───────────────────────────────────────────────────
+
+
+def test_prompt_scope_returns_project(monkeypatch):
+    inputs = iter(["P"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+    p = Path("/project/skills")
+    g = Path("/global/skills")
+    result = cli._prompt_scope(p, g)
+    assert result == p
+
+
+def test_prompt_scope_retries_on_invalid(monkeypatch):
+    inputs = iter(["X", "Q", "G"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+    p = Path("/project/skills")
+    g = Path("/global/skills")
+    result = cli._prompt_scope(p, g)
+    assert result == g
+
+
+def test_prompt_scope_eof_exits(monkeypatch):
+    monkeypatch.setattr("builtins.input", lambda _: (_ for _ in ()).throw(EOFError()))
+    with pytest.raises(SystemExit, match="1"):
+        cli._prompt_scope(Path("/p"), Path("/g"))
+
+
+# ─── scope prompt integration (no --path) ───────────────────────────
+
+
+def test_cmd_install_scope_project(tmp_path, monkeypatch):
+    dest = tmp_path / ".claude" / "skills"
+    monkeypatch.setattr(cli, "_prompt_scope", lambda *_: dest)
+    args = argparse.Namespace(skills=[], all=True, agent=False, path=None)
+    cli.cmd_install(args)
+    assert (dest / cli.get_available_skills()[0]["name"]).is_dir()
+
+
+def test_cmd_install_agent_scope_project(tmp_path, monkeypatch):
+    dest = tmp_path / ".claude" / "agents"
+    monkeypatch.setattr(cli, "_prompt_scope", lambda *_: dest)
+    args = argparse.Namespace(skills=[], all=True, agent=True, path=None)
+    cli.cmd_install(args)
+    assert (dest / cli.get_available_agents()[0]["name"]).is_dir()
+
+
+def test_cmd_init_project_scope_project(tmp_path, monkeypatch):
+    dest = tmp_path / ".claude"
+    monkeypatch.setattr(cli, "_prompt_scope", lambda *_: dest)
+    args = argparse.Namespace(path=None, force=False)
+    cli.cmd_init_project(args)
+    assert (dest / "CLAUDE.md").exists()
+
+
+def test_cmd_init_memory_scope_project(tmp_path, monkeypatch):
+    monkeypatch.setattr(cli, "_prompt_scope", lambda *_: tmp_path)
+    args = argparse.Namespace(path=None, force=False)
+    cli.cmd_init_memory(args)
+    assert (tmp_path / ".claude" / "memory" / "MEMORY.md").exists()
 
 
 # ─── main (argparse integration) ────────────────────────────────────

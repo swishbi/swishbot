@@ -26,7 +26,7 @@ swishbot install dbt --path ~/.claude/skills
 swishbot install --all
 
 # Install an agent
-swishbot install --agent data-modeler
+swishbot install --agent analytics-engineer
 
 # Install all agents
 swishbot install --agent --all
@@ -52,8 +52,7 @@ swishbot init-memory
 ### Discovery & Planning
 | Skill | Description | Status |
 |-------|-------------|--------|
-| `business-logic-mapping` | Map tribal knowledge from SMEs into implementation-ready business logic tied to staging columns | :white_check_mark: |
-| `requirements-discovery` | Act as a business analyst to guide stakeholders from idea to implementation-ready requirements | :white_check_mark: |
+| `requirements-discovery` | Act as a business analyst — stakeholder discovery, SME interviews, and column-level logic mapping | :white_check_mark: |
 
 ### Infrastructure
 | Skill | Description | Status |
@@ -64,14 +63,14 @@ swishbot init-memory
 ### Ingestion
 | Skill | Description | Status |
 |-------|-------------|--------|
-| `dlt-pipelines` | Writing dlt/Python ingestion pipelines | :white_check_mark: |
+| `dlt` | Writing dlt/Python ingestion pipelines | :white_check_mark: |
 
 ### Orchestration
 | Skill | Description | Status |
 |-------|-------------|--------|
 | `dagster` | Orchestrate data pipelines with Dagster and Dagster+ | :white_check_mark: |
 
-### Transformation (dbt)
+### Transformation
 | Skill | Description | Status |
 |-------|-------------|--------|
 | `dbt` | All dbt layers — staging, intermediate, marts, SQL conventions, MCP tooling | :white_check_mark: |
@@ -81,7 +80,6 @@ swishbot init-memory
 | Skill | Description | Status |
 |-------|-------------|--------|
 | `powerbi` | Power BI best practices | :white_check_mark: |
-| `semantic-layer` | Building the semantic layer | :x: |
 
 ## Available Agents
 
@@ -89,10 +87,9 @@ Agents are persona definitions that compose multiple skills into roles. Install 
 
 | Agent | Description | Skills Composed |
 |-------|-------------|-----------------|
-| `analytics-engineer` | Builds dbt models across all layers with MCP tooling | dbt |
-| `business-analyst` | Guides stakeholders from idea to implementation-ready spec | requirements-discovery, business-logic-mapping |
-| `data-engineer` | Builds ingestion pipelines with proper security | dlt-pipelines, dba-security |
-| `data-modeler` | Designs and builds dimensional models across the full dbt DAG | dbt, dimensional-modeling |
+| `analytics-engineer` | Designs dimensional schemas and builds dbt models across all layers with MCP tooling | dbt, dimensional-modeling |
+| `business-analyst` | Guides stakeholders from idea to implementation-ready spec; validates sources with dbt MCP | requirements-discovery, dbt |
+| `data-engineer` | Builds ingestion pipelines with proper security | dlt, dba-security |
 | `platform-engineer` | Sets up infrastructure, security, and platform architecture | dagster, iac-terraform, dba-security |
 
 ## How It Works
@@ -130,8 +127,6 @@ swishbot/
 │           │   │   └── AGENT.md
 │           │   ├── data-engineer/
 │           │   │   └── AGENT.md
-│           │   ├── data-modeler/
-│           │   │   └── AGENT.md
 │           │   └── platform-engineer/
 │           │       └── AGENT.md
 │           └── skills/
@@ -145,9 +140,11 @@ swishbot/
 │               │   │   ├── intermediate/
 │               │   │   │   ├── create-intermediate-model.md
 │               │   │   │   └── refactor-to-intermediate.md
-│               │   │   └── marts/
-│               │   │       ├── create-mart-model.md
-│               │   │       └── create-incremental-mart.md
+│               │   │   ├── marts/
+│               │   │   │   ├── create-mart-model.md
+│               │   │   │   └── create-incremental-mart.md
+│               │   │   └── semantic/
+│               │   │       └── define-semantic-model.md
 │               │   ├── references/      # Reference documentation
 │               │   │   ├── style-and-conventions.md
 │               │   │   ├── mcp-setup-and-tools.md
@@ -164,15 +161,13 @@ swishbot/
 │               │   │   ├── add-dbt-component.md
 │               │   │   └── add-custom-component.md
 │               │   └── examples/
-│               ├── dlt-pipelines/
+│               ├── dlt/
 │               │   ├── SKILL.md
 │               │   └── scripts/
 │               │       └── check-secrets.sh
 │               ├── dimensional-modeling/
 │               │   ├── SKILL.md
 │               │   └── examples/
-│               ├── business-logic-mapping/
-│               │   └── SKILL.md
 │               ├── requirements-discovery/
 │               │   └── SKILL.md
 │               ├── dba-security/
@@ -181,8 +176,6 @@ swishbot/
 │               │   │   └── validate-sql.sh
 │               │   └── examples/
 │               ├── iac-terraform/
-│               │   └── SKILL.md
-│               ├── semantic-layer/
 │               │   └── SKILL.md
 │               └── powerbi/
 │                   ├── SKILL.md         # Router: tenets + workflow index

@@ -10,10 +10,9 @@ Start each session by invoking the agent for your work type. Agents load all rel
 
 | Work Type | Agent | How to Invoke |
 |-----------|-------|---------------|
-| dbt models (any layer) | `analytics-engineer` | "Act as the analytics-engineer agent" |
-| Dimensional schema design | `data-modeler` | "Act as the data-modeler agent" |
+| dbt models + dimensional schema design | `analytics-engineer` | "Act as the analytics-engineer agent" |
 | Data pipelines (dlt/APIs) | `data-engineer` | "Act as the data-engineer agent" |
-| Requirements / discovery | `business-analyst` | "Act as the business-analyst agent" |
+| Requirements / discovery / data validation | `business-analyst` | "Act as the business-analyst agent" |
 | Infrastructure / security | `platform-engineer` | "Act as the platform-engineer agent" |
 
 For ad-hoc tasks that don't fit an agent, reference the relevant skill directly: "Use the dbt skill to..."
@@ -26,8 +25,7 @@ For ad-hoc tasks that don't fit an agent, reference the relevant skill directly:
 ### Discovery & Planning
 | Skill | Description | Status |
 |-------|-------------|--------|
-| business-logic-mapping | Map tribal knowledge from SMEs into implementation-ready business logic tied to staging columns | :white_check_mark: |
-| requirements-discovery | Act as a business analyst to guide stakeholders from idea to implementation-ready requirements | :white_check_mark: |
+| requirements-discovery | Act as a business analyst — stakeholder discovery, SME interviews, and column-level logic mapping | :white_check_mark: |
 
 ### Infrastructure
 | Skill | Description | Status |
@@ -38,14 +36,14 @@ For ad-hoc tasks that don't fit an agent, reference the relevant skill directly:
 ### Ingestion
 | Skill | Description | Status |
 |-------|-------------|--------|
-| dlt-pipelines | Writing dlt/Python ingestion pipelines | :white_check_mark: |
+| dlt | Writing dlt/Python ingestion pipelines | :white_check_mark: |
 
 ### Orchestration
 | Skill | Description | Status |
 |-------|-------------|--------|
 | dagster | Orchestrate data pipelines with Dagster and Dagster+ | :white_check_mark: |
 
-### Transformation (dbt)
+### Transformation
 | Skill | Description | Status |
 |-------|-------------|--------|
 | dbt | All dbt layers — staging, intermediate, marts, SQL conventions, MCP tooling | :white_check_mark: |
@@ -55,7 +53,6 @@ For ad-hoc tasks that don't fit an agent, reference the relevant skill directly:
 | Skill | Description | Status |
 |-------|-------------|--------|
 | powerbi | Power BI best practices | :white_check_mark: |
-| semantic-layer | Building the semantic layer | :x: |
 
 ## Installed Agents
 
@@ -63,10 +60,9 @@ For ad-hoc tasks that don't fit an agent, reference the relevant skill directly:
 
 | Agent | Description |
 |-------|-------------|
-| analytics-engineer | Builds dbt models across all layers with MCP tooling |
-| business-analyst | Guides stakeholders from idea to implementation-ready spec |
+| analytics-engineer | Designs dimensional schemas and builds dbt models across all layers with MCP tooling |
+| business-analyst | Guides stakeholders from idea to implementation-ready spec; validates sources with dbt MCP |
 | data-engineer | Builds ingestion pipelines with proper security |
-| data-modeler | Designs and builds dimensional models across the full dbt DAG |
 | platform-engineer | Sets up infrastructure, security, and platform architecture |
 
 ## Security
@@ -109,6 +105,14 @@ Everything is backed by code. No drag-and-drop, no GUI-configured pipelines, no 
 ├── dagster_cloud.yaml
 └── .claude/                # Skills, agents, memory
 ```
+
+## Shared Project Memory
+
+<!-- After running `swishbot init-memory`, uncomment to load shared project memory into this session: -->
+<!-- @.claude/memory/MEMORY.md -->
+
+<!-- Agents auto-load their own per-agent memory from .claude/agent-memory/<agent-name>/ -->
+<!-- The shared .claude/memory/ files hold cross-agent decisions (conventions, modeling choices, source quirks) -->
 
 ## Platform & Environment
 

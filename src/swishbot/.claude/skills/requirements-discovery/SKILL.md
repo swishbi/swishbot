@@ -1,6 +1,6 @@
 ---
 name: requirements-discovery
-description: "Act as a business analyst to guide stakeholders from idea to implementation-ready requirements. Use when a user asks to scope a report, run a discovery session, gather requirements for a dashboard, or produce a developer specification from stakeholder input."
+description: "Act as a business analyst to guide stakeholders from idea to implementation-ready requirements. Use when a user asks to scope a report, run a discovery session, gather requirements for a dashboard, produce a developer specification, interview SMEs, extract business rules, document column-level logic, or map business logic to staging columns."
 argument-hint: "[deliverable]"
 ---
 
@@ -20,8 +20,10 @@ This is phase 0. No code gets written, no models get built, until discovery is c
 |----------|-------------|
 | [Run Discovery Session](workflows/run-discovery-session.md) | Stakeholder brings a vague idea — guide them through scoping |
 | [Produce Developer Requirements](workflows/produce-developer-requirements.md) | Scoped deliverable needs a technical specification for engineers |
+| [Run SME Interview](workflows/run-sme-interview.md) | Interview SMEs and map source system objects and fields |
+| [Create Logic Map](workflows/create-logic-map.md) | Translate tribal knowledge to column-level staging logic |
 
-**Full discovery workflow:** For a new request, run both workflows in order.
+**Full BA workflow:** For a new request, run all four workflows in order.
 
 ## Anti-Patterns
 
@@ -30,14 +32,14 @@ This is phase 0. No code gets written, no models get built, until discovery is c
 - **Mistaking process problems for technology problems.** "The data is wrong" often means "nobody owns data quality in this process." A new pipeline will not fix a broken process.
 - **Skipping straight to building.** The temptation to start coding is strong. Resist it. Thirty minutes of discovery saves days of rework.
 - **Gold-plating the spec.** The spec should be precise enough to build against, not so detailed that it takes longer to write than to build. Focus on decisions, not documentation.
+- **Skipping SME conversations.** Documentation and data dictionaries are starting points, not substitutes. The business logic that matters most is the logic that is not written down anywhere.
+- **Assuming field names are self-explanatory.** `status`, `type`, `category` — these mean different things in every system. Always ask: "What does this field represent and what are the valid values?"
+- **Not validating against the source system.** If you have not compared your logic against what the SME sees on their screen, you have not validated. Data warehouse queries alone are not sufficient.
 
 ## Related Skills
 
-- **[business-logic-mapping](../business-logic-mapping/SKILL.md)** — Downstream: maps tribal knowledge from SMEs into implementation-ready business logic tied to staging columns
-- **[dbt-staging](../dbt-staging/SKILL.md)** — Building the staging/bronze layer identified during reverse engineering
-- **[dbt-intermediate](../dbt-intermediate/SKILL.md)** — Building the intermediate/silver layer for complex transformations
-- **[dbt-marts](../dbt-marts/SKILL.md)** — Building the mart/gold layer that produces the stakeholder's output
-- **[dimensional-modeling](../dimensional-modeling/SKILL.md)** — Designing fact and dimension tables identified during scope narrowing
+- **[dbt](../dbt/SKILL.md)** — The staging, intermediate, and mart models whose columns are referenced in business logic mappings
+- **[dimensional-modeling](../dimensional-modeling/SKILL.md)** — Fact and dimension design informed by the documented business rules and relationships
 
 ---
 

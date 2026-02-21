@@ -6,7 +6,7 @@ Wire a dbt project into Dagster using `DbtProjectComponent`.
 
 ## Prerequisites
 
-- A working dbt project in `transformation/` (see the **dbt-staging** skill)
+- A working dbt project in `transformation/` (see the **dbt** skill)
 - Dagster project set up with the concept-based layout (see **Set Up Project** workflow)
 - `dagster-dbt` in your dependencies
 

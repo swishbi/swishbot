@@ -6,7 +6,7 @@ Wire a dlt pipeline into Dagster as assets using `DltLoadCollectionComponent`.
 
 ## Prerequisites
 
-- A working dlt pipeline in `ingestion/<source>/` (see the **dlt-pipelines** skill)
+- A working dlt pipeline in `ingestion/<source>/` (see the **dlt** skill)
 - Dagster project set up with the concept-based layout (see **Set Up Project** workflow)
 - `dagster-dlt` in your dependencies
 

@@ -12,15 +12,15 @@ PLACEHOLDER = "<!-- SKILLS_CATALOG -->"
 AGENTS_PLACEHOLDER = "<!-- AGENTS_CATALOG -->"
 
 CATEGORIES = {
-    "Discovery & Planning": ["business-logic-mapping", "requirements-discovery"],
+    "Discovery & Planning": ["requirements-discovery"],
     "Infrastructure": ["dba-security", "iac-terraform"],
-    "Ingestion": ["dlt-pipelines"],
+    "Ingestion": ["dlt"],
     "Orchestration": ["dagster"],
-    "Transformation (dbt)": [
+    "Transformation": [
         "dbt",
         "dimensional-modeling",
     ],
-    "Analytics & Presentation": ["powerbi", "semantic-layer"],
+    "Analytics & Presentation": ["powerbi"],
 }
 
 

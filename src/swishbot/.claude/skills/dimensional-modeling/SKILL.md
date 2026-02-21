@@ -8,7 +8,7 @@ argument-hint: "[business-process]"
 
 ## Overview
 
-Dimensional modeling follows the Kimball methodology as its foundation: star schemas, conformed dimensions, the bus matrix, and a relentless focus on grain. This skill encodes the *design* layer — the decisions about what to model and why — while **dbt-intermediate** and **dbt-marts** handle the *implementation* layer of how models are built.
+Dimensional modeling follows the Kimball methodology as its foundation: star schemas, conformed dimensions, the bus matrix, and a relentless focus on grain. This skill encodes the *design* layer — the decisions about what to model and why — while **dbt** handles the *implementation* layer of how models are built.
 
 Modern adaptations from the traditional Kimball approach:
 
@@ -47,16 +47,12 @@ Each pattern has a corresponding example file in the [examples/](examples/) dire
 - **Conforming by name-matching without a verified key** — Matching on `customer_name` alone will produce false positives. Use the matching hierarchy: system cross-references first, verified business keys second.
 - **Treating system cross-references as permanent** — System foreign keys (`erp.crm_customer_id`) are pragmatically reliable but represent integration debt. Document them, use them, and advocate for true business keys over time.
 - **NULL foreign keys in fact tables** — Never allow a NULL dimension key on a fact row. Coalesce to the unknown member key so gaps are explicit and queryable, not silently invisible.
-- **Mixing design and implementation concerns** — This skill defines *what* to model. Use dbt-intermediate and dbt-marts for *how* to implement it.
+- **Mixing design and implementation concerns** — This skill defines *what* to model. Use dbt for *how* to implement it.
 
 ## Related Skills
 
 - **[requirements-discovery](../requirements-discovery/SKILL.md)** — Upstream discovery process that identifies which facts and dimensions need to be modeled
-- **[business-logic-mapping](../business-logic-mapping/SKILL.md)** — Maps business rules and survivorship logic that feed into dimension and fact definitions
-- **[dbt-staging](../dbt-staging/SKILL.md)** — The first transformation layer that produces clean inputs for dimensional models
-- **[dbt-intermediate](../dbt-intermediate/SKILL.md)** — Where cross-reference models and grain-changing transformations live
-- **[dbt-marts](../dbt-marts/SKILL.md)** — Where final fact and dimension tables are materialized
-- **[dbt-style](../dbt-style/SKILL.md)** — Naming, SQL style, and project structure conventions applied to dimensional models
+- **[dbt](../dbt/SKILL.md)** — The transformation layer that implements the dimensional models designed here
 - **[powerbi](../powerbi/SKILL.md)** — Power BI semantic models that consume the star schemas designed here
 
 ---
