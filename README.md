@@ -58,7 +58,7 @@ swishbot init-memory
 | Skill | Description | Status |
 |-------|-------------|--------|
 | `dba-security` | DBA security practices | :white_check_mark: |
-| `iac-terraform` | Deploying infrastructure using Terraform/IaC | :x: |
+| `iac-terraform` | Deploying infrastructure using Terraform/IaC | :white_check_mark: |
 
 ### Ingestion
 | Skill | Description | Status |
@@ -176,7 +176,13 @@ swishbot/
 │               │   │   └── validate-sql.sh
 │               │   └── examples/
 │               ├── iac-terraform/
-│               │   └── SKILL.md
+│               │   ├── SKILL.md         # Router: project setup + environment/state workflows
+│               │   ├── workflows/
+│               │   │   ├── setup-project-structure.md
+│               │   │   └── configure-environments-state-cicd.md
+│               │   ├── scripts/
+│               │   │   └── validate-terraform.sh
+│               │   └── examples/
 │               └── powerbi/
 │                   ├── SKILL.md         # Router: tenets + workflow index
 │                   ├── workflows/       # Step-by-step procedures

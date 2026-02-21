@@ -31,7 +31,7 @@ For ad-hoc tasks that don't fit an agent, reference the relevant skill directly:
 | Skill | Description | Status |
 |-------|-------------|--------|
 | dba-security | DBA security practices | :white_check_mark: |
-| iac-terraform | Deploying infrastructure using Terraform/IaC | :x: |
+| iac-terraform | Deploying infrastructure using Terraform/IaC | :white_check_mark: |
 
 ### Ingestion
 | Skill | Description | Status |

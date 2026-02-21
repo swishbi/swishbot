@@ -1,0 +1,40 @@
+# Copyright (c) 2026 Swish BI Limited. All rights reserved.
+#
+# Example variable values for provisioning Azure AI Foundry with Claude.
+# Copy this file to terraform.tfvars and adjust values for the target environment.
+
+environment          = "prod"
+location             = "eastus2"
+resource_name_prefix = "clientname-foundry"
+project_name         = "data-platform"
+project_description  = "Client data engineering and analytics"
+
+# Require Entra ID auth only (recommended for enterprise)
+disable_api_key_auth = true
+
+# Claude model deployments — pin versions explicitly
+deployment_sku = "GlobalStandard"
+
+deploy_opus          = true
+opus_deployment_name = "claude-opus-4-6"
+opus_model_id        = "claude-opus-4-6"
+opus_model_version   = "2025-09-25"
+opus_capacity        = 1
+
+sonnet_deployment_name = "claude-sonnet-4-6"
+sonnet_model_id        = "claude-sonnet-4-6"
+sonnet_model_version   = "2025-09-25"
+sonnet_capacity        = 1
+
+deploy_haiku          = true
+haiku_deployment_name = "claude-haiku-4-5"
+haiku_model_id        = "claude-haiku-4-5"
+haiku_model_version   = "2024-10-01"
+haiku_capacity        = 1
+
+tags = {
+  managed_by  = "terraform"
+  environment = "prod"
+  client      = "client-name"
+  cost_center = "data-platform"
+}

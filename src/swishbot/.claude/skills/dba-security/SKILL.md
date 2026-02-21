@@ -47,6 +47,7 @@ As mart complexity grows, split into domain-specific schemas (e.g., `mrt_finance
 
 ## Related Skills
 
+- **[iac-terraform](../iac-terraform/SKILL.md)** — Provision the warehouse, databases, and IAM roles that dba-security configures
 - **[dlt](../dlt/SKILL.md)** — Loader role and raw database permissions
 - **[dbt](../dbt/SKILL.md)** — Staging layer references raw database, first transformed layer in analytics
 
