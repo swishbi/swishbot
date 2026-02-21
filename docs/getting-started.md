@@ -38,7 +38,7 @@ swishbot install --all
 swishbot install dbt --path ~/my-project/.claude/skills
 ```
 
-Skills are copied to `~/.claude/skills/` by default.
+Without `--path`, swishbot will prompt you to choose project-local (`.claude/skills/`) or global (`~/.claude/skills/`).
 
 ## Install agents
 
@@ -55,7 +55,7 @@ swishbot install --agent --all
 swishbot install --agent analytics-engineer --path ~/my-project/.claude/agents
 ```
 
-Agents are copied to `~/.claude/agents/` by default.
+Without `--path`, swishbot will prompt you to choose project-local (`.claude/agents/`) or global (`~/.claude/agents/`).
 
 ## Set up your project
 

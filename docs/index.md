@@ -35,8 +35,8 @@ swishbot init-project
 ## How it works
 
 1. **Install swishbot** — `pip install swishbot`
-2. **Install skills** — `swishbot install <skill>` copies skill files to `~/.claude/skills/`
-3. **Install agents** — `swishbot install --agent <agent>` copies agent files to `~/.claude/agents/`
+2. **Install skills** — `swishbot install <skill>` copies skill files to `.claude/skills/` in your project or `~/.claude/skills/` globally
+3. **Install agents** — `swishbot install --agent <agent>` copies agent files to `.claude/agents/` in your project or `~/.claude/agents/` globally
 4. **Init your project** — `swishbot init-project` creates a `CLAUDE.md` that references your installed skills and agents
 5. **Work with Claude** — Claude reads the skills and applies the methodology to your project
 

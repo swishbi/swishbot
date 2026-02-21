@@ -61,8 +61,8 @@ swishbot install --agent --all
 |--------|-------------|
 | `skills` | One or more skill or agent names to install |
 | `--all` | Install all available skills (or all agents with `--agent`) |
-| `--agent` | Install agents instead of skills (default target: `~/.claude/agents/`) |
-| `--path` | Custom install directory (default: `~/.claude/skills/` or `~/.claude/agents/`) |
+| `--agent` | Install agents instead of skills |
+| `--path` | Install directory. If omitted, prompts to choose project-local (`.claude/`) or global (`~/.claude/`) |
 
 If a skill or agent is already installed, it will be overwritten.
 
@@ -134,7 +134,7 @@ Create a starter `CLAUDE.md` and `SECURITY.md` in your project directory.
 swishbot init-project
 
 # Specific directory
-swishbot init-project --path ~/my-project
+swishbot init-project --path ~/my-project/.claude
 
 # Overwrite existing
 swishbot init-project --force
@@ -142,7 +142,7 @@ swishbot init-project --force
 
 | Option | Description |
 |--------|-------------|
-| `--path` | Target directory (default: current directory) |
+| `--path` | Directory where CLAUDE.md is written. If omitted, prompts for project-local (`.claude/`) or global (`~/.claude/`) |
 | `--force` | Overwrite an existing `CLAUDE.md` |
 
 Both files are copied together — `CLAUDE.md` defines project conventions and installed skills, while `SECURITY.md` provides security guidelines for SQL safety, credential handling, and prompt injection defense.
@@ -199,7 +199,7 @@ swishbot init-memory --force
 
 | Option | Description |
 |--------|-------------|
-| `--path` | Target directory (default: current directory) |
+| `--path` | Project root directory (memory goes inside `<path>/.claude/memory/`). If omitted, prompts for project-local or global |
 | `--force` | Overwrite an existing memory directory |
 
 Example output:
