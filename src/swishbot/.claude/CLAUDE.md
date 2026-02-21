@@ -106,6 +106,14 @@ Everything is backed by code. No drag-and-drop, no GUI-configured pipelines, no 
 └── .claude/                # Skills, agents, memory
 ```
 
+## Shared Project Memory
+
+<!-- After running `swishbot init-memory`, uncomment to load shared project memory into this session: -->
+<!-- @.claude/memory/MEMORY.md -->
+
+<!-- Agents auto-load their own per-agent memory from .claude/agent-memory/<agent-name>/ -->
+<!-- The shared .claude/memory/ files hold cross-agent decisions (conventions, modeling choices, source quirks) -->
+
 ## Platform & Environment
 
 <!-- Fill in for your project: -->

@@ -217,3 +217,24 @@ Claude will update these files as decisions are made during sessions.
 ```
 
 This creates a `.claude/memory/` directory with template files and a `settings.json` with a `Stop` hook that prompts Claude to save decisions at the end of each session.
+
+### Memory architecture
+
+`init-memory` sets up **shared project memory** — a single `.claude/memory/` directory that all agents contribute to and read from. This fills a gap that native Claude Code memory mechanisms don't cover:
+
+| Memory type | Path | Scope | Managed by |
+|-------------|------|-------|------------|
+| Per-agent memory | `.claude/agent-memory/<agent-name>/` | Single agent | Auto-managed by Claude Code (`memory: project`) |
+| Shared project memory | `.claude/memory/` | All agents + main session | Updated via Stop hook |
+
+**Per-agent memory** is declared with `memory: project` in each agent's frontmatter. Claude Code automatically creates `.claude/agent-memory/<agent-name>/MEMORY.md` and injects it into the agent's system prompt at startup — no configuration needed. Use this for agent-specific learnings.
+
+**Shared project memory** is what `swishbot init-memory` creates. All agents read it at session start, and the Stop hook prompts Claude to write cross-agent decisions (naming conventions, modeling choices, source quirks) back to it.
+
+To also load shared memory in the **main session** (not inside an agent), add an `@` import to your `CLAUDE.md`:
+
+```markdown
+@.claude/memory/MEMORY.md
+```
+
+The project `CLAUDE.md` template (from `swishbot init-project`) includes a commented-out version of this import — uncomment it after running `init-memory`.

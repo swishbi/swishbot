@@ -369,10 +369,11 @@ def _scaffold_memory(dest: Path) -> None:
                             {
                                 "type": "prompt",
                                 "prompt": (
-                                    "Review this session. If any data modeling decisions, "
-                                    "source configurations, or convention choices were made, "
-                                    "update the relevant files in .claude/memory/. Only update "
-                                    "if substantive decisions were made — skip routine coding sessions."
+                                    "Review this session. If cross-agent project decisions were made — "
+                                    "naming conventions, modeling choices, source configurations — "
+                                    "update the relevant files in .claude/memory/. "
+                                    "Do NOT update .claude/agent-memory/ here; agents manage that automatically. "
+                                    "Only update if substantive shared decisions were made."
                                 ),
                                 "timeout": 30,
                             }

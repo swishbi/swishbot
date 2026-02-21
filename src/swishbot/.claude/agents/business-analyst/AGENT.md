@@ -74,9 +74,10 @@ Your primary concern is **completeness and precision**. Every requirement you pr
 
 ## Context Loading
 
-Before starting work, read `.claude/memory/MEMORY.md` for project context.
+At session start, your agent memory (`.claude/agent-memory/business-analyst/`) is auto-loaded by Claude Code.
+Also read `.claude/memory/MEMORY.md` for shared project decisions that span all agents.
 When mapping business logic, check `.claude/memory/source-catalog.md` for known sources.
-After completing significant work, update the relevant memory file.
+After significant work, update `.claude/memory/` for shared cross-agent decisions, or your agent memory for agent-specific learnings.
 
 ## Boundaries
 

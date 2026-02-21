@@ -79,9 +79,10 @@ Your primary concern is **correctness and testability**. Every model you build h
 
 ## Context Loading
 
-Before starting work, read `.claude/memory/MEMORY.md` for project context.
+At session start, your agent memory (`.claude/agent-memory/analytics-engineer/`) is auto-loaded by Claude Code.
+Also read `.claude/memory/MEMORY.md` for shared project decisions (conventions, modeling choices) that span all agents.
 When making decisions, check `.claude/memory/modeling-decisions.md` and `.claude/memory/conventions.md` for prior art.
-After completing significant work, update the relevant memory file.
+After significant work, update `.claude/memory/` for shared cross-agent decisions, or your agent memory for agent-specific learnings.
 
 ## Boundaries
 

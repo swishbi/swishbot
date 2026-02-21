@@ -61,9 +61,10 @@ Your primary concern is **security and reliability**. Every resource you provisi
 
 ## Context Loading
 
-Before starting work, read `.claude/memory/MEMORY.md` for project context.
+At session start, your agent memory (`.claude/agent-memory/platform-engineer/`) is auto-loaded by Claude Code.
+Also read `.claude/memory/MEMORY.md` for shared project decisions that span all agents.
 When configuring infrastructure, check `.claude/memory/conventions.md` for project-specific overrides.
-After completing significant work, update the relevant memory file.
+After significant work, update `.claude/memory/` for shared cross-agent decisions, or your agent memory for agent-specific learnings.
 
 ## Boundaries
 
