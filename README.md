@@ -52,8 +52,7 @@ swishbot init-memory
 ### Discovery & Planning
 | Skill | Description | Status |
 |-------|-------------|--------|
-| `business-logic-mapping` | Map tribal knowledge from SMEs into implementation-ready business logic tied to staging columns | :white_check_mark: |
-| `requirements-discovery` | Act as a business analyst to guide stakeholders from idea to implementation-ready requirements | :white_check_mark: |
+| `requirements-discovery` | Act as a business analyst — stakeholder discovery, SME interviews, and column-level logic mapping | :white_check_mark: |
 
 ### Infrastructure
 | Skill | Description | Status |
@@ -89,7 +88,7 @@ Agents are persona definitions that compose multiple skills into roles. Install 
 | Agent | Description | Skills Composed |
 |-------|-------------|-----------------|
 | `analytics-engineer` | Designs dimensional schemas and builds dbt models across all layers with MCP tooling | dbt, dimensional-modeling |
-| `business-analyst` | Guides stakeholders from idea to implementation-ready spec; validates sources with dbt MCP | requirements-discovery, business-logic-mapping, dbt |
+| `business-analyst` | Guides stakeholders from idea to implementation-ready spec; validates sources with dbt MCP | requirements-discovery, dbt |
 | `data-engineer` | Builds ingestion pipelines with proper security | dlt-pipelines, dba-security |
 | `platform-engineer` | Sets up infrastructure, security, and platform architecture | dagster, iac-terraform, dba-security |
 
@@ -169,8 +168,6 @@ swishbot/
 │               ├── dimensional-modeling/
 │               │   ├── SKILL.md
 │               │   └── examples/
-│               ├── business-logic-mapping/
-│               │   └── SKILL.md
 │               ├── requirements-discovery/
 │               │   └── SKILL.md
 │               ├── dba-security/

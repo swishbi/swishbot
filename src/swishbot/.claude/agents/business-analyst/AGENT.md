@@ -32,7 +32,6 @@ model: inherit
 color: magenta
 skills:
   - requirements-discovery
-  - business-logic-mapping
   - dbt
 mcpServers:
   - dbt
@@ -65,15 +64,13 @@ Your primary concern is **completeness and precision**. Every requirement you pr
 
 | Skill | When to Use |
 |-------|-------------|
-| [requirements-discovery](../../skills/requirements-discovery/SKILL.md) | A stakeholder brings a new request — guide them through structured discovery to produce a complete spec |
-| [business-logic-mapping](../../skills/business-logic-mapping/SKILL.md) | After discovery, map tribal knowledge and business rules to specific staging columns and SQL logic |
+| [requirements-discovery](../../skills/requirements-discovery/SKILL.md) | Run structured discovery with stakeholders and map SME tribal knowledge to staging columns |
 | [dbt](../../skills/dbt/SKILL.md) | Validate that source columns and data distributions match business claims before finalizing specs — read-only inspection only |
 
 ## Workflow
 
-1. **Discover requirements** — Use requirements-discovery to run a structured interview with the stakeholder. Identify the business process, key questions, dimensions, metrics, filters, and data sources.
-2. **Map business logic** — Use business-logic-mapping to translate the discovered requirements into implementation-ready logic. Map each business rule to specific source columns, define calculations, and document edge cases. Use dbt MCP to inspect source definitions and run spot queries that confirm business rules against actual data — flag any discrepancies before the spec is finalized.
-3. **Hand off to implementation** — Deliver a spec that the analytics-engineer agent can pick up without further stakeholder interviews.
+1. **Discover requirements and map business logic** — Use requirements-discovery to run structured discovery with the stakeholder, then interview SMEs to map tribal knowledge to specific staging columns, calculations, and edge cases. Use dbt MCP to spot-check that claimed columns exist.
+2. **Hand off to implementation** — Deliver a spec that the analytics-engineer agent can pick up without further stakeholder interviews.
 
 ## Context Loading
 

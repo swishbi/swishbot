@@ -25,8 +25,7 @@ For ad-hoc tasks that don't fit an agent, reference the relevant skill directly:
 ### Discovery & Planning
 | Skill | Description | Status |
 |-------|-------------|--------|
-| business-logic-mapping | Map tribal knowledge from SMEs into implementation-ready business logic tied to staging columns | :white_check_mark: |
-| requirements-discovery | Act as a business analyst to guide stakeholders from idea to implementation-ready requirements | :white_check_mark: |
+| requirements-discovery | Act as a business analyst — stakeholder discovery, SME interviews, and column-level logic mapping | :white_check_mark: |
 
 ### Infrastructure
 | Skill | Description | Status |
