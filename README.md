@@ -70,7 +70,7 @@ swishbot init-memory
 |-------|-------------|--------|
 | `dagster` | Orchestrate data pipelines with Dagster and Dagster+ | :white_check_mark: |
 
-### Transformation (dbt)
+### Transformation
 | Skill | Description | Status |
 |-------|-------------|--------|
 | `dbt` | All dbt layers — staging, intermediate, marts, SQL conventions, MCP tooling | :white_check_mark: |

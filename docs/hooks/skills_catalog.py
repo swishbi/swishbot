@@ -16,7 +16,7 @@ CATEGORIES = {
     "Infrastructure": ["dba-security", "iac-terraform"],
     "Ingestion": ["dlt"],
     "Orchestration": ["dagster"],
-    "Transformation (dbt)": [
+    "Transformation": [
         "dbt",
         "dimensional-modeling",
     ],
