@@ -64,6 +64,148 @@ DAX measure and column names must be specific and unambiguous. Avoid short or ge
 See [examples/](examples/) for reference files:
 - `semantic_model.tmdl` — Complete semantic model in TMDL format showing all framework tables, field parameters, calculation groups, and parameterized M queries
 
+## MCP Servers
+
+Power BI offers two MCP servers that serve different purposes. Both are in preview.
+
+References:
+- Overview: https://learn.microsoft.com/en-us/power-bi/developer/mcp/mcp-servers-overview
+- Modeling MCP (GitHub): https://github.com/microsoft/powerbi-modeling-mcp
+- Remote MCP setup: https://learn.microsoft.com/en-us/power-bi/developer/mcp/remote-mcp-server-get-started
+
+### Modeling MCP Server (recommended)
+
+Runs locally via stdio. Gives Claude direct access to create, edit, and validate semantic models — measures, relationships, columns, calculation groups, DAX queries, and TMDL files. This is the primary server for the **Build Semantic Model** and **Design Semantic Model** workflows.
+
+**Platform:** Cross-platform — builds available for Windows, macOS (Intel + Apple Silicon), and Linux. Note that connecting to **Power BI Desktop** requires Windows (or WSL with path interop). Connecting to **Fabric workspaces** or **PBIP files** works on any platform.
+
+**Setup:**
+
+1. Check the [latest version](https://marketplace.visualstudio.com/items?itemName=analysis-services.powerbi-modeling-mcp) on the VS Code Marketplace
+2. Download the VSIX package for your platform using the URL template:
+   ```
+   https://marketplace.visualstudio.com/_apis/public/gallery/publishers/analysis-services/vsextensions/powerbi-modeling-mcp/[version]/vspackage?targetPlatform=[platform]
+   ```
+
+   | Platform | `targetPlatform` value |
+   |----------|----------------------|
+   | Windows x64 | `win32-x64` |
+   | Windows ARM | `win32-arm64` |
+   | macOS Apple Silicon | `darwin-arm64` |
+   | macOS Intel | `darwin-x64` |
+   | Linux x64 | `linux-x64` |
+   | Linux ARM64 | `linux-arm64` |
+
+3. Rename the downloaded `.vsix` file to `.zip` and extract to a permanent location
+4. Run the server executable once to verify it starts, then add to `.mcp.json`
+
+**`.mcp.json` by platform:**
+
+macOS / Linux:
+```json
+{
+  "mcpServers": {
+    "powerbi-modeling": {
+      "command": "~/MCPServers/PowerBIModelingMCP/extension/server/powerbi-modeling-mcp",
+      "args": ["--start", "--skipconfirmation"]
+    }
+  }
+}
+```
+
+Windows (PowerShell / cmd):
+```json
+{
+  "mcpServers": {
+    "powerbi-modeling": {
+      "command": "C:\\Users\\<username>\\MCPServers\\PowerBIModelingMCP\\extension\\server\\powerbi-modeling-mcp.exe",
+      "args": ["--start", "--skipconfirmation"]
+    }
+  }
+}
+```
+
+WSL (calling the Windows exe via `/mnt/c/` interop):
+```json
+{
+  "mcpServers": {
+    "powerbi-modeling": {
+      "command": "/mnt/c/Users/<username>/MCPServers/PowerBIModelingMCP/extension/server/powerbi-modeling-mcp.exe",
+      "args": ["--start", "--skipconfirmation"]
+    }
+  }
+}
+```
+
+> **WSL note:** Extract the VSIX on the Windows filesystem (not inside the WSL filesystem) so the `.exe` can access Power BI Desktop and Windows-side resources.
+
+**Connection:** After setup, tell Claude which model to connect to:
+- Power BI Desktop: "Connect to 'My Model' in Power BI Desktop"
+- Fabric workspace: "Connect to semantic model 'Sales' in Fabric Workspace 'Production'"
+- PBIP files: "Open semantic model from PBIP folder './model/definition/'"
+
+**Key flags:**
+- `--readonly` — Safe mode, prevents all write operations (good for exploration)
+- `--skipconfirmation` — Auto-approves writes without prompts (recommended for Claude Code where the human-in-the-loop is the permission system)
+- `--readwrite` — Default; enables writes with confirmation prompts
+
+### Remote MCP Server
+
+Hosted by Microsoft at `https://api.fabric.microsoft.com/v1/mcp/powerbi`. Queries published semantic models using Copilot's DAX generation engine. Useful for validating data in published models or exploring schemas without a local Power BI Desktop instance.
+
+**Prerequisites:**
+- Power BI admin must enable the tenant setting: *"Users can use the Power BI Model Context Protocol server endpoint (preview)"*
+- Build permissions on the target semantic model
+- Copilot license (required for the Generate Query tool — can be disabled if you only need schema + execute)
+
+**Setup:** Add to `.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "powerbi-remote": {
+      "type": "http",
+      "url": "https://api.fabric.microsoft.com/v1/mcp/powerbi"
+    }
+  }
+}
+```
+
+> **Note:** The Remote MCP uses HTTP transport. Verify your MCP client supports HTTP-based servers — not all do. Claude Code supports this via the `type: "http"` configuration.
+
+**Authentication:** No environment variables needed — the server authenticates via browser-based Microsoft OAuth when first invoked. Queries execute under the authenticated user's permissions, and row-level security (RLS) is enforced.
+
+**Semantic model ID:** Every tool call requires a semantic model ID. Find it in the Power BI service URL:
+
+```
+https://app.powerbi.com/groups/{workspaceId}/datasets/{semanticModelId}
+```
+
+To avoid providing the ID every session, store frequently used IDs in a project file (e.g., `.claude/memory/powerbi-models.md`) or reference them in your CLAUDE.md:
+
+```markdown
+## Power BI Semantic Models
+- Sales Model: `a1b2c3d4-e5f6-7890-abcd-ef1234567890`
+- Finance Model: `f9e8d7c6-b5a4-3210-fedc-ba0987654321`
+```
+
+**Available tools:**
+- **Get Semantic Model Schema** — Retrieves tables, columns, measures, relationships, and AI metadata
+- **Generate Query** — Converts natural language to optimized DAX (requires Copilot license)
+- **Execute Query** — Runs a DAX query and returns results
+
+### Which server to use
+
+| Scenario | Server |
+|----------|--------|
+| Building or editing a semantic model (measures, relationships, columns) | Modeling |
+| Validating DAX queries during development | Modeling |
+| Querying a published model to check data after deployment | Remote |
+| Exploring a model schema without Power BI Desktop | Remote |
+| Working with TMDL / Power BI Project files | Modeling |
+
+Start with the **Modeling MCP server** — it covers the full build-and-validate cycle and runs on all platforms. Add the Remote server when you need to query published production models or leverage Copilot's DAX generation.
+
 ## Anti-Patterns
 
 - **Model inside the report .pbix** — Couples the dataset to a single report. Every new report duplicates the model, causing refresh sprawl and governance drift.

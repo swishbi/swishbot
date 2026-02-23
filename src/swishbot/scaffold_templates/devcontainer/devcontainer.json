@@ -17,7 +17,8 @@
         "redhat.vscode-yaml",
         "innoverio.vscode-dbt-power-user",
         "samuelcolvin.jinjahtml",
-        "analysis-services.tmdl"
+        "analysis-services.tmdl",
+        "analysis-services.powerbi-modeling-mcp"
       ],
       "settings": {
         "python.defaultInterpreterPath": "/usr/local/bin/python",

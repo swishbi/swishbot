@@ -77,23 +77,27 @@ Transform records in-flight with `map` (modify), `filter` (drop), and `yield_map
 
 ### MCP Server
 
-Requires `dlt[workspace]`. The dlt MCP server gives Claude direct access to pipeline metadata and loaded data for validation:
-
-```bash
-dlt workspace mcp          # Project-level (port 43654)
-dlt pipeline <name> mcp    # Pipeline-level (port 43656)
-```
-
-Add to `.mcp.json`:
+The dlt MCP server gives Claude direct access to pipeline metadata and loaded data for validation. Install by adding the following to `.mcp.json`:
 
 ```json
 {
   "mcpServers": {
-    "dlt-workspace": {"url": "http://127.0.0.1:43654/"},
-    "dlt-pipeline": {"url": "http://127.0.0.1:43656/"}
+    "dlt": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--with",
+        "dlt-mcp[search]",
+        "python",
+        "-m",
+        "dlt_mcp"
+      ]
+    }
   }
 }
 ```
+
+This runs the `dlt-mcp` package with search support via `uv` — no separate install step required. See https://dlthub.com/docs/dlt-ecosystem/llm-tooling/llm-native-workflow#install-mcp-server-optional for details.
 
 ## Anti-Patterns
 
