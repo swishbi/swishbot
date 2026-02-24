@@ -118,7 +118,7 @@ Windows (PowerShell / cmd):
 {
   "mcpServers": {
     "powerbi-modeling": {
-      "command": "C:\\Users\\<username>\\MCPServers\\PowerBIModelingMCP\\extension\\server\\powerbi-modeling-mcp.exe",
+      "command": "C:\\MCPServers\\PowerBIModelingMCP\\extension\\server\\powerbi-modeling-mcp.exe",
       "args": ["--start", "--skipconfirmation"]
     }
   }
@@ -130,14 +130,14 @@ WSL (calling the Windows exe via `/mnt/c/` interop):
 {
   "mcpServers": {
     "powerbi-modeling": {
-      "command": "/mnt/c/Users/<username>/MCPServers/PowerBIModelingMCP/extension/server/powerbi-modeling-mcp.exe",
+      "command": "/mnt/c/MCPServers/PowerBIModelingMCP/extension/server/powerbi-modeling-mcp.exe",
       "args": ["--start", "--skipconfirmation"]
     }
   }
 }
 ```
 
-> **WSL note:** Extract the VSIX on the Windows filesystem (not inside the WSL filesystem) so the `.exe` can access Power BI Desktop and Windows-side resources.
+> **WSL note:** Extract the VSIX to `C:\MCPServers\` on the Windows filesystem (not inside WSL). This avoids per-user paths in `.mcp.json`, keeping the config portable across team members.
 
 **Connection:** After setup, tell Claude which model to connect to:
 - Power BI Desktop: "Connect to 'My Model' in Power BI Desktop"
