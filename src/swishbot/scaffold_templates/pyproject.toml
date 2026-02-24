@@ -11,12 +11,13 @@ dependencies = [
     "dbt-core",
     "dbt-duckdb",
     "dbt-snowflake",
-    "dlt[snowflake]",
+    "dlt[duckdb, snowflake]",
 ]
 
 [project.optional-dependencies]
 dev = [
     "dagster-webserver",
+    "dagster-dg-cli",
     "pytest",
     "ruff",
 ]
