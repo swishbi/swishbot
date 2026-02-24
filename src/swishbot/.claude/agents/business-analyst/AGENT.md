@@ -33,8 +33,10 @@ color: magenta
 skills:
   - requirements-discovery
   - dbt
+  - powerbi
 mcpServers:
   - dbt
+  - powerbi-remote
 disallowedTools:
   - Bash
 memory: project
@@ -66,6 +68,7 @@ Your primary concern is **completeness and precision**. Every requirement you pr
 |-------|-------------|
 | [requirements-discovery](../../skills/requirements-discovery/SKILL.md) | Run structured discovery with stakeholders and map SME tribal knowledge to staging columns |
 | [dbt](../../skills/dbt/SKILL.md) | Validate that source columns and data distributions match business claims before finalizing specs — read-only inspection only |
+| [powerbi](../../skills/powerbi/SKILL.md) | Inspect published Power BI semantic models and reports to validate that stakeholder requirements align with existing BI assets |
 
 ## Workflow
 
