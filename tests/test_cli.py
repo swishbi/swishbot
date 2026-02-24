@@ -48,11 +48,11 @@ def test_get_available_agents_has_required_keys():
         assert "description" in a
 
 
-def test_get_available_agents_names_match_dirs():
+def test_get_available_agents_names_match_files():
     agents = cli.get_available_agents()
     for a in agents:
-        agent_dir = cli.AGENTS_DIR / a["name"]
-        assert agent_dir.is_dir(), f"Agent dir missing: {agent_dir}"
+        agent_file = cli.AGENTS_DIR / f"{a['name']}.md"
+        assert agent_file.is_file(), f"Agent file missing: {agent_file}"
 
 
 def test_get_available_agents_empty_dir(monkeypatch, tmp_path):
@@ -64,56 +64,52 @@ def test_get_available_agents_empty_dir(monkeypatch, tmp_path):
 
 def test_agent_skills_documented_in_body():
     available_skills = {s["name"] for s in cli.get_available_skills()}
-    for d in sorted(cli.AGENTS_DIR.iterdir()):
-        agent_md = d / "AGENT.md"
-        if not (d.is_dir() and agent_md.exists()):
+    for f in sorted(cli.AGENTS_DIR.iterdir()):
+        if not (f.is_file() and f.suffix == ".md"):
             continue
-        content = agent_md.read_text()
-        assert "## Skills" in content, f"Agent {d.name} missing '## Skills' section in body"
+        content = f.read_text()
+        assert "## Skills" in content, f"Agent {f.stem} missing '## Skills' section in body"
         # Validate any skill links in the body point to existing skill dirs
-        skill_refs = re.findall(r"\(../../skills/([^/]+)/SKILL\.md\)", content)
+        skill_refs = re.findall(r"\(\.\./skills/([^/]+)/SKILL\.md\)", content)
         for skill in skill_refs:
-            assert skill in available_skills, f"Agent {d.name} references unknown skill '{skill}'"
+            assert skill in available_skills, f"Agent {f.stem} references unknown skill '{skill}'"
 
 
 def test_agent_frontmatter_has_skills_list():
     available_skills = {s["name"] for s in cli.get_available_skills()}
-    for d in sorted(cli.AGENTS_DIR.iterdir()):
-        agent_md = d / "AGENT.md"
-        if not (d.is_dir() and agent_md.exists()):
+    for f in sorted(cli.AGENTS_DIR.iterdir()):
+        if not (f.is_file() and f.suffix == ".md"):
             continue
-        content = agent_md.read_text()
+        content = f.read_text()
         # Extract frontmatter block (between opening and closing ---)
         fm_match = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
-        assert fm_match, f"Agent {d.name} missing YAML frontmatter"
+        assert fm_match, f"Agent {f.stem} missing YAML frontmatter"
         frontmatter = fm_match.group(1)
         # Must declare skills in frontmatter (block sequence) so Claude Code injects them at startup
         skills_match = re.search(r"^skills:\n((?:[ \t]+-[ \t]+\S+\n?)+)", frontmatter, re.MULTILINE)
-        assert skills_match, f"Agent {d.name} missing 'skills:' block list in frontmatter"
+        assert skills_match, f"Agent {f.stem} missing 'skills:' block list in frontmatter"
         for skill in re.findall(r"[ \t]+-[ \t]+(\S+)", skills_match.group(1)):
-            assert skill in available_skills, f"Agent {d.name} frontmatter references unknown skill '{skill}'"
+            assert skill in available_skills, f"Agent {f.stem} frontmatter references unknown skill '{skill}'"
 
 
 def test_agent_descriptions_are_single_line():
-    for d in sorted(cli.AGENTS_DIR.iterdir()):
-        agent_md = d / "AGENT.md"
-        if not (d.is_dir() and agent_md.exists()):
+    for f in sorted(cli.AGENTS_DIR.iterdir()):
+        if not (f.is_file() and f.suffix == ".md"):
             continue
-        content = agent_md.read_text()
+        content = f.read_text()
         match = re.search(r'description:\s*"?([^"\n]+)"?', content)
-        assert match, f"Agent {d.name} missing description"
+        assert match, f"Agent {f.stem} missing description"
         desc = match.group(1).strip()
-        assert "\n" not in desc, f"Agent {d.name} description contains newline"
+        assert "\n" not in desc, f"Agent {f.stem} description contains newline"
 
 
 def test_all_agents_have_copyright_footer():
-    for d in sorted(cli.AGENTS_DIR.iterdir()):
-        agent_md = d / "AGENT.md"
-        if not (d.is_dir() and agent_md.exists()):
+    for f in sorted(cli.AGENTS_DIR.iterdir()):
+        if not (f.is_file() and f.suffix == ".md"):
             continue
-        content = agent_md.read_text().rstrip()
+        content = f.read_text().rstrip()
         assert content.endswith("*Copyright (c) 2026 Swish BI Limited. All rights reserved.*"), (
-            f"Agent {d.name} missing copyright footer"
+            f"Agent {f.stem} missing copyright footer"
         )
 
 
@@ -258,9 +254,8 @@ def test_cmd_install_agent_single(tmp_path):
     args = argparse.Namespace(skills=[agent_name], all=False, agent=True, path=str(tmp_path))
     cli.cmd_install(args)
 
-    installed = tmp_path / agent_name
-    assert installed.is_dir()
-    assert (installed / "AGENT.md").exists()
+    installed = tmp_path / f"{agent_name}.md"
+    assert installed.is_file()
 
 
 def test_cmd_install_agent_all(tmp_path):
@@ -269,7 +264,7 @@ def test_cmd_install_agent_all(tmp_path):
 
     available = cli.get_available_agents()
     for a in available:
-        assert (tmp_path / a["name"]).is_dir()
+        assert (tmp_path / f"{a['name']}.md").is_file()
 
 
 def test_cmd_install_agent_overwrites_existing(tmp_path):
@@ -278,7 +273,7 @@ def test_cmd_install_agent_overwrites_existing(tmp_path):
 
     cli.cmd_install(args)
     cli.cmd_install(args)
-    assert (tmp_path / agent_name / "AGENT.md").exists()
+    assert (tmp_path / f"{agent_name}.md").is_file()
 
 
 def test_cmd_install_agent_nonexistent(tmp_path):
@@ -655,7 +650,7 @@ def test_cmd_install_agent_scope_project(tmp_path, monkeypatch):
     monkeypatch.setattr(cli, "_prompt_scope", lambda *_: dest)
     args = argparse.Namespace(skills=[], all=True, agent=True, path=None)
     cli.cmd_install(args)
-    assert (dest / cli.get_available_agents()[0]["name"]).is_dir()
+    assert (dest / f"{cli.get_available_agents()[0]['name']}.md").is_file()
 
 
 def test_cmd_init_project_scope_project(tmp_path, monkeypatch):

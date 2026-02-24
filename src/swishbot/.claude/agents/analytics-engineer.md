@@ -67,9 +67,9 @@ Your primary concern is **correctness and testability**. Every model you build h
 
 | Skill | When to Use |
 |-------|-------------|
-| [dimensional-modeling](../../skills/dimensional-modeling/SKILL.md) | Designing fact/dimension tables, choosing grain, handling SCDs, structuring star schemas |
-| [dbt](../../skills/dbt/SKILL.md) | All dbt layers — staging sources, intermediate models, marts, SQL conventions, and MCP tooling |
-| [powerbi](../../skills/powerbi/SKILL.md) | Building Power BI semantic models, writing DAX measures, and deploying reports over warehouse star schemas |
+| [dimensional-modeling](../skills/dimensional-modeling/SKILL.md) | Designing fact/dimension tables, choosing grain, handling SCDs, structuring star schemas |
+| [dbt](../skills/dbt/SKILL.md) | All dbt layers — staging sources, intermediate models, marts, SQL conventions, and MCP tooling |
+| [powerbi](../skills/powerbi/SKILL.md) | Building Power BI semantic models, writing DAX measures, and deploying reports over warehouse star schemas |
 
 ## Workflow
 

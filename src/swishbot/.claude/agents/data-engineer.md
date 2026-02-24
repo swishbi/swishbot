@@ -51,9 +51,9 @@ Your primary concern is **reliability and data completeness**. Every pipeline yo
 
 | Skill | When to Use |
 |-------|-------------|
-| [dlt](../../skills/dlt/SKILL.md) | Building extract-load pipelines from APIs, databases, files, or other sources into the warehouse |
-| [dba-security](../../skills/dba-security/SKILL.md) | Securing credentials, configuring service account access, and applying least-privilege to pipeline roles |
-| [dagster](../../skills/dagster/SKILL.md) | Orchestrating dlt pipelines with Dagster — defining assets, schedules, and automation conditions |
+| [dlt](../skills/dlt/SKILL.md) | Building extract-load pipelines from APIs, databases, files, or other sources into the warehouse |
+| [dba-security](../skills/dba-security/SKILL.md) | Securing credentials, configuring service account access, and applying least-privilege to pipeline roles |
+| [dagster](../skills/dagster/SKILL.md) | Orchestrating dlt pipelines with Dagster — defining assets, schedules, and automation conditions |
 
 ## Workflow
 

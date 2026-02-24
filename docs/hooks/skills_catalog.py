@@ -66,13 +66,12 @@ def _build_catalog(skills: dict[str, str]) -> str:
 def _read_agents() -> dict[str, str]:
     """Read agent names and descriptions from AGENT.md frontmatter."""
     agents = {}
-    for d in sorted(AGENTS_DIR.iterdir()):
-        agent_md = d / "AGENT.md"
-        if d.is_dir() and agent_md.exists():
-            content = agent_md.read_text()
+    for f in sorted(AGENTS_DIR.iterdir()):
+        if f.is_file() and f.suffix == ".md":
+            content = f.read_text()
             match = re.search(r'description:\s*"?([^"\n]+)"?', content)
             desc = match.group(1).strip().rstrip('"') if match else "(no description)"
-            agents[d.name] = desc
+            agents[f.stem] = desc
     return agents
 
 

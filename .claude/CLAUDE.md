@@ -56,7 +56,7 @@ The `description` field is extracted via regex (`description:\s*"?([^"\n]+)"?`) 
 
 ## Agents
 
-Each agent lives in `src/swishbot/.claude/agents/<agent-name>/` with a mandatory `AGENT.md` containing YAML frontmatter (`name`, `description`, `model`, `color`, `skills`) and persona content. Agents compose multiple skills into a role — they tell Claude "you are a [role], use these skills."
+Each agent is a flat markdown file at `src/swishbot/.claude/agents/<agent-name>.md` containing YAML frontmatter (`name`, `description`, `model`, `color`, `skills`) and persona content. Agents compose multiple skills into a role — they tell Claude "you are a [role], use these skills."
 
 Recognized Claude Code agent frontmatter fields: `name`, `description`, `model`, `color`, `tools`, `disallowedTools`, `skills`, `mcpServers`, `memory`, `permissionMode`, `maxTurns`, `hooks`. The fields currently used by swishbot agents:
 - `skills` — injects full skill content at startup; subagents do NOT inherit parent skills, so this is essential
