@@ -121,14 +121,10 @@ swishbot/
 │           ├── CLAUDE.md        # Starter project config
 │           ├── SECURITY.md      # User-facing security policy
 │           ├── agents/          # Agent persona definitions
-│           │   ├── analytics-engineer/
-│           │   │   └── AGENT.md
-│           │   ├── business-analyst/
-│           │   │   └── AGENT.md
-│           │   ├── data-engineer/
-│           │   │   └── AGENT.md
-│           │   └── platform-engineer/
-│           │       └── AGENT.md
+│           │   ├── analytics-engineer.md
+│           │   ├── business-analyst.md
+│           │   ├── data-engineer.md
+│           │   └── platform-engineer.md
 │           └── skills/
 │               ├── dbt/
 │               │   ├── SKILL.md         # Behavioral guide + router

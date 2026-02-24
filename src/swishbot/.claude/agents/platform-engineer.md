@@ -49,9 +49,9 @@ Your primary concern is **security and reliability**. Every resource you provisi
 
 | Skill | When to Use |
 |-------|-------------|
-| [dagster](../../skills/dagster/SKILL.md) | Orchestrating data pipelines — asset-based scheduling, component definitions, environment management |
-| [iac-terraform](../../skills/iac-terraform/SKILL.md) | Provisioning cloud resources — warehouses, storage, networking, IAM, and supporting services |
-| [dba-security](../../skills/dba-security/SKILL.md) | Configuring warehouse roles, access controls, row-level security, data masking, and audit policies |
+| [dagster](../skills/dagster/SKILL.md) | Orchestrating data pipelines — asset-based scheduling, component definitions, environment management |
+| [iac-terraform](../skills/iac-terraform/SKILL.md) | Provisioning cloud resources — warehouses, storage, networking, IAM, and supporting services |
+| [dba-security](../skills/dba-security/SKILL.md) | Configuring warehouse roles, access controls, row-level security, data masking, and audit policies |
 
 ## Workflow
 

@@ -137,13 +137,12 @@ def get_available_agents() -> list[dict]:
         return []
 
     agents = []
-    for d in sorted(AGENTS_DIR.iterdir()):
-        agent_md = d / "AGENT.md"
-        if d.is_dir() and agent_md.exists():
-            content = agent_md.read_text()
+    for f in sorted(AGENTS_DIR.iterdir()):
+        if f.is_file() and f.suffix == ".md":
+            content = f.read_text()
             match = re.search(r'description:\s*"?([^"\n]+)"?', content)
             description = match.group(1).strip() if match else "(no description)"
-            agents.append({"name": d.name, "description": description})
+            agents.append({"name": f.stem, "description": description})
 
     return agents
 
@@ -267,14 +266,14 @@ def _install_agents(args: argparse.Namespace) -> None:
             print(f"Available: {', '.join(sorted(available))}", file=sys.stderr)
             sys.exit(1)
 
-        src = AGENTS_DIR / name
-        agent_dest = dest / name
+        src = AGENTS_DIR / f"{name}.md"
+        agent_dest = dest / f"{name}.md"
 
         if agent_dest.exists():
             print(f"  {_yellow('⟳')} {_bold(name)} {_dim('— already installed, overwriting')}")
-            shutil.rmtree(agent_dest)
+            agent_dest.unlink()
 
-        shutil.copytree(src, agent_dest)
+        shutil.copy2(src, agent_dest)
         print(f"  {_green('✓')} {_bold(name)} {_dim(f'→ {agent_dest}')}")
 
     print(f"\n{_bold('Done.')} {_dim(f'Agents installed to {dest}')}")
@@ -577,9 +576,10 @@ def cmd_scaffold(args: argparse.Namespace) -> None:
 
     # Copy agents
     agents_dest = claude_dir / "agents"
+    agents_dest.mkdir(parents=True, exist_ok=True)
     for agent in sorted(AGENTS_DIR.iterdir()):
-        if agent.is_dir() and (agent / "AGENT.md").exists():
-            shutil.copytree(agent, agents_dest / agent.name)
+        if agent.is_file() and agent.suffix == ".md":
+            shutil.copy2(agent, agents_dest / agent.name)
 
     # Copy CLAUDE.md and SECURITY.md
     shutil.copy2(CLAUDE_MD, claude_dir / "CLAUDE.md")
