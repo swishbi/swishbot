@@ -87,9 +87,9 @@ Agents are persona definitions that compose multiple skills into roles. Install 
 
 | Agent | Description | Skills Composed |
 |-------|-------------|-----------------|
-| `analytics-engineer` | Designs dimensional schemas and builds dbt models across all layers with MCP tooling | dbt, dimensional-modeling |
-| `business-analyst` | Guides stakeholders from idea to implementation-ready spec; validates sources with dbt MCP | requirements-discovery, dbt |
-| `data-engineer` | Builds ingestion pipelines with proper security | dlt, dba-security |
+| `analytics-engineer` | Designs dimensional schemas and builds dbt models across all layers with MCP tooling and Power BI semantic models | dbt, dimensional-modeling, powerbi |
+| `business-analyst` | Guides stakeholders from idea to implementation-ready spec; validates sources with dbt MCP and inspects Power BI assets | requirements-discovery, dbt, powerbi |
+| `data-engineer` | Builds ingestion pipelines with dlt and orchestrates them with Dagster, applying proper security practices | dlt, dba-security, dagster |
 | `platform-engineer` | Sets up infrastructure, security, and platform architecture | dagster, iac-terraform, dba-security |
 
 ## How It Works
