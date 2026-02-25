@@ -10,7 +10,8 @@
       "name": "swishbot",
       "source": "./plugins/swishbot",
       "description": "Data stack skills, agents, hooks, and slash commands for data engineering with Claude Code.",
-      "category": "development"
+      "category": "development",
+      "version": "1.0.3"
     }
   ]
 }
