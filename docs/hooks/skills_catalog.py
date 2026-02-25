@@ -6,8 +6,8 @@ Only exposes names and descriptions — not the actual content.
 import re
 from pathlib import Path
 
-SKILLS_DIR = Path(__file__).resolve().parents[2] / "src" / "swishbot" / ".claude" / "skills"
-AGENTS_DIR = Path(__file__).resolve().parents[2] / "src" / "swishbot" / ".claude" / "agents"
+SKILLS_DIR = Path(__file__).resolve().parents[2] / "plugins" / "swishbot" / "skills"
+AGENTS_DIR = Path(__file__).resolve().parents[2] / "plugins" / "swishbot" / "agents"
 PLACEHOLDER = "<!-- SKILLS_CATALOG -->"
 AGENTS_PLACEHOLDER = "<!-- AGENTS_CATALOG -->"
 

@@ -7,7 +7,7 @@ hooks:
     - matcher: "Write|Edit"
       hooks:
         - type: command
-          command: "~/.claude/skills/dlt/scripts/check-secrets.sh"
+          command: "${CLAUDE_PLUGIN_ROOT}/skills/dlt/scripts/check-secrets.sh"
           timeout: 10
 ---
 

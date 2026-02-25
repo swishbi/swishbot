@@ -1,0 +1,69 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Check if the file being written follows dbt naming conventions (stg_, int_, fct_, dim_ prefixes) and SQL style rules from references/style-and-conventions.md. If violations found, list them. $ARGUMENTS",
+            "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/skills/dlt/scripts/check-secrets.sh",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/skills/dba-security/scripts/validate-sql.sh",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/skills/iac-terraform/scripts/validate-terraform.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "If the file just written is a staging model, verify it follows the CTE structure (source, renamed, final) defined in references/staging-sql-conventions.md. $ARGUMENTS",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Review this session. If cross-agent project decisions were made — naming conventions, modeling choices, source configurations — update the relevant files in .claude/memory/. Do NOT update .claude/agent-memory/ here; agents manage that automatically. Only update if substantive shared decisions were made.",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

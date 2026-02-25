@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Project Is
 
-swishbot is a Python CLI that distributes "skills" and "agents" into `~/.claude/` for Claude Code to reference during data engineering work. Skills are opinionated methodology guides; agents are persona definitions that compose multiple skills into roles (e.g., analytics-engineer, data-engineer).
+swishbot is a Claude Code plugin that distributes "skills" and "agents" for data engineering work. Skills are opinionated methodology guides; agents are persona definitions that compose multiple skills into roles (e.g., analytics-engineer, data-engineer). The repo is structured as a **monorepo marketplace** containing a single plugin.
 
 ## Commands
 
@@ -13,40 +13,39 @@ swishbot is a Python CLI that distributes "skills" and "agents" into `~/.claude/
 uv sync --extra test
 
 # Lint and format
-uv run ruff check src/ tests/
-uv run ruff format src/ tests/
+uv run ruff check tests/ docs/
+uv run ruff format tests/ docs/
 
 # Run all tests
 uv run pytest -v
 
 # Run a single test
-uv run pytest -v tests/test_cli.py::test_function_name
-
-# Pre-commit hooks (ruff on commit, pytest on push)
-uv run pre-commit install && uv run pre-commit install --hook-type pre-push
+uv run pytest -v tests/test_plugin.py::test_function_name
 ```
 
 ## Architecture
 
-Single-module CLI (`src/swishbot/cli.py`) with seven subcommands routed via `match` statement:
+The repo is a **marketplace** (`.claude-plugin/marketplace.json`) containing one **plugin** (`plugins/swishbot/`). No Python CLI — everything is native Claude Code.
 
-- **`list`** — Discovers skills and agents by scanning `*/SKILL.md` and `*/AGENT.md`, extracts metadata from YAML frontmatter via regex
-- **`install`** — Copies skill directories to `~/.claude/skills/` (or `--path`). With `--agent`, copies agent directories to `~/.claude/agents/`
-- **`init`** — Scaffolds a new skill directory with `workflows/` subdir from `SKILL_TEMPLATE`
-- **`init-project`** — Copies `src/swishbot/.claude/CLAUDE.md` and `SECURITY.md` into a target project's root
-- **`hooks`** — Reads installed skills at a given path and prints a merged `hooks:` block from all SKILL.md frontmatter, suitable for pasting into `settings.json`
-- **`init-memory`** — Creates `.claude/memory/` with shared project memory templates (`MEMORY.md`, `conventions.md`, `modeling-decisions.md`, `source-catalog.md`) and writes `.claude/settings.json` with a `Stop` hook that prompts Claude to update memory files after each session
-- **`scaffold`** — Full project scaffold: copies all skills and agents, project template files (from `scaffold_templates/`), CLAUDE.md, SECURITY.md, and calls `_scaffold_memory()` to set up shared memory. Produces a complete `ingestion/` + `transformation/` + `orchestration/` project layout
+### Plugin Structure (`plugins/swishbot/`)
 
-Key constants: `CLAUDE_DIR`, `SKILLS_DIR`, `AGENTS_DIR`, `DEFAULT_INSTALL_PATH`, `DEFAULT_AGENT_INSTALL_PATH`, `CLAUDE_MD` (all `pathlib.Path`).
+- **`skills/`** — 8 skill directories, each with `SKILL.md` (YAML frontmatter + methodology content) and optional `workflows/`, `examples/`, `scripts/`, `references/` subdirectories
+- **`agents/`** — 4 agent markdown files with YAML frontmatter (`name`, `description`, `model`, `color`, `skills`, `mcpServers`, `memory`) and persona content
+- **`commands/`** — 3 slash commands (`scaffold.md`, `init-project.md`, `init-memory.md`) that replace the old CLI subcommands
+- **`hooks/hooks.json`** — Merged hooks from all skills (PreToolUse, PostToolUse, Stop events)
+- **`.mcp.json`** — MCP server definitions (dbt, dagster, dlt, powerbi)
+- **`templates/`** — Scaffold template files for project generation; `templates/memory/` for memory templates
+- **`CLAUDE.md`** — Starter project config (template for init-project command)
+- **`SECURITY.md`** — Security policy (template for init-project command)
+- **`.claude-plugin/plugin.json`** — Plugin manifest with name, version, description
 
-The source tree under `src/swishbot/.claude/` mirrors the install target `~/.claude/`:
-- `src/swishbot/.claude/skills/` → `~/.claude/skills/`
-- `src/swishbot/.claude/agents/` → `~/.claude/agents/`
+### Marketplace (`/.claude-plugin/marketplace.json`)
+
+Root-level marketplace catalog that references `./plugins/swishbot` as the single plugin.
 
 ## Skills
 
-Each skill lives in `src/swishbot/.claude/skills/<skill-name>/` with a mandatory `SKILL.md` containing YAML frontmatter and methodology content. Optional subdirectories: `workflows/`, `examples/`, `scripts/`.
+Each skill lives in `plugins/swishbot/skills/<skill-name>/` with a mandatory `SKILL.md` containing YAML frontmatter and methodology content. Optional subdirectories: `workflows/`, `examples/`, `scripts/`, `references/`.
 
 Recognized Claude Code frontmatter fields: `name`, `description`, `user-invocable`, `disable-model-invocation`, `allowed-tools`, `argument-hint`, `model`, `context`, `agent`, `hooks`. Only use these in the `---` block — custom fields are ignored by Claude Code.
 
@@ -54,51 +53,63 @@ Skills with workflows use SKILL.md as a **router** that maps user intents to spe
 
 The `description` field is extracted via regex (`description:\s*"?([^"\n]+)"?`) — keep it on one line. Write descriptions as implicit triggers: include natural-language phrases users would say when they need this skill.
 
+Hook scripts in skills must use `${CLAUDE_PLUGIN_ROOT}` paths, not `~/.claude/` paths.
+
 ## Agents
 
-Each agent is a flat markdown file at `src/swishbot/.claude/agents/<agent-name>.md` containing YAML frontmatter (`name`, `description`, `model`, `color`, `skills`) and persona content. Agents compose multiple skills into a role — they tell Claude "you are a [role], use these skills."
+Each agent is a flat markdown file at `plugins/swishbot/agents/<agent-name>.md` containing YAML frontmatter and persona content. Agents compose multiple skills into a role — they tell Claude "you are a [role], use these skills."
 
 Recognized Claude Code agent frontmatter fields: `name`, `description`, `model`, `color`, `tools`, `disallowedTools`, `skills`, `mcpServers`, `memory`, `permissionMode`, `maxTurns`, `hooks`. The fields currently used by swishbot agents:
 - `skills` — injects full skill content at startup; subagents do NOT inherit parent skills, so this is essential
-- `mcpServers` — references already-configured MCP servers by name (e.g., `dbt`); makes them available inside the agent even if the parent conversation has a different MCP context
-- `memory` — `project` scope gives each agent a persistent `.claude/agent-memory/<name>/` directory for cross-session learning; auto-loads `MEMORY.md` into the system prompt
-- `disallowedTools` — used on business-analyst to block `Bash`; keeps the agent focused on spec authoring, not command execution
+- `mcpServers` — references already-configured MCP servers by name (e.g., `dbt`); makes them available inside the agent
+- `memory` — `project` scope gives each agent a persistent `.claude/agent-memory/<name>/` directory for cross-session learning
+- `disallowedTools` — used on business-analyst to block `Bash`; keeps the agent focused on spec authoring
+
 The skills an agent uses are also documented in a `## Skills` table in the body for human readers.
 
-Agents are authored by swishbot maintainers (no `init` scaffold). The `description` field follows the same regex extraction as skills.
+## Commands (Slash Commands)
+
+Each command is a markdown file in `plugins/swishbot/commands/` with YAML frontmatter (`name`, `description`, `allowed-tools`) and instructions for Claude to follow. Commands replace the old CLI subcommands:
+
+| Command | Replaces |
+|---------|----------|
+| `scaffold.md` | `swishbot scaffold` |
+| `init-project.md` | `swishbot init-project` |
+| `init-memory.md` | `swishbot init-memory` |
 
 ## Conventions
 
-- Python 3.10+ required (uses `match` statements)
-- No runtime dependencies — stdlib only
 - Copyright header on all source files: `# Copyright (c) 2026 Swish BI Limited. All rights reserved.`
-- CLI commands follow `cmd_*` naming; skills use kebab-case directories
+- Skills use kebab-case directories
 - Ruff config: line-length 120, rules E/F/I/UP
-- Tests use monkeypatching and `tmp_path` for isolation; organized by command with section comments
+- Tests validate plugin structure — skills, agents, commands, hooks, templates all present with correct frontmatter
+- All hook scripts must use `${CLAUDE_PLUGIN_ROOT}` for paths
+- Plugin version in `plugin.json` must be bumped for each release (cache invalidation)
 
 ## New Skill Checklist
 
 When adding a new skill, complete every step:
 
-1. Scaffold the skill directory: `swishbot init <skill-name>` (creates `SKILL.md` + `workflows/`)
+1. Create the skill directory in `plugins/swishbot/skills/<skill-name>/`
 2. Write `SKILL.md` with YAML frontmatter (`name`, `description`, optional `argument-hint`) and methodology content
    - `description` must be a single line (extracted via regex); include natural-language trigger phrases
    - End file with copyright footer: `*Copyright (c) 2026 Swish BI Limited. All rights reserved.*`
    - For skills with workflows: add a routing table in the markdown body (not frontmatter) that maps intents to workflow files
-3. Add optional subdirectories if needed: `examples/`, `scripts/`
-   - Add workflow files in `workflows/` if the skill has multi-step procedures
+3. Add optional subdirectories if needed: `workflows/`, `examples/`, `scripts/`
 4. Add cross-references to related skills in a `## Related Skills` section
 5. Update related skills to cross-reference back to the new skill
-6. Update the status table in `README.md` — add the skill row and set status to `:white_check_mark:`
-7. Update the status table in `src/swishbot/.claude/CLAUDE.md` — same as above
+6. If the skill has hooks: add them to `plugins/swishbot/hooks/hooks.json` using `${CLAUDE_PLUGIN_ROOT}` paths
+7. Update the status table in `README.md` — add the skill row and set status to `:white_check_mark:`
 8. Update the `CATEGORIES` dict in `docs/hooks/skills_catalog.py` — add the skill to the correct category
-9. Update the project structure tree in `README.md` if the directory layout changed
-10. Run `uv run ruff check src/ tests/` and `uv run ruff format src/ tests/`
-11. Run `uv run pytest -v` — all tests must pass
+9. Run `uv run ruff check tests/ docs/` and `uv run ruff format tests/ docs/`
+10. Run `uv run pytest -v` — all tests must pass
+11. Bump `version` in `plugins/swishbot/.claude-plugin/plugin.json`
 
 ## Commit Checklist
 
 - Lint and format pass (`uv run ruff check` + `uv run ruff format`)
 - Tests pass (`uv run pytest -v`)
-- If skills changed: update status tables in both `README.md` and `src/swishbot/.claude/CLAUDE.md`, and `CATEGORIES` in `docs/hooks/skills_catalog.py`
+- If skills changed: update status tables in `README.md`, and `CATEGORIES` in `docs/hooks/skills_catalog.py`
 - New skills need correct `name`/`description` frontmatter in SKILL.md
+- If hooks changed: update `plugins/swishbot/hooks/hooks.json`
+- Version bumped in `plugin.json` if releasing

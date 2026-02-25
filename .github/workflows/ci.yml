@@ -26,17 +26,13 @@ jobs:
         run: uv sync --extra test --extra docs --python ${{ matrix.python-version }}
 
       - name: Lint
-        run: uv run ruff check src/ tests/
+        run: uv run ruff check tests/ docs/
 
       - name: Format check
-        run: uv run ruff format --check src/ tests/
+        run: uv run ruff format --check tests/ docs/
 
       - name: Test
         run: uv run pytest -v
-
-      - name: Build package
-        if: matrix.python-version == '3.12'
-        run: uv build
 
       - name: Build docs
         if: matrix.python-version == '3.12'

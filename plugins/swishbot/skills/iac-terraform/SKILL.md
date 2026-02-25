@@ -6,7 +6,7 @@ hooks:
     - matcher: "Bash"
       hooks:
         - type: command
-          command: "~/.claude/skills/iac-terraform/scripts/validate-terraform.sh"
+          command: "${CLAUDE_PLUGIN_ROOT}/skills/iac-terraform/scripts/validate-terraform.sh"
           timeout: 10
 ---
 
