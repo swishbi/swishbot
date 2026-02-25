@@ -31,7 +31,7 @@ extra_css:
 nav:
   - Home: index.md
   - Getting Started: getting-started.md
-  - CLI Reference: cli-reference.md
+  - Commands & Setup: commands-and-setup.md
   - Skills Catalog: skills.md
   - Agents Catalog: agents.md
   - Creating Skills: creating-skills.md

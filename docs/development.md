@@ -26,10 +26,10 @@
 
 ```bash
 # Lint
-uv run ruff check src/ tests/
+uv run ruff check tests/ docs/
 
 # Format
-uv run ruff format src/ tests/
+uv run ruff format tests/ docs/
 
 # Tests
 uv run pytest -v
@@ -47,9 +47,9 @@ CI runs on every push to `main` and on all pull requests. It tests against Pytho
 
 ## Commit checklist
 
-- [ ] `uv run ruff check src/ tests/` and `uv run ruff format src/ tests/` pass
+- [ ] `uv run ruff check tests/ docs/` and `uv run ruff format tests/ docs/` pass
 - [ ] `uv run pytest -v` passes
-- [ ] Version bumped in `pyproject.toml` if release-worthy
-- [ ] Skill tables updated in `README.md` and `CLAUDE.md` if skills changed
+- [ ] Version bumped in `plugins/swishbot/.claude-plugin/plugin.json` if release-worthy
+- [ ] If skills changed: update status tables in `README.md`, and `CATEGORIES` in `docs/hooks/skills_catalog.py`
 - [ ] New skills have correct `name` and `description` in frontmatter
-- [ ] Project structure in `README.md` updated if files/directories added
+- [ ] If hooks changed: update `plugins/swishbot/hooks/hooks.json`
