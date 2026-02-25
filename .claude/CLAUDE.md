@@ -37,7 +37,7 @@ The repo is a **marketplace** (`.claude-plugin/marketplace.json`) containing one
 - **`templates/`** — Scaffold template files for project generation; `templates/memory/` for memory templates
 - **`CLAUDE.md`** — Starter project config (template for init-project command)
 - **`SECURITY.md`** — Security policy (template for init-project command)
-- **`.claude-plugin/plugin.json`** — Plugin manifest with name, version, description
+- **`.claude-plugin/plugin.json`** — Plugin manifest with name, version, description, author (object: `{"name": "..."}`, not a string)
 
 ### Marketplace (`/.claude-plugin/marketplace.json`)
 
