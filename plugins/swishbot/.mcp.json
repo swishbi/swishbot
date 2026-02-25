@@ -10,7 +10,7 @@
     },
     "dlt": {
       "command": "uv",
-      "args": ["run", "--with", "dlt-mcp[search]", "python", "-m", "dlt_mcp"]
+      "args": ["run", "--with", "dlt-mcp[search]>=0.2.0,<1.0", "python", "-m", "dlt_mcp"]
     },
     "powerbi-modeling": {
       "command": "~/MCPServers/PowerBIModelingMCP/extension/server/powerbi-modeling-mcp",

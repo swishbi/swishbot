@@ -7,13 +7,13 @@ hooks:
     - matcher: "Write|Edit"
       hooks:
         - type: prompt
-          prompt: "Check if the file being written follows dbt naming conventions (stg_, int_, fct_, dim_ prefixes) and SQL style rules from references/style-and-conventions.md. If violations found, list them. $ARGUMENTS"
+          prompt: "Check if the file being written follows dbt naming conventions (stg_, int_, fct_, dim_ prefixes) and SQL style rules from references/style-and-conventions.md. If violations found, list them."
           timeout: 15
   PostToolUse:
     - matcher: "Write|Edit"
       hooks:
         - type: prompt
-          prompt: "If the file just written is a staging model, verify it follows the CTE structure (source, renamed, final) defined in references/staging-sql-conventions.md. $ARGUMENTS"
+          prompt: "If the file just written is a staging model, verify it follows the CTE structure (source, renamed, final) defined in references/staging-sql-conventions.md."
           timeout: 15
 ---
 
