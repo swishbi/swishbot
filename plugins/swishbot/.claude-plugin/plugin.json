@@ -1,7 +1,9 @@
 {
   "name": "swishbot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Data stack skills and agents for Claude Code — dbt, dlt, Dagster, Power BI, Terraform, and more.",
-  "author": "Swish BI Limited",
+  "author": {
+    "name": "Swish BI Limited"
+  },
   "license": "Proprietary"
 }
