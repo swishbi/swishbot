@@ -11,7 +11,14 @@
 set -euo pipefail
 
 INPUT=$(cat)
-COMMAND=$(echo "$INPUT" | grep -oP '"command"\s*:\s*"[^"]*"' | head -1 | sed 's/.*: *"//;s/"$//' || true)
+COMMAND=$(echo "$INPUT" | python3 -c "
+import sys, json
+try:
+    data = json.load(sys.stdin)
+    print(data.get('command', ''))
+except Exception:
+    pass
+" 2>/dev/null || true)
 
 if [ -z "$COMMAND" ]; then
     exit 0

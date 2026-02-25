@@ -1,51 +1,58 @@
 # swishbot
 
 [![CI](https://github.com/swishbi/swishbot/actions/workflows/ci.yml/badge.svg)](https://github.com/swishbi/swishbot/actions/workflows/ci.yml)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![License](https://img.shields.io/badge/license-Proprietary-red)](LICENSE)
 
-A distributable skill and agent library for [Swish BI](swishbi.com). Install skills and agents into your Claude environment with a single command.
+A Claude Code plugin that distributes data stack skills, agents, and project scaffolding for [Swish BI](swishbi.com). Install once — get 8 skills, 4 agents, hooks, MCP servers, and slash commands.
 
 ## Quick Start
 
 ```bash
-# Install swishbot
-pip install swishbot
+# Add the swishbot marketplace
+/plugin marketplace add swishbi/swishbot
 
-# List available skills
-swishbot list
+# Install the plugin
+/plugin install swishbot@swishbot
 
-# Install a skill into your Claude project
-swishbot install dbt
+# Everything is now available:
+# - 8 skills auto-loaded
+# - 4 agents in /agents
+# - Hooks active
+# - MCP servers configured
 
-# Install a skill to a custom path
-swishbot install dbt --path ~/.claude/skills
+# Scaffold a new project
+/swishbot:scaffold my-client-project
 
-# Install all skills
-swishbot install --all
-
-# Install an agent
-swishbot install --agent analytics-engineer
-
-# Install all agents
-swishbot install --agent --all
-
-# Scaffold a new analytics project
-swishbot scaffold my-client-project
-
-# Add a starter CLAUDE.md to your project
-swishbot init-project
-
-# Overwrite an existing CLAUDE.md
-swishbot init-project --force
-
-# List hooks provided by installed skills
-swishbot hooks
-
-# Scaffold project memory directory
-swishbot init-memory
+# Set up project config
+/swishbot:init-project
+/swishbot:init-memory
 ```
+
+No `pip install`. No Python dependency. Pure Claude Code native.
+
+## Zero-Touch Team Onboarding
+
+Add this to your project's `.claude/settings.json` (checked into version control):
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "swishbot": {
+      "source": {
+        "source": "github",
+        "repo": "swishbi/swishbot",
+        "ref": "stable"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "swishbot@swishbot": true
+  }
+}
+```
+
+New team members clone the repo, open with Claude Code, and are prompted to accept the plugin. No manual steps.
 
 ## Available Skills
 
@@ -83,7 +90,7 @@ swishbot init-memory
 
 ## Available Agents
 
-Agents are persona definitions that compose multiple skills into roles. Install an agent to give Claude a focused identity for a specific type of work.
+Agents are persona definitions that compose multiple skills into roles. Install the plugin to get all agents automatically.
 
 | Agent | Description | Skills Composed |
 |-------|-------------|-----------------|
@@ -92,9 +99,17 @@ Agents are persona definitions that compose multiple skills into roles. Install 
 | `data-engineer` | Builds ingestion pipelines with dlt and orchestrates them with Dagster, applying proper security practices | dlt, dba-security, dagster |
 | `platform-engineer` | Sets up infrastructure, security, and platform architecture | dagster, iac-terraform, dba-security |
 
+## Slash Commands
+
+| Command | Description |
+|---------|-------------|
+| `/swishbot:scaffold <name>` | Scaffold a complete analytics project with ingestion, transformation, and orchestration layers |
+| `/swishbot:init-project` | Install a starter CLAUDE.md and SECURITY.md into your project |
+| `/swishbot:init-memory` | Scaffold shared project memory directory with cross-agent templates |
+
 ## How It Works
 
-Each skill is a self-contained directory with a `SKILL.md` file that Claude reads to understand how to execute the work. Agents are persona definitions (`AGENT.md`) that compose multiple skills into a role. When you run `swishbot install <skill>` or `swishbot install --agent <agent>`, it copies the directory into your Claude configuration so it's available in your sessions.
+swishbot is a **Claude Code plugin** — a self-contained package that bundles skills, agents, hooks, MCP servers, and slash commands. When installed via `claude plugin install`, everything auto-loads into your Claude Code sessions.
 
 Skills are designed to be platform-agnostic at the methodology level — they encode *how to think about the problem*, and Claude applies that reasoning to whatever platform you're working on (Snowflake, BigQuery, Databricks, etc.).
 
@@ -102,95 +117,47 @@ Skills are designed to be platform-agnostic at the methodology level — they en
 
 ```
 swishbot/
-├── pyproject.toml
-├── SECURITY.md                  # Contributor security policy
-├── .github/
-│   └── workflows/
-│       └── ci.yml               # CI: lint, format, test
-├── src/
-│   └── swishbot/
-│       ├── __init__.py
-│       ├── cli.py               # CLI logic
-│       ├── scaffold_templates/  # Templates for scaffold command
-│       ├── memory_templates/    # Templates for init-memory
-│       │   ├── MEMORY.md
-│       │   ├── conventions.md
-│       │   ├── modeling-decisions.md
-│       │   └── source-catalog.md
-│       └── .claude/             # Mirrors ~/.claude/ install target
-│           ├── CLAUDE.md        # Starter project config
-│           ├── SECURITY.md      # User-facing security policy
-│           ├── agents/          # Agent persona definitions
-│           │   ├── analytics-engineer.md
-│           │   ├── business-analyst.md
-│           │   ├── data-engineer.md
-│           │   └── platform-engineer.md
-│           └── skills/
-│               ├── dbt/
-│               │   ├── SKILL.md         # Behavioral guide + router
-│               │   ├── workflows/       # Step-by-step procedures
-│               │   │   ├── staging/
-│               │   │   │   ├── create-staging-source.md
-│               │   │   │   ├── transform-staging-models.md
-│               │   │   │   └── validate-staging-models.md
-│               │   │   ├── intermediate/
-│               │   │   │   ├── create-intermediate-model.md
-│               │   │   │   └── refactor-to-intermediate.md
-│               │   │   ├── marts/
-│               │   │   │   ├── create-mart-model.md
-│               │   │   │   └── create-incremental-mart.md
-│               │   │   └── semantic/
-│               │   │       └── define-semantic-model.md
-│               │   ├── references/      # Reference documentation
-│               │   │   ├── style-and-conventions.md
-│               │   │   ├── mcp-setup-and-tools.md
-│               │   │   ├── loader-metadata.md
-│               │   │   └── staging-sql-conventions.md
-│               │   ├── scripts/         # Hook scripts
-│               │   │   └── check-source-yaml.sh
-│               │   └── examples/
-│               ├── dagster/
-│               │   ├── SKILL.md         # Router: project setup + component workflows
-│               │   ├── workflows/
-│               │   │   ├── setup-project.md
-│               │   │   ├── add-dlt-component.md
-│               │   │   ├── add-dbt-component.md
-│               │   │   └── add-custom-component.md
-│               │   └── examples/
-│               ├── dlt/
-│               │   ├── SKILL.md
-│               │   └── scripts/
-│               │       └── check-secrets.sh
-│               ├── dimensional-modeling/
-│               │   ├── SKILL.md
-│               │   └── examples/
-│               ├── requirements-discovery/
-│               │   └── SKILL.md
-│               ├── dba-security/
-│               │   ├── SKILL.md
-│               │   ├── scripts/
-│               │   │   └── validate-sql.sh
-│               │   └── examples/
-│               ├── iac-terraform/
-│               │   ├── SKILL.md         # Router: project setup + environment/state workflows
-│               │   ├── workflows/
-│               │   │   ├── setup-project-structure.md
-│               │   │   └── configure-environments-state-cicd.md
-│               │   ├── scripts/
-│               │   │   └── validate-terraform.sh
-│               │   └── examples/
-│               └── powerbi/
-│                   ├── SKILL.md         # Router: tenets + workflow index
-│                   ├── workflows/       # Step-by-step procedures
-│                   │   ├── design-semantic-model.md
-│                   │   ├── build-semantic-model.md
-│                   │   ├── build-report.md
-│                   │   ├── deploy-and-publish.md
-│                   │   └── connect-and-consume.md
-│                   └── examples/
-│                       └── semantic_model.tmdl
-└── tests/
-    └── test_cli.py              # CLI test suite
+├── .claude-plugin/
+│   └── marketplace.json              # Marketplace catalog
+├── plugins/
+│   └── swishbot/                     # The plugin
+│       ├── .claude-plugin/
+│       │   └── plugin.json           # Plugin manifest
+│       ├── skills/                   # All 8 skills
+│       │   ├── dbt/
+│       │   │   ├── SKILL.md
+│       │   │   ├── workflows/
+│       │   │   ├── references/
+│       │   │   ├── scripts/
+│       │   │   └── examples/
+│       │   ├── dagster/
+│       │   ├── dlt/
+│       │   ├── dimensional-modeling/
+│       │   ├── powerbi/
+│       │   ├── requirements-discovery/
+│       │   ├── dba-security/
+│       │   └── iac-terraform/
+│       ├── agents/                   # All 4 agents
+│       │   ├── analytics-engineer.md
+│       │   ├── data-engineer.md
+│       │   ├── business-analyst.md
+│       │   └── platform-engineer.md
+│       ├── commands/                 # Slash commands
+│       │   ├── scaffold.md
+│       │   ├── init-project.md
+│       │   └── init-memory.md
+│       ├── hooks/
+│       │   └── hooks.json            # Merged hooks from all skills
+│       ├── .mcp.json                 # MCP servers (dbt, dagster, dlt, powerbi)
+│       ├── templates/                # Scaffold templates
+│       │   └── memory/              # Memory templates
+│       ├── CLAUDE.md                 # Starter project config
+│       └── SECURITY.md              # Security policy
+├── tests/
+│   └── test_plugin.py               # Plugin validation tests
+├── docs/
+├── README.md
+└── pyproject.toml                    # Dev/test dependencies only
 ```
 
 ## Contributing

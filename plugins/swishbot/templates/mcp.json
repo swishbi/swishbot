@@ -20,7 +20,7 @@
       "args": [
         "run",
         "--with",
-        "dlt-mcp[search]",
+        "dlt-mcp[search]>=0.2.0,<1.0",
         "python",
         "-m",
         "dlt_mcp"

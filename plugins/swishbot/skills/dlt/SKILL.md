@@ -7,7 +7,7 @@ hooks:
     - matcher: "Write|Edit"
       hooks:
         - type: command
-          command: "~/.claude/skills/dlt/scripts/check-secrets.sh"
+          command: "${CLAUDE_PLUGIN_ROOT}/skills/dlt/scripts/check-secrets.sh"
           timeout: 10
 ---
 
@@ -26,9 +26,7 @@ References:
 
 ## dlt's Claude Code Reference
 
-dlt maintains a detailed reference for building REST API pipelines with Claude Code, covering authentication methods, pagination strategies, incremental loading, data selection, and end-to-end examples. **Fetch this when building or debugging a dlt pipeline:**
-
-https://raw.githubusercontent.com/dlt-hub/verified-sources/master/ai/claude/CLAUDE.md
+This skill's workflows cover REST API, SQL database, and filesystem pipelines end-to-end. For dlt-hub's additional Claude Code reference (authentication methods, pagination strategies, incremental loading examples), users can manually review: https://github.com/dlt-hub/verified-sources/tree/master/ai/claude
 
 ## Pipeline Types
 
@@ -87,7 +85,7 @@ The dlt MCP server gives Claude direct access to pipeline metadata and loaded da
       "args": [
         "run",
         "--with",
-        "dlt-mcp[search]",
+        "dlt-mcp[search]>=0.2.0,<1.0",
         "python",
         "-m",
         "dlt_mcp"

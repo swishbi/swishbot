@@ -27,10 +27,10 @@ fi
 
 # Patterns that suggest hardcoded credentials
 PATTERNS=(
-    'password\s*=\s*["\x27][^"\x27]+'
-    'api_key\s*=\s*["\x27][^"\x27]+'
-    'secret\s*=\s*["\x27][^"\x27]+'
-    'token\s*=\s*["\x27][A-Za-z0-9]+'
+    "password\s*=\s*[\"'][^\"']+"
+    "api_key\s*=\s*[\"'][^\"']+"
+    "secret\s*=\s*[\"'][^\"']+"
+    "token\s*=\s*[\"'][A-Za-z0-9_.+/=-]+"
     'AKIA[0-9A-Z]{16}'
     'sk-[a-zA-Z0-9]{20,}'
     'ghp_[a-zA-Z0-9]{36}'

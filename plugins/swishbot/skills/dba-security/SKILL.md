@@ -6,7 +6,7 @@ hooks:
     - matcher: "Bash"
       hooks:
         - type: command
-          command: "~/.claude/skills/dba-security/scripts/validate-sql.sh"
+          command: "${CLAUDE_PLUGIN_ROOT}/skills/dba-security/scripts/validate-sql.sh"
           timeout: 10
 ---
 
