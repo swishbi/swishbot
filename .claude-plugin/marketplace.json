@@ -1,10 +1,12 @@
 {
   "name": "swishbot",
-  "description": "Data stack skills and agents for analytics engineering — dbt, dlt, Dagster, Power BI, Terraform, and more.",
+  "owner": {
+    "name": "Swish BI Limited"
+  },
   "plugins": [
     {
       "name": "swishbot",
-      "path": "./plugins/swishbot",
+      "source": "./plugins/swishbot",
       "description": "Data stack skills, agents, hooks, and slash commands for data engineering with Claude Code."
     }
   ]

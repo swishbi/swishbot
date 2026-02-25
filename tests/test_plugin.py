@@ -52,9 +52,9 @@ def test_marketplace_json_references_plugin():
     assert len(data["plugins"]) > 0
     plugin_entry = data["plugins"][0]
     assert plugin_entry["name"] == "swishbot"
-    # Verify the path resolves to the actual plugin directory
-    plugin_path = (MARKETPLACE_ROOT.parent / plugin_entry["path"]).resolve()
-    assert plugin_path.exists(), f"Plugin path {plugin_entry['path']} does not resolve"
+    # Verify the source resolves to the actual plugin directory
+    plugin_path = (MARKETPLACE_ROOT.parent / plugin_entry["source"]).resolve()
+    assert plugin_path.exists(), f"Plugin source {plugin_entry['source']} does not resolve"
 
 
 # ─── skills ──────────────────────────────────────────────────────────
