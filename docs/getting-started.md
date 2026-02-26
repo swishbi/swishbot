@@ -2,14 +2,6 @@
 
 ## Install the plugin
 
-=== "skills.sh"
-
-    ```bash
-    npx skills add swishbi/swishbot
-    ```
-
-    Follow the interactive prompts to install the plugin.
-
 === "Claude Code"
 
     ```bash
@@ -19,6 +11,14 @@
     # Install the plugin
     /plugin install swishbot@swishbot
     ```
+
+=== "skills.sh"
+
+    ```bash
+    npx skills add swishbi/swishbot
+    ```
+
+    Follow the interactive prompts to install the plugin.
 
 Both paths result in the same outcome: the plugin is installed and all skills, agents, hooks, and MCP servers auto-load.
 
@@ -53,7 +53,7 @@ New team members clone the repo, open with Claude Code, and are prompted to acce
 | Agents | 4 | analytics-engineer, data-engineer, business-analyst, platform-engineer |
 | Hooks | Auto | SQL validation, credential checks, Terraform validation |
 | MCP servers | 4 | dbt, dagster, dlt, powerbi |
-| Slash commands | 3 | scaffold, init-project, init-memory |
+| Slash commands | 4 | scaffold, init-project, init-memory, migrate |
 
 ## Set up your project
 
@@ -101,6 +101,16 @@ Create a complete analytics project with ingestion, transformation, orchestratio
 ```
 
 See [Commands & Setup](commands-and-setup.md#scaffold) for what gets created.
+
+## Migrate an existing project
+
+Restructure an existing dlt + dbt project into the swishbot layout with Dagster orchestration:
+
+```bash
+/swishbot:migrate ./my-existing-project
+```
+
+See [Commands & Setup](commands-and-setup.md#migrate) for the full migration procedure.
 
 ## Verify it works
 

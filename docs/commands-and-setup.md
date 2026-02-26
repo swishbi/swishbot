@@ -2,14 +2,6 @@
 
 ## Plugin installation
 
-=== "skills.sh"
-
-    ```bash
-    npx skills add swishbi/swishbot
-    ```
-
-    Follow the interactive prompts to install the plugin.
-
 === "Claude Code"
 
     ```bash
@@ -19,6 +11,14 @@
     # Install the plugin
     /plugin install swishbot@swishbot
     ```
+
+=== "skills.sh"
+
+    ```bash
+    npx skills add swishbi/swishbot
+    ```
+
+    Follow the interactive prompts to install the plugin.
 
 Both paths result in the same outcome: the plugin is installed and all skills, agents, hooks, and MCP servers auto-load into your Claude Code sessions.
 
@@ -98,6 +98,30 @@ This creates a `.claude/memory/` directory with template files and a `Stop` hook
 - `conventions.md`
 - `modeling-decisions.md`
 - `source-catalog.md`
+
+### `/swishbot:migrate`
+
+Migrate an existing dlt + dbt project into the swishbot structure with Dagster orchestration.
+
+```bash
+/swishbot:migrate ./my-existing-project
+```
+
+| Argument | Description |
+|----------|-------------|
+| `dir` | Project directory to migrate (defaults to current directory) |
+
+#### What happens {#migrate}
+
+The command runs in 5 phases:
+
+1. **Discovery** — scans for dlt pipelines (`@dlt.source`, `.dlt/`), dbt projects (`dbt_project.yml`), existing Dagster config, and project files
+2. **Restructure** — moves dlt pipelines to `ingestion/`, dbt project to `transformation/` (uses `git mv` in git repos)
+3. **Dagster orchestration** — copies orchestration templates and creates placeholder `defs.yaml` with TODOs for each detected pipeline
+4. **Project config** — merges `pyproject.toml` dependencies, `.gitignore` entries, `.mcp.json` servers; sets up `.claude/` with CLAUDE.md, SECURITY.md, memory templates
+5. **Summary** — prints what moved where and a TODO checklist for manual follow-up
+
+Key principles: confirms before moving files, merges config (never overwrites), uses `git mv` to preserve history, creates placeholder TODOs rather than broken configs.
 
 ## Hooks
 
