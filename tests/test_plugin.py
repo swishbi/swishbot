@@ -186,7 +186,7 @@ def test_commands_exist():
 
 def test_command_names():
     command_names = {f.stem for f in _get_commands()}
-    expected = {"scaffold", "init-project", "init-memory"}
+    expected = {"scaffold", "init-project", "init-memory", "migrate"}
     assert expected.issubset(command_names), f"Missing commands: {expected - command_names}"
 
 

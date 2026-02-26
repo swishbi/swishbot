@@ -106,6 +106,7 @@ Agents are persona definitions that compose multiple skills into roles. Install 
 | `/swishbot:scaffold <name>` | Scaffold a complete analytics project with ingestion, transformation, and orchestration layers |
 | `/swishbot:init-project` | Install a starter CLAUDE.md and SECURITY.md into your project |
 | `/swishbot:init-memory` | Scaffold shared project memory directory with cross-agent templates |
+| `/swishbot:migrate [dir]` | Migrate an existing dlt + dbt project into the swishbot structure with Dagster orchestration |
 
 ## How It Works
 
@@ -145,7 +146,8 @@ swishbot/
 │       ├── commands/                 # Slash commands
 │       │   ├── scaffold.md
 │       │   ├── init-project.md
-│       │   └── init-memory.md
+│       │   ├── init-memory.md
+│       │   └── migrate.md
 │       ├── hooks/
 │       │   └── hooks.json            # Merged hooks from all skills
 │       ├── .mcp.json                 # MCP servers (dbt, dagster, dlt, powerbi)

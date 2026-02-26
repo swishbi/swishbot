@@ -1,6 +1,6 @@
 ---
 name: dlt
-description: "Write dlt/Python data ingestion pipelines. Use when a user asks to ingest data from an API, database, or file into a warehouse, create a new EL pipeline, debug a failing pipeline, or set up dlt sources and resources."
+description: "Write and maintain dlt/Python data ingestion pipelines. Use when a user asks to ingest data from an API, database, or file into a warehouse, create a new EL pipeline, debug a failing pipeline, add a new endpoint to an existing pipeline, handle schema changes, change write dispositions or primary keys, retire a resource, or tune pipeline performance."
 argument-hint: "[source-name]"
 hooks:
   PreToolUse:
@@ -53,6 +53,7 @@ What kind of source?
 | [Create SQL Database Pipeline](workflows/create-sql-database-pipeline.md) | Loading from a database (direct connection or SQL-over-REST) |
 | [Create Filesystem Pipeline](workflows/create-filesystem-pipeline.md) | Loading files from cloud storage or local filesystem |
 | [Debug Pipeline](workflows/debug-pipeline.md) | Pipeline is failing — inspect state, check traces, isolate the issue |
+| [Update Pipeline](workflows/update-pipeline.md) | Modifying an existing pipeline — adding endpoints, handling schema changes, changing write dispositions, retiring resources, or tuning performance |
 
 ## Common Patterns
 

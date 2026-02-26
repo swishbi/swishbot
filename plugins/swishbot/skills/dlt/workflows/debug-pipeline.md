@@ -54,7 +54,49 @@ Isolate the failing resource and test it independently:
 - Add logging or print statements to narrow down the failure point
 - Test with a small data sample before running the full extraction
 
-## Step 5: Common Issues
+## Step 5: Common Testing & Debugging Commands
+
+### Load Environment Variables
+
+When your pipeline reads credentials or config from a `.env` file, load them into the current shell first:
+
+```bash
+set -a && source .env && set +a
+```
+
+### Run Specific Resources
+
+Run only the resources you need instead of the full pipeline:
+
+```bash
+python <pipeline_file>.py --resources <resource1> <resource2>
+```
+
+> **Tip:** Check the `if __name__ == "__main__"` block at the top of the pipeline file — it often documents available arguments and usage examples.
+
+### Sync Pipeline State
+
+Re-sync local pipeline state with the destination (useful when state drifts or after manual table changes):
+
+```bash
+dlt pipeline <pipeline-name> sync
+```
+
+### Drop Tables
+
+Drop specific tables from the destination and reset their pipeline state:
+
+```bash
+dlt pipeline <pipeline-name> drop <table1> <table2>
+```
+
+Drop all tables and fully reset the pipeline:
+
+```bash
+dlt pipeline <pipeline-name> drop --drop-all
+```
+
+## Step 6: Common Issues
 
 | Symptom | Likely Cause | Fix |
 |---------|-------------|-----|

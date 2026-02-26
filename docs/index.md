@@ -16,14 +16,6 @@ swishbot distributes self-contained **skills**, **agents**, **hooks**, **MCP ser
 
 ## Quick start
 
-=== "skills.sh"
-
-    ```bash
-    npx skills add swishbi/swishbot
-    ```
-
-    Follow the interactive prompts to install.
-
 === "Claude Code"
 
     ```bash
@@ -33,6 +25,14 @@ swishbot distributes self-contained **skills**, **agents**, **hooks**, **MCP ser
     # Install the plugin
     /plugin install swishbot@swishbot
     ```
+
+=== "skills.sh"
+
+    ```bash
+    npx skills add swishbi/swishbot
+    ```
+
+    Follow the interactive prompts to install.
 
 Everything is now available:
 
@@ -56,7 +56,7 @@ No `pip install`. No Python dependency. Pure Claude Code native.
 
 1. **Install the plugin** — via skills.sh or native Claude Code commands
 2. **Skills, agents, hooks, and MCP servers auto-load** — no per-skill install step
-3. **Use slash commands** — `/swishbot:scaffold`, `/swishbot:init-project`, `/swishbot:init-memory`
+3. **Use slash commands** — `/swishbot:scaffold`, `/swishbot:init-project`, `/swishbot:init-memory`, `/swishbot:migrate`
 4. **Work with Claude** — Claude reads the skills and applies the methodology to your project
 
 Skills are platform-agnostic at the methodology level. They encode consistent, best-practices guidance that Claude applies to whatever stack you're working with.
