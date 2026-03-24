@@ -4,7 +4,7 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![License](https://img.shields.io/badge/license-Proprietary-red)](LICENSE)
 
-A Claude Code plugin that distributes data stack skills, agents, and project scaffolding for [Swish BI](swishbi.com). Install once — get 8 skills, 4 agents, hooks, MCP servers, and slash commands.
+A Claude Code plugin that distributes data stack skills, agents, and project scaffolding for [Swish BI](swishbi.com). Install once — get 9 skills, 4 agents, hooks, MCP servers, and slash commands.
 
 ## Quick Start
 
@@ -88,6 +88,11 @@ New team members clone the repo, open with Claude Code, and are prompted to acce
 |-------|-------------|--------|
 | `powerbi` | Power BI best practices | :white_check_mark: |
 
+### Documentation
+| Skill | Description | Status |
+|-------|-------------|--------|
+| `tech-docs` | Write technical documentation — setup guides, runbooks, data dictionaries, pipeline READMEs, architecture notes | :white_check_mark: |
+
 ## Available Agents
 
 Agents are persona definitions that compose multiple skills into roles. Install the plugin to get all agents automatically.
@@ -124,7 +129,7 @@ swishbot/
 │   └── swishbot/                     # The plugin
 │       ├── .claude-plugin/
 │       │   └── plugin.json           # Plugin manifest
-│       ├── skills/                   # All 8 skills
+│       ├── skills/                   # All 9 skills
 │       │   ├── dbt/
 │       │   │   ├── SKILL.md
 │       │   │   ├── workflows/
@@ -137,7 +142,8 @@ swishbot/
 │       │   ├── powerbi/
 │       │   ├── requirements-discovery/
 │       │   ├── dba-security/
-│       │   └── iac-terraform/
+│       │   ├── iac-terraform/
+│       │   └── tech-docs/
 │       ├── agents/                   # All 4 agents
 │       │   ├── analytics-engineer.md
 │       │   ├── data-engineer.md

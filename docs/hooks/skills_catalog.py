@@ -21,6 +21,7 @@ CATEGORIES = {
         "dimensional-modeling",
     ],
     "Analytics & Presentation": ["powerbi"],
+    "Documentation": ["tech-docs"],
 }
 
 
