@@ -2,16 +2,6 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/skills/dlt/scripts/check-secrets.sh",
-            "timeout": 10
-          }
-        ]
-      },
-      {
         "matcher": "Bash",
         "hooks": [
           {
@@ -32,17 +22,6 @@
         ]
       }
     ],
-    "PostToolUse": [],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "prompt",
-            "prompt": "Review this session. If cross-agent project decisions were made — naming conventions, modeling choices, source configurations — update the relevant files in .claude/memory/. Do NOT update .claude/agent-memory/ here; agents manage that automatically. Only update if substantive shared decisions were made.",
-            "timeout": 30
-          }
-        ]
-      }
-    ]
+    "PostToolUse": []
   }
 }

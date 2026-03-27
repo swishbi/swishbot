@@ -86,14 +86,14 @@ Example frontmatter with a hook:
 
 ```yaml
 ---
-name: dlt
-description: "Write dlt/Python data ingestion pipelines."
+name: my-skill
+description: "Example skill with a pre-tool hook."
 hooks:
   PreToolUse:
-    - matcher: "Write|Edit"
+    - matcher: "Bash"
       hooks:
         - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/skills/dlt/scripts/check-secrets.sh"
+          command: "${CLAUDE_PLUGIN_ROOT}/skills/my-skill/scripts/validate.sh"
           timeout: 10
 ---
 ```

@@ -79,7 +79,7 @@ Scaffold a memory directory so Claude can persist modeling decisions, source met
 /swishbot:init-memory
 ```
 
-This creates `.claude/memory/` with template files and a session-end hook. There are two distinct memory systems at work:
+This creates `.claude/memory/` with template files. There are two distinct memory systems at work:
 
 - **Per-agent memory** — Each agent (analytics-engineer, data-engineer, etc.) automatically manages its own `.claude/agent-memory/<agent-name>/` directory via `memory: project`. No setup needed.
 - **Shared project memory** — `/swishbot:init-memory` creates `.claude/memory/` for cross-agent decisions (naming conventions, modeling choices, source quirks) that all agents read and contribute to.

@@ -131,9 +131,8 @@ Current hooks:
 
 | Skill | Event | Matcher | Script |
 |-------|-------|---------|--------|
-| `dba-security` | PreToolUse | `Write\|Edit` | `validate-sql.sh` |
-| `dlt` | PreToolUse | `Write\|Edit` | `check-secrets.sh` |
-| `iac-terraform` | PreToolUse | `Write\|Edit` | `validate-terraform.sh` |
+| `dba-security` | PreToolUse | `Bash` | `validate-sql.sh` |
+| `iac-terraform` | PreToolUse | `Bash` | `validate-terraform.sh` |
 
 Hook scripts use `${CLAUDE_PLUGIN_ROOT}` paths to locate scripts within the plugin directory.
 
@@ -155,11 +154,11 @@ MCP servers are auto-configured via the plugin's `.mcp.json`. No manual setup ne
 | Memory type | Path | Scope | Managed by |
 |-------------|------|-------|------------|
 | Per-agent memory | `.claude/agent-memory/<agent-name>/` | Single agent | Auto-managed by Claude Code (`memory: project`) |
-| Shared project memory | `.claude/memory/` | All agents + main session | Updated via Stop hook |
+| Shared project memory | `.claude/memory/` | All agents + main session | Updated manually or via `MEMORY.md` conventions |
 
 **Per-agent memory** is declared with `memory: project` in each agent's frontmatter. Claude Code automatically creates `.claude/agent-memory/<agent-name>/MEMORY.md` and injects it into the agent's system prompt at startup — no configuration needed. Use this for agent-specific learnings.
 
-**Shared project memory** is what `/swishbot:init-memory` creates. All agents read it at session start, and the Stop hook prompts Claude to write cross-agent decisions (naming conventions, modeling choices, source quirks) back to it.
+**Shared project memory** is what `/swishbot:init-memory` creates. All agents read it at session start. Update these files manually or ask Claude to update them when cross-agent decisions are made (naming conventions, modeling choices, source quirks).
 
 To also load shared memory in the **main session** (not inside an agent), add an `@` import to your `CLAUDE.md`:
 

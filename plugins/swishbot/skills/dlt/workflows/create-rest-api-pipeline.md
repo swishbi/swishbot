@@ -109,7 +109,7 @@ def my_source(api_token: str = dlt.secrets.value):
     ...
 ```
 
-Never hardcode credentials in pipeline code — the `check-secrets.sh` hook will block writes containing secrets.
+Never hardcode credentials in pipeline code — use `dlt.secrets.value` or environment variables instead.
 
 ## Step 3: Configure Pagination
 
