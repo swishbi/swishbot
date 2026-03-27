@@ -223,7 +223,6 @@ def test_hooks_json_is_valid():
     # Must have at least PreToolUse and PostToolUse
     assert "PreToolUse" in data["hooks"]
     assert "PostToolUse" in data["hooks"]
-    assert "Stop" in data["hooks"]
 
 
 def test_hooks_scripts_use_plugin_root():

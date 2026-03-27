@@ -27,28 +27,7 @@ You are setting up shared project memory templates for cross-agent knowledge per
 
    Read each template file from the plugin, then write it to the target.
 
-4. **Set up session capture hook.** Check if `.claude/settings.json` exists:
-   - If it does NOT exist, create it with:
-     ```json
-     {
-       "hooks": {
-         "Stop": [
-           {
-             "hooks": [
-               {
-                 "type": "prompt",
-                 "prompt": "Review this session. If cross-agent project decisions were made — naming conventions, modeling choices, source configurations — update the relevant files in .claude/memory/. Do NOT update .claude/agent-memory/ here; agents manage that automatically. Only update if substantive shared decisions were made.",
-                 "timeout": 30
-               }
-             ]
-           }
-         ]
-       }
-     }
-     ```
-   - If it DOES exist, inform the user they may want to add the Stop hook manually.
-
-5. **Print a summary:**
+4. **Print a summary:**
    ```
    Memory templates → .claude/memory/
      - MEMORY.md

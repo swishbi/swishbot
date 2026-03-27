@@ -60,7 +60,7 @@ def my_source(bucket_url: str = dlt.config.value):
     ...
 ```
 
-Never hardcode credentials in pipeline code — the `check-secrets.sh` hook will block writes containing secrets.
+Never hardcode credentials in pipeline code — use `dlt.secrets.value` or environment variables instead.
 
 ## Step 2: Define Table Configs
 

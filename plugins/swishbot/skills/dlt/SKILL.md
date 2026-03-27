@@ -2,13 +2,6 @@
 name: dlt
 description: "Write and maintain dlt/Python data ingestion pipelines. Use when a user asks to ingest data from an API, database, or file into a warehouse, create a new EL pipeline, debug a failing pipeline, add a new endpoint to an existing pipeline, handle schema changes, change write dispositions or primary keys, retire a resource, or tune pipeline performance."
 argument-hint: "[source-name]"
-hooks:
-  PreToolUse:
-    - matcher: "Write|Edit"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/skills/dlt/scripts/check-secrets.sh"
-          timeout: 10
 ---
 
 # dlt Pipelines

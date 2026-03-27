@@ -98,19 +98,6 @@ You are migrating an existing data project (dlt pipelines, dbt project, or both)
     - Create `.claude/settings.json` with plugin marketplace config:
     ```json
     {
-      "hooks": {
-        "Stop": [
-          {
-            "hooks": [
-              {
-                "type": "prompt",
-                "prompt": "Review this session. If cross-agent project decisions were made — naming conventions, modeling choices, source configurations — update the relevant files in .claude/memory/. Do NOT update .claude/agent-memory/ here; agents manage that automatically. Only update if substantive shared decisions were made.",
-                "timeout": 30
-              }
-            ]
-          }
-        ]
-      },
       "extraKnownMarketplaces": {
         "swishbot": {
           "source": {

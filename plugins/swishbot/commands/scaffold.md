@@ -66,19 +66,6 @@ You are scaffolding a new analytics project. The project name is provided as `$A
    - Create `.claude/settings.json` with the following content:
    ```json
    {
-     "hooks": {
-       "Stop": [
-         {
-           "hooks": [
-             {
-               "type": "prompt",
-               "prompt": "Review this session. If cross-agent project decisions were made — naming conventions, modeling choices, source configurations — update the relevant files in .claude/memory/. Do NOT update .claude/agent-memory/ here; agents manage that automatically. Only update if substantive shared decisions were made.",
-               "timeout": 30
-             }
-           ]
-         }
-       ]
-     },
      "extraKnownMarketplaces": {
        "swishbot": {
          "source": {
