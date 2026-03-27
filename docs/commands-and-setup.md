@@ -92,7 +92,7 @@ Scaffold a project memory directory with templates for Claude to persist decisio
 /swishbot:init-memory
 ```
 
-This creates a `.claude/memory/` directory with template files and a `Stop` hook that prompts Claude to save decisions at the end of each session:
+This creates a `.claude/memory/` directory with template files:
 
 - `MEMORY.md`
 - `conventions.md`

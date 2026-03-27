@@ -51,7 +51,7 @@ New team members clone the repo, open with Claude Code, and are prompted to acce
 |-----------|-------|-------------|
 | Skills | 8 | dbt, dagster, dlt, dimensional-modeling, powerbi, requirements-discovery, dba-security, iac-terraform |
 | Agents | 4 | analytics-engineer, data-engineer, business-analyst, platform-engineer |
-| Hooks | Auto | SQL validation, credential checks, Terraform validation |
+| Hooks | Auto | SQL validation, Terraform validation |
 | MCP servers | 4 | dbt, dagster, dlt, powerbi |
 | Slash commands | 4 | scaffold, init-project, init-memory, migrate |
 
