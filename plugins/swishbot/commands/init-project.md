@@ -22,9 +22,9 @@ You are setting up a project with swishbot's starter CLAUDE.md and SECURITY.md.
 
 4. **Copy SECURITY.md** from `${CLAUDE_PLUGIN_ROOT}/SECURITY.md` to `.claude/SECURITY.md`. Read the source file first, then write it to the target.
 
-5. **Copy settings.json** from `${CLAUDE_PLUGIN_ROOT}/.claude/settings.json` to `.claude/settings.json`. Read the source file first, then write it to the target. If `.claude/settings.json` already exists, skip silently — do not overwrite user customizations.
+5. **Copy settings.json** from `${CLAUDE_PLUGIN_ROOT}/templates/settings.json` to `.claude/settings.json`. Read the source file first, then write it to the target. If `.claude/settings.json` already exists, skip silently — do not overwrite user customizations. Note whether the file was installed or skipped; you will need this for the summary.
 
-6. **Print a summary:**
+6. **Print a summary.** Use the template below, but if settings.json was skipped in step 5, replace `settings.json → .claude/settings.json` with `settings.json → skipped (already exists)`:
    ```
    Installed:
      CLAUDE.md    → .claude/CLAUDE.md
