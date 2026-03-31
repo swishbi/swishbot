@@ -10,6 +10,7 @@ src/swishbot/_version.py
 # Virtual environments
 .venv/
 venv/
+.env
 
 # Testing
 .pytest_cache/
