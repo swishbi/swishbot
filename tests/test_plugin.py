@@ -306,3 +306,27 @@ def test_plugin_claude_md_exists():
 
 def test_plugin_security_md_exists():
     assert (PLUGIN_ROOT / "SECURITY.md").exists(), "Plugin SECURITY.md not found"
+
+
+# ─── settings ────────────────────────────────────────────────────────
+
+
+def test_plugin_settings_json_exists():
+    assert (PLUGIN_ROOT / ".claude" / "settings.json").exists(), ".claude/settings.json missing from plugin"
+
+
+def test_plugin_settings_allows_mcp_servers():
+    settings_file = PLUGIN_ROOT / ".claude" / "settings.json"
+    data = json.loads(settings_file.read_text())
+    allowed = data.get("permissions", {}).get("allow", [])
+    mcp_rules = [r for r in allowed if r.startswith("mcp__")]
+    assert len(mcp_rules) > 0, "No MCP allow rules found in settings.json"
+    expected_servers = {"dbt", "dagster-dg-cli", "dlt", "powerbi-modeling", "powerbi-remote"}
+    covered = {rule.split("__")[1] for rule in mcp_rules if len(rule.split("__")) >= 2}
+    assert expected_servers.issubset(covered), f"MCP servers not covered in settings: {expected_servers - covered}"
+
+
+def test_settings_template_matches_plugin_settings():
+    plugin_settings = json.loads((PLUGIN_ROOT / ".claude" / "settings.json").read_text())
+    template_settings = json.loads((TEMPLATES_DIR / "settings.json").read_text())
+    assert plugin_settings == template_settings, "templates/settings.json does not match .claude/settings.json"
