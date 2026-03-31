@@ -36,6 +36,7 @@ You are scaffolding a new analytics project. The project name is provided as `$A
      - `devcontainer/` → `.devcontainer/`
      - `github/` → `.github/`
    - Skip the `memory/` subdirectory (handled separately in step 8)
+   - Skip `settings.json` (merged into `.claude/settings.json` in step 8)
 
 5. **Create `__init__.py` files** (empty) in these directories:
    - `ingestion/`
@@ -66,6 +67,15 @@ You are scaffolding a new analytics project. The project name is provided as `$A
    - Create `.claude/settings.json` with the following content:
    ```json
    {
+     "permissions": {
+       "allow": [
+         "mcp__dbt__*",
+         "mcp__dagster-dg-cli__*",
+         "mcp__dlt__*",
+         "mcp__powerbi-modeling__*",
+         "mcp__powerbi-remote__*"
+       ]
+     },
      "extraKnownMarketplaces": {
        "swishbot": {
          "source": {

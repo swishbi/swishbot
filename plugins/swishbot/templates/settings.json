@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__dbt__*",
+      "mcp__dagster-dg-cli__*",
+      "mcp__dlt__*",
+      "mcp__powerbi-modeling__*",
+      "mcp__powerbi-remote__*"
+    ]
+  }
+}
