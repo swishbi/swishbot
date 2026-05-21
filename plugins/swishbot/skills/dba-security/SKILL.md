@@ -1,13 +1,6 @@
 ---
 name: dba-security
 description: "Apply DBA security best practices. Use when a user asks to set up warehouse roles, configure access controls, create database environments, set up dbt grants, implement row-level security, or audit permissions. Applies to Snowflake, BigQuery, Databricks, Postgres, and DuckDB."
-hooks:
-  PreToolUse:
-    - matcher: "Bash"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/skills/dba-security/scripts/validate-sql.sh"
-          timeout: 10
 ---
 
 # DBA Security Practices

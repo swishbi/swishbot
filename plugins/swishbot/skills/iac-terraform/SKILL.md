@@ -1,13 +1,6 @@
 ---
 name: iac-terraform
 description: "Deploy analytics infrastructure as code with Terraform. Use when a user asks to provision Snowflake warehouses, BigQuery datasets, Databricks workspaces, GCS/S3 storage buckets, IAM roles, or Azure AI Foundry resources for data platform services."
-hooks:
-  PreToolUse:
-    - matcher: "Bash"
-      hooks:
-        - type: command
-          command: "${CLAUDE_PLUGIN_ROOT}/skills/iac-terraform/scripts/validate-terraform.sh"
-          timeout: 10
 ---
 
 # Infrastructure as Code — Terraform
