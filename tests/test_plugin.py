@@ -5,6 +5,7 @@
 
 import json
 import re
+import subprocess
 from pathlib import Path
 
 PLUGIN_ROOT = Path(__file__).resolve().parents[1] / "plugins" / "swishbot"
@@ -108,6 +109,24 @@ def test_skill_hook_scripts_use_plugin_root():
             assert "~/.claude/" not in frontmatter, (
                 f"Skill {skill_dir.name} uses ~/.claude/ path in hooks — should use ${{CLAUDE_PLUGIN_ROOT}}"
             )
+
+
+def test_no_skill_declares_hooks_in_frontmatter():
+    """Hooks belong in plugins/swishbot/hooks/hooks.json, not in SKILL.md frontmatter.
+
+    Declaring hooks in both places causes double-firing. The hooks.json file is the
+    single source of truth — see the Hooks section of CLAUDE.md.
+    """
+    for skill_dir in _get_skills():
+        content = (skill_dir / "SKILL.md").read_text()
+        fm_match = re.match(r"^---\n(.+?)\n---", content, re.DOTALL)
+        if not fm_match:
+            continue
+        frontmatter = fm_match.group(1)
+        assert not re.search(r"^hooks:", frontmatter, re.MULTILINE), (
+            f"Skill {skill_dir.name} declares hooks in SKILL.md frontmatter — "
+            f"move them to plugins/swishbot/hooks/hooks.json"
+        )
 
 
 # ─── agents ──────────────────────────────────────────────────────────
@@ -330,3 +349,82 @@ def test_settings_template_matches_plugin_settings():
     plugin_settings = json.loads((PLUGIN_ROOT / ".claude" / "settings.json").read_text())
     template_settings = json.loads((TEMPLATES_DIR / "settings.json").read_text())
     assert plugin_settings == template_settings, "templates/settings.json does not match .claude/settings.json"
+
+
+# ─── hook script behavior ───────────────────────────────────────────
+
+
+VALIDATE_SQL = PLUGIN_ROOT / "skills" / "dba-security" / "scripts" / "validate-sql.sh"
+VALIDATE_TF = PLUGIN_ROOT / "skills" / "iac-terraform" / "scripts" / "validate-terraform.sh"
+
+
+def _run_hook(script: Path, command: str, cwd: str) -> int:
+    payload = json.dumps(
+        {
+            "tool_name": "Bash",
+            "tool_input": {"command": command},
+            "cwd": cwd,
+        }
+    )
+    result = subprocess.run(
+        ["bash", str(script)],
+        input=payload,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return result.returncode
+
+
+def test_sql_hook_skips_outside_dbt_project(tmp_path):
+    """No dbt_project.yml in tree → hook is a no-op even for dangerous commands."""
+    assert _run_hook(VALIDATE_SQL, "psql -c 'DROP TABLE foo;'", str(tmp_path)) == 0
+
+
+def test_sql_hook_fires_inside_dbt_project(tmp_path):
+    """dbt_project.yml ancestor → dangerous command is blocked."""
+    (tmp_path / "dbt_project.yml").write_text("name: test\n")
+    sub = tmp_path / "models" / "staging"
+    sub.mkdir(parents=True)
+    assert _run_hook(VALIDATE_SQL, "psql -c 'DROP TABLE foo;'", str(sub)) == 2
+
+
+def test_sql_hook_fires_with_enforce_marker(tmp_path):
+    """Opt-in .swishbot-enforce marker activates the hook anywhere."""
+    (tmp_path / ".swishbot-enforce").write_text("")
+    assert _run_hook(VALIDATE_SQL, "psql -c 'DROP TABLE foo;'", str(tmp_path)) == 2
+
+
+def test_sql_hook_allows_benign_command_in_scope(tmp_path):
+    """Benign Bash commands pass through even inside a dbt project."""
+    (tmp_path / "dbt_project.yml").write_text("name: test\n")
+    assert _run_hook(VALIDATE_SQL, "ls -la", str(tmp_path)) == 0
+
+
+def test_terraform_hook_skips_outside_tf_project(tmp_path):
+    """No *.tf, no .terraform/, no marker → no-op."""
+    assert _run_hook(VALIDATE_TF, "terraform destroy", str(tmp_path)) == 0
+
+
+def test_terraform_hook_fires_with_tf_file(tmp_path):
+    """A *.tf file in the tree activates the hook."""
+    (tmp_path / "main.tf").write_text("")
+    assert _run_hook(VALIDATE_TF, "terraform destroy", str(tmp_path)) == 2
+
+
+def test_terraform_hook_fires_with_terraform_dir(tmp_path):
+    """A .terraform/ directory activates the hook."""
+    (tmp_path / ".terraform").mkdir()
+    assert _run_hook(VALIDATE_TF, "terraform destroy", str(tmp_path)) == 2
+
+
+def test_terraform_hook_fires_with_enforce_marker(tmp_path):
+    """Opt-in .swishbot-enforce marker activates the hook anywhere."""
+    (tmp_path / ".swishbot-enforce").write_text("")
+    assert _run_hook(VALIDATE_TF, "terraform destroy", str(tmp_path)) == 2
+
+
+def test_terraform_hook_allows_benign_command_in_scope(tmp_path):
+    """Benign Bash commands pass through even inside a Terraform project."""
+    (tmp_path / "main.tf").write_text("")
+    assert _run_hook(VALIDATE_TF, "terraform plan", str(tmp_path)) == 0

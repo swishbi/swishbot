@@ -86,6 +86,23 @@ Each command is a markdown file in `plugins/swishbot/commands/` with YAML frontm
 - All hook scripts must use `${CLAUDE_PLUGIN_ROOT}` for paths
 - Plugin version in `plugin.json` must be bumped for each release (cache invalidation)
 
+## Hooks
+
+All hooks are declared in a single file: `plugins/swishbot/hooks/hooks.json`. Do **not** duplicate hook declarations in individual `SKILL.md` frontmatter — that causes double-firing.
+
+Claude Code matchers only support tool names (`Bash`, `Write|Edit`), not file-path or CWD patterns. Any directory/project scoping must happen **inside the hook script**.
+
+Convention for `type: command` hooks:
+
+- Read `tool_input.command` (not top-level `command`) and `cwd` from the JSON payload on stdin
+- Short-circuit (exit 0) when CWD is outside the relevant project context. Existing scope markers:
+  - `validate-sql.sh` fires only when `dbt_project.yml` is found in CWD or any ancestor (up to 8 levels)
+  - `validate-terraform.sh` fires only when a `*.tf` file or `.terraform/` directory is found in CWD or any ancestor
+  - Either script also fires when a `.swishbot-enforce` opt-in marker exists in CWD or an ancestor (escape hatch for non-standard project layouts)
+- Use `set -euo pipefail` and bound any upward `dirname` walk with a depth limit (the existing scripts use 8)
+
+Avoid `type: prompt` hooks. They spawn an LLM round-trip on every matched tool call, can't be conditionally scoped, and their natural-language responses get treated as blocking errors when the file isn't relevant (e.g., a markdown plan file evaluated against SQL conventions). Teach conventions through skill body content and `references/` files instead.
+
 ## New Skill Checklist
 
 When adding a new skill, complete every step:
@@ -98,7 +115,7 @@ When adding a new skill, complete every step:
 3. Add optional subdirectories if needed: `workflows/`, `examples/`, `scripts/`
 4. Add cross-references to related skills in a `## Related Skills` section
 5. Update related skills to cross-reference back to the new skill
-6. If the skill has hooks: add them to `plugins/swishbot/hooks/hooks.json` using `${CLAUDE_PLUGIN_ROOT}` paths
+6. If the skill has hooks: add them to `plugins/swishbot/hooks/hooks.json` using `${CLAUDE_PLUGIN_ROOT}` paths, and scope the hook script by CWD/project marker (see the **Hooks** section above). Do not declare hooks in `SKILL.md` frontmatter.
 7. Update the status table in `README.md` — add the skill row and set status to `:white_check_mark:`
 8. Update the `CATEGORIES` dict in `docs/hooks/skills_catalog.py` — add the skill to the correct category
 9. Run `uv run ruff check tests/ docs/` and `uv run ruff format tests/ docs/`

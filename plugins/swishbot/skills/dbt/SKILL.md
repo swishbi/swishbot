@@ -2,19 +2,6 @@
 name: dbt
 description: "Build the dbt transformation layer. Use for any dbt work — staging sources, building intermediate models, creating marts, defining MetricFlow semantic models and metrics, querying with mf CLI, applying SQL conventions, setting up dbt MCP, debugging errors, or reviewing project structure."
 argument-hint: "[source-name-or-model-name]"
-hooks:
-  PreToolUse:
-    - matcher: "Write|Edit"
-      hooks:
-        - type: prompt
-          prompt: "Check if the file being written follows dbt naming conventions (stg_, int_, fct_, dim_ prefixes) and SQL style rules from references/style-and-conventions.md. If violations found, list them."
-          timeout: 15
-  PostToolUse:
-    - matcher: "Write|Edit"
-      hooks:
-        - type: prompt
-          prompt: "If the file just written is a staging model, verify it follows the CTE structure (source, renamed, final) defined in references/staging-sql-conventions.md."
-          timeout: 15
 ---
 
 # dbt Transformation Layer
