@@ -20,10 +20,20 @@ Authoritative references:
 | Workflow | When to Use |
 |----------|-------------|
 | [Design Semantic Model](workflows/design-semantic-model.md) | Planning which tables to import, model boundaries, single vs. split model decisions |
-| [Build Semantic Model](workflows/build-semantic-model.md) | Creating or editing the model — M queries, relationships, DAX measures, naming conventions |
+| [Build Semantic Model](workflows/build-semantic-model.md) | Creating or editing the model — M queries, relationships, DAX measures, naming conventions, donor-cloning measure suites |
+| [Edit TMDL at Scale](workflows/edit-tmdl-at-scale.md) | Bulk, zero-corruption editing of PBIP/TMDL files — measure suites, model-wide rewrites — via the generate → chunk → Edit → byte-verify pipeline when the Modeling MCP isn't available |
 | [Build Report](workflows/build-report.md) | Building reports against a live-connected semantic model — layout, visuals, filters, audiences |
 | [Deploy and Publish](workflows/deploy-and-publish.md) | Setting up workspaces, deployment pipelines (DEV/TEST/PROD), apps, refresh schedules |
 | [Connect and Consume](workflows/connect-and-consume.md) | Connecting to the semantic model from Excel or external tools instead of exporting data |
+
+## References
+
+Deep-dive references for file-based semantic-model work. Load the specific one your task needs.
+
+| Reference | When to Use |
+|-----------|-------------|
+| [TMDL Anatomy](references/tmdl-anatomy.md) | PBIP folder layout and TMDL block grammar, UTF-8/CRLF encoding rules, `lineageTag` uniqueness, the `_Measures` insertion anchor, and paired structures (`_PrmKPI`, calculated columns) |
+| [DAX Time-Intelligence Patterns](references/dax-time-intelligence-patterns.md) | Prior-period / to-date / complete-period DAX patterns, the format-mapping-by-base-type table, and the canonical ~70-variant TI suite catalog |
 
 ## Core Tenets
 

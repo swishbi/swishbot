@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Project Is
 
-swishbot is a Claude Code plugin that distributes "skills" and "agents" for data engineering work. Skills are opinionated methodology guides; agents are persona definitions that compose multiple skills into roles (e.g., analytics-engineer, data-engineer). The repo is structured as a **monorepo marketplace** containing a single plugin.
+swishbot is a Claude Code plugin that distributes "skills" and "agents" for data engineering work. Skills are opinionated methodology guides; agents are persona definitions that compose multiple skills into roles (e.g., data-engineer, platform-engineer). The repo is structured as a **monorepo marketplace** containing a single plugin.
 
 ## Commands
 
@@ -30,7 +30,7 @@ The repo is a **marketplace** (`.claude-plugin/marketplace.json`) containing one
 ### Plugin Structure (`plugins/swishbot/`)
 
 - **`skills/`** — 8 skill directories, each with `SKILL.md` (YAML frontmatter + methodology content) and optional `workflows/`, `examples/`, `scripts/`, `references/` subdirectories
-- **`agents/`** — 4 agent markdown files with YAML frontmatter (`name`, `description`, `model`, `color`, `skills`, `mcpServers`, `memory`) and persona content
+- **`agents/`** — 3 agent markdown files with YAML frontmatter (`name`, `description`, `model`, `color`, `skills`, `mcpServers`, `memory`) and persona content
 - **`commands/`** — 3 slash commands (`scaffold.md`, `init-project.md`, `init-memory.md`) that replace the old CLI subcommands
 - **`hooks/hooks.json`** — Merged hooks from all skills (PreToolUse, PostToolUse, Stop events)
 - **`.mcp.json`** — MCP server definitions (dbt, dagster, dlt, powerbi)

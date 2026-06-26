@@ -1,6 +1,6 @@
 # swishbot
 
-A Claude Code plugin that distributes data stack skills, agents, and project scaffolding for [Swish BI](https://swishbi.com). Install once — get 8 skills, 4 agents, hooks, MCP servers, and slash commands.
+A Claude Code plugin that distributes data stack skills, agents, and project scaffolding for [Swish BI](https://swishbi.com). Install once — get 8 skills, 3 agents, hooks, MCP servers, and slash commands.
 
 ## What is swishbot?
 
@@ -8,7 +8,7 @@ swishbot distributes self-contained **skills**, **agents**, **hooks**, **MCP ser
 
 **Skills** are opinionated methodology guides that Claude reads to understand how to execute specific tasks. Each skill encodes *how to think about the problem*, not platform-specific implementation details. Claude already knows the platforms (Snowflake, BigQuery, Databricks, etc.) — skills teach it how **you** think.
 
-**Agents** are persona definitions that compose multiple skills into a focused role (e.g., analytics-engineer, data-engineer). They give Claude a specific identity for a type of work.
+**Agents** are persona definitions that compose multiple skills into a focused role (e.g., data-engineer, platform-engineer). They give Claude a specific identity for a type of work.
 
 **Hooks** enforce rules automatically — SQL validation, credential checks, and more — without any manual setup.
 
@@ -37,7 +37,7 @@ swishbot distributes self-contained **skills**, **agents**, **hooks**, **MCP ser
 Everything is now available:
 
 - 8 skills auto-loaded
-- 4 agents in `/agents`
+- 3 agents in `/agents`
 - Hooks active
 - MCP servers configured
 

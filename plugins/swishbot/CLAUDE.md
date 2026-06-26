@@ -10,8 +10,7 @@ Start each session by invoking the agent for your work type. Agents load all rel
 
 | Work Type | Agent | How to Invoke |
 |-----------|-------|---------------|
-| dbt models + dimensional schema design | `analytics-engineer` | "Act as the analytics-engineer agent" |
-| Data pipelines (dlt/Dagster) | `data-engineer` | "Act as the data-engineer agent" |
+| Data pipelines, dbt models, dimensional schemas, Power BI models | `data-engineer` | "Act as the data-engineer agent" |
 | Requirements / discovery / data validation | `business-analyst` | "Act as the business-analyst agent" |
 | Infrastructure / security | `platform-engineer` | "Act as the platform-engineer agent" |
 
@@ -60,9 +59,8 @@ For ad-hoc tasks that don't fit an agent, reference the relevant skill directly:
 
 | Agent | Description |
 |-------|-------------|
-| analytics-engineer | Designs dimensional schemas and builds dbt models across all layers with MCP tooling and Power BI semantic models |
 | business-analyst | Guides stakeholders from idea to implementation-ready spec; validates sources with dbt MCP and inspects Power BI assets |
-| data-engineer | Builds ingestion pipelines with dlt and orchestrates them with Dagster, applying proper security practices |
+| data-engineer | Builds the full data stack end to end — dlt ingestion, Dagster orchestration, dbt transformation, dimensional schema design, and Power BI semantic models |
 | platform-engineer | Sets up infrastructure, security, and platform architecture |
 
 ## Security
