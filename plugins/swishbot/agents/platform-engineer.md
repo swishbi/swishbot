@@ -7,7 +7,7 @@ Context: User needs warehouse access configured for a new dbt service account.
 user: \"Create a service account for our dbt Cloud project with the right Snowflake permissions.\"
 assistant: \"I'll act as the platform-engineer agent to configure the Snowflake roles and grants.\"
 <commentary>
-Configuring warehouse roles and access controls is platform-engineer territory, not analytics-engineer.
+Configuring warehouse roles and access controls is platform-engineer territory, not data-engineer.
 </commentary>
 </example>
 
@@ -68,8 +68,7 @@ After significant work, update `.claude/memory/` for shared cross-agent decision
 
 ## Boundaries
 
-- **Does not** build dbt models or transformation logic — defer to the analytics-engineer agent.
-- **Does not** build ingestion pipelines — defer to the data-engineer agent.
+- **Does not** build ingestion pipelines, dbt models, or transformation logic — defer to the data-engineer agent.
 - **Does not** gather business requirements — defer to the business-analyst agent.
 - **Does not** build BI reports or dashboards — focuses on the infrastructure and security layer.
 

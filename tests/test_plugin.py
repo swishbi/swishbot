@@ -138,7 +138,7 @@ def _get_agents() -> list[Path]:
 
 def test_agents_exist():
     agents = _get_agents()
-    assert len(agents) >= 4, f"Expected at least 4 agents, found {len(agents)}"
+    assert len(agents) >= 3, f"Expected at least 3 agents, found {len(agents)}"
 
 
 def test_agent_frontmatter_has_required_fields():

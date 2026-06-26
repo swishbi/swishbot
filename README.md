@@ -4,7 +4,7 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![License](https://img.shields.io/badge/license-Proprietary-red)](LICENSE)
 
-A Claude Code plugin that distributes data stack skills, agents, and project scaffolding for [Swish BI](swishbi.com). Install once — get 9 skills, 4 agents, hooks, MCP servers, and slash commands.
+A Claude Code plugin that distributes data stack skills, agents, and project scaffolding for [Swish BI](swishbi.com). Install once — get 9 skills, 3 agents, hooks, MCP servers, and slash commands.
 
 ## Quick Start
 
@@ -17,7 +17,7 @@ A Claude Code plugin that distributes data stack skills, agents, and project sca
 
 # Everything is now available:
 # - 8 skills auto-loaded
-# - 4 agents in /agents
+# - 3 agents in /agents
 # - Hooks active
 # - MCP servers configured
 
@@ -99,9 +99,8 @@ Agents are persona definitions that compose multiple skills into roles. Install 
 
 | Agent | Description | Skills Composed |
 |-------|-------------|-----------------|
-| `analytics-engineer` | Designs dimensional schemas and builds dbt models across all layers with MCP tooling and Power BI semantic models | dbt, dimensional-modeling, powerbi |
 | `business-analyst` | Guides stakeholders from idea to implementation-ready spec; validates sources with dbt MCP and inspects Power BI assets | requirements-discovery, dbt, powerbi |
-| `data-engineer` | Builds ingestion pipelines with dlt and orchestrates them with Dagster, applying proper security practices | dlt, dba-security, dagster |
+| `data-engineer` | Builds the full data stack end to end — dlt ingestion, Dagster orchestration, dbt transformation, dimensional schema design, and Power BI semantic models | dlt, dba-security, dagster, dbt, dimensional-modeling, powerbi |
 | `platform-engineer` | Sets up infrastructure, security, and platform architecture | dagster, iac-terraform, dba-security |
 
 ## Slash Commands
@@ -144,8 +143,7 @@ swishbot/
 │       │   ├── dba-security/
 │       │   ├── iac-terraform/
 │       │   └── tech-docs/
-│       ├── agents/                   # All 4 agents
-│       │   ├── analytics-engineer.md
+│       ├── agents/                   # All 3 agents
 │       │   ├── data-engineer.md
 │       │   ├── business-analyst.md
 │       │   └── platform-engineer.md

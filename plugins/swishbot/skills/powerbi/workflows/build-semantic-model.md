@@ -305,7 +305,9 @@ With the framework tables in place, write the client-specific business measures 
 
 ### 7. Apply TMDL Format (If Version-Controlled)
 
-When the semantic model is managed in source control (e.g., via Tabular Editor or the TMDL format), follow the TMDL file structure for measures, tables, and relationships. This enables proper diff/merge workflows. See [examples/semantic_model.tmdl](../examples/semantic_model.tmdl) for the full structure.
+When the semantic model is managed in source control (e.g., via Tabular Editor or the TMDL format), follow the TMDL file structure for measures, tables, and relationships. This enables proper diff/merge workflows. See [examples/semantic_model.tmdl](../examples/semantic_model.tmdl) for the full structure, and [references/tmdl-anatomy.md](../references/tmdl-anatomy.md) for the block grammar, encoding rules, and `lineageTag` requirements.
+
+**How to edit:** When the Power BI **Modeling MCP server is available, prefer it** — it creates, edits, and validates measures, relationships, and columns directly, with no whitespace bookkeeping. For file-based PBIP editing where the Modeling MCP can't be used — cloud-synced paths (OneDrive/SharePoint) with sandbox-blocked `Bash` writes, no Windows/Power BI Desktop, or headless/CI — use the proven **generate → chunk → Edit → byte-verify** pipeline in [Edit TMDL at Scale](edit-tmdl-at-scale.md). Never hand-type bulk TMDL changes.
 
 ### 8. Configure Refresh
 
@@ -323,6 +325,32 @@ Before publishing:
 - Verify parameters are used everywhere — search for hardcoded server/database strings
 - Confirm `discourageImplicitMeasures` is enabled
 - Check that all key/FK columns are hidden in `_hidden` display folders
+
+## Cloning measure suites (donor-clone)
+
+Large time-intelligence suites (70–140 measures per base) are authored by **cloning a live donor suite**, not by hand. The rules:
+
+- **Clone from the current bytes of a live donor suite — never from templates or backups.** The donor carries every bug fix made since it was authored; a stale source silently resurrects fixed bugs.
+- **Audit the donor before cloning.** Assert the exact set of `formatString`s and `annotation`s found in the donor blocks — surplus items are inherited warts. (This audit once caught `PYWTD` missing its `formatString` in all 16 suites, and a stale description line cloned onto 17 `(Reference Date)` measures — both traced to the original template and fixed model-wide.)
+- **Per-block rewrites:**
+  - **Name** in the header.
+  - **`[Measure]` cross-references** — a plain string-replace of the base name covers the header, description, and DAX.
+  - **Description** — donor descriptions follow the `"<Base> <variant phrase>."` template, so substitution is trivial. Enforce this template when authoring.
+  - **`displayFolder`** → the new suite folder.
+  - **`lineageTag`** → a **fresh `uuid4`** (never reuse the donor's).
+  - **`formatString`** → mapped per target type using the [format-mapping table](../references/dax-time-intelligence-patterns.md#format-mapping-by-base-type). Assert-fail on any format you didn't expect.
+- **Think before cloning every variant.** A `(Reference Date)` variant that activates a `DimDate→DimJob` relationship double-filters against a base that already pins `DimDate→Fact` via `USERELATIONSHIP` (different table pairs ⇒ both active). Drop variants whose semantics break for the base — don't clone for symmetry.
+- **Display-folder convention:** each base gets `<Area>\<Base Name>`, and the base measure itself **moves into its own suite folder** alongside its companions.
+
+Apply the generated blocks with the [Edit TMDL at Scale](edit-tmdl-at-scale.md) pipeline, and use the [DAX Time-Intelligence Patterns](../references/dax-time-intelligence-patterns.md) reference for the underlying measure logic and the canonical suite catalog.
+
+## Documentation style guide
+
+Measure descriptions are end-user-facing — keep doc generation mechanical and the voice consistent:
+
+- **Mirror the dbt YAML voice** — descriptions read like a business glossary, not internal notes.
+- **End-user voice, no internal jargon** — avoid `int_`, "surrogate", "grain", "seed", and similar implementation terms.
+- **Use the `"<Base> <variant phrase>."` template** for time-intelligence companions, so a base description plus a variant phrase composes the companion's description automatically.
 
 ---
 

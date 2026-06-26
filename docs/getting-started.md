@@ -50,7 +50,7 @@ New team members clone the repo, open with Claude Code, and are prompted to acce
 | Component | Count | Description |
 |-----------|-------|-------------|
 | Skills | 8 | dbt, dagster, dlt, dimensional-modeling, powerbi, requirements-discovery, dba-security, iac-terraform |
-| Agents | 4 | analytics-engineer, data-engineer, business-analyst, platform-engineer |
+| Agents | 3 | data-engineer, business-analyst, platform-engineer |
 | Hooks | Auto | SQL validation, Terraform validation |
 | MCP servers | 4 | dbt, dagster, dlt, powerbi |
 | Slash commands | 4 | scaffold, init-project, init-memory, migrate |
@@ -81,7 +81,7 @@ Scaffold a memory directory so Claude can persist modeling decisions, source met
 
 This creates `.claude/memory/` with template files. There are two distinct memory systems at work:
 
-- **Per-agent memory** — Each agent (analytics-engineer, data-engineer, etc.) automatically manages its own `.claude/agent-memory/<agent-name>/` directory via `memory: project`. No setup needed.
+- **Per-agent memory** — Each agent (data-engineer, business-analyst, etc.) automatically manages its own `.claude/agent-memory/<agent-name>/` directory via `memory: project`. No setup needed.
 - **Shared project memory** — `/swishbot:init-memory` creates `.claude/memory/` for cross-agent decisions (naming conventions, modeling choices, source quirks) that all agents read and contribute to.
 
 After running `init-memory`, uncomment the `@` import in your `CLAUDE.md` to also load shared memory into the main Claude session:
