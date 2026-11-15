@@ -5,7 +5,7 @@ This script sets up catalogs and grants for a Databricks data warehouse
 using Unity Catalog. Run these commands in the Databricks SQL editor.
 
 Databricks maps to the security model as follows:
-  - Databases      → Catalogs (raw, raw_dev, analytics, analytics_dev, analytics_ci)
+  - Databases      → Catalogs (raw, raw_dev, analytics, analytics_dev)
   - Schemas        → Schemas within catalogs (created at runtime by dbt/ingestion)
   - Roles          → Groups
   - Warehouses     → SQL Warehouses (managed separately in workspace settings)
@@ -47,9 +47,6 @@ CREATE CATALOG IF NOT EXISTS analytics
 CREATE CATALOG IF NOT EXISTS analytics_dev
   COMMENT 'Contains development schemas for transformed data.';
 
-CREATE CATALOG IF NOT EXISTS analytics_ci
-  COMMENT 'Transformed data for CI environment. CI reads raw from production.';
-
 
 -- ============================================================================
 -- 2. Groups
@@ -62,6 +59,7 @@ CREATE CATALOG IF NOT EXISTS analytics_ci
 -- CREATE GROUP developer;
 -- CREATE GROUP automation;
 -- CREATE GROUP loader;
+-- CREATE GROUP bi;
 
 
 -- ============================================================================
@@ -73,6 +71,7 @@ CREATE CATALOG IF NOT EXISTS analytics_ci
 --   analyst    is a member of  developer
 --   developer  is a member of  automation
 --   loader     is standalone
+--   bi         is standalone (read-only BI tools)
 --
 -- This means automation inherits all developer and analyst permissions.
 
@@ -83,16 +82,17 @@ CREATE CATALOG IF NOT EXISTS analytics_ci
 -- The role that owns a catalog gets ALL PRIVILEGES — full control over
 -- schemas, tables, and objects within it.
 
--- Loader: full control of raw catalogs
+-- Loader: full control of production raw only
 GRANT ALL PRIVILEGES ON CATALOG raw TO loader;
-GRANT ALL PRIVILEGES ON CATALOG raw_dev TO loader;
 
--- Developer: full control of analytics_dev
+-- Developer: full control of the development catalogs. People, development
+-- agents, CI and branch deployments (service principals in this group) all
+-- work here; CI builds one schema per pull request in analytics_dev.
+GRANT ALL PRIVILEGES ON CATALOG raw_dev TO developer;
 GRANT ALL PRIVILEGES ON CATALOG analytics_dev TO developer;
 
--- Automation: full control of analytics (prod and CI)
+-- Automation: full control of production analytics only
 GRANT ALL PRIVILEGES ON CATALOG analytics TO automation;
-GRANT ALL PRIVILEGES ON CATALOG analytics_ci TO automation;
 
 
 -- ============================================================================
@@ -109,13 +109,6 @@ GRANT BROWSE ON CATALOG raw TO developer;
 GRANT EXECUTE ON CATALOG raw TO developer;
 GRANT READ VOLUME ON CATALOG raw TO developer;
 
-GRANT USE CATALOG ON CATALOG raw_dev TO developer;
-GRANT USE SCHEMA ON CATALOG raw_dev TO developer;
-GRANT SELECT ON CATALOG raw_dev TO developer;
-GRANT BROWSE ON CATALOG raw_dev TO developer;
-GRANT EXECUTE ON CATALOG raw_dev TO developer;
-GRANT READ VOLUME ON CATALOG raw_dev TO developer;
-
 -- Developer: read analytics (prod) — inherited by automation
 GRANT USE SCHEMA ON CATALOG analytics TO developer;
 GRANT SELECT ON CATALOG analytics TO developer;
@@ -127,3 +120,11 @@ GRANT READ VOLUME ON CATALOG analytics TO developer;
 -- config and the grant_usage_on_schemas_where_select on-run-end hook.
 GRANT USE CATALOG ON CATALOG analytics TO analyst;
 GRANT BROWSE ON CATALOG analytics TO analyst;
+
+-- BI: read production analytics and analytics_dev, write nothing
+GRANT USE CATALOG ON CATALOG analytics TO bi;
+GRANT USE SCHEMA ON CATALOG analytics TO bi;
+GRANT SELECT ON CATALOG analytics TO bi;
+GRANT USE CATALOG ON CATALOG analytics_dev TO bi;
+GRANT USE SCHEMA ON CATALOG analytics_dev TO bi;
+GRANT SELECT ON CATALOG analytics_dev TO bi;

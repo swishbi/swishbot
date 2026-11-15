@@ -25,7 +25,7 @@ Create environment-specific databases to isolate where each process **writes**. 
 | Database | Purpose | Who writes | Who reads |
 |----------|---------|------------|-----------|
 | **`raw`** | Production source data | Loader | Developer, Automation |
-| **`raw_dev`** | Pipeline development sandbox | Developer (people and agents), Loader | Developer |
+| **`raw_dev`** | Pipeline development sandbox | Developer (people, agents, CI and branch deployments) | Developer |
 | **`analytics`** | Production transformations | Automation | Developer, Analyst, BI |
 | **`analytics_dev`** | Developer workspaces and CI | Developer (people, agents and CI) | Developer, BI |
 
@@ -36,6 +36,7 @@ Key principles:
 - **Production `analytics`** is only written by Automation: never by people, agents or CI
 - **CI runs untrusted code.** A pull request can carry a bad change, a malicious dependency or an AI agent's mistake, and CI runs it. So CI signs in as its own user on Developer: it reads production (for `--defer`) and writes only the development databases
 - **Development** gives developers write access to `raw_dev` and `analytics_dev` and read access to production `raw` and `analytics`
+- **`raw_dev` belongs to development.** Loader writes production `raw` only. Every object is owned by the role that created it, and changing a table (dlt adds columns as a source grows) takes ownership. So a `raw_dev` schema created by Loader stays out of developers' reach. Keep Loader out of `raw_dev` entirely
 - **dbt developer schemas** live in `analytics_dev` using the pattern `dbt_<first-initial><lastname>` (e.g., `dbt_jsmith`)
 
 ## Step 3: Create Roles and Hierarchy
@@ -51,7 +52,7 @@ Analyst < Developer < Automation
 
 | Role | Purpose |
 |------|---------|
-| **Loader** | Standalone role (no inheritance). Reads and writes to raw databases (`raw`, `raw_dev`). Used by production ingestion (dlt, Fivetran, etc.) |
+| **Loader** | Standalone role (no inheritance). Reads and writes production `raw`. Used by production ingestion only (dlt, Fivetran, etc.) |
 | **Analyst** | Read-only access to analytics marts layer. Starting point for business users |
 | **BI** | Standalone, read-only. Reads production `analytics` and `analytics_dev`. Used by BI tools and semantic layers (Power BI, Cube), one user per tool |
 | **Developer** | Inherits Analyst. Plus: read `raw` and production `analytics`, read/write `raw_dev` and `analytics_dev`. Used by people, development agents and dbt CI |
@@ -61,7 +62,7 @@ Analyst < Developer < Automation
 
 | Role | `raw` | `raw_dev` | `analytics` | `analytics_dev` |
 |------|-------|-----------|-------------|-----------------|
-| **Loader** | read/write | read/write | — | — |
+| **Loader** | read/write | — | — | — |
 | **Analyst** | — | — | read (marts only) | — |
 | **BI** | — | — | read | read |
 | **Developer** | read | read/write + create schema | read | read/write + create schema |
@@ -82,7 +83,7 @@ Roles say what a login may do; users say who it is. Give every person, service, 
 |------|------|---------------|
 | `loader` | Loader | key pair |
 | `automation` | Automation | key pair |
-| `dbt_ci` | Developer | key pair |
+| `dbt_ci`, for dbt CI and Dagster branch deployments (both run pull request code) | Developer | key pair |
 | one per BI tool (`powerbi`, `cube`) | BI | key pair |
 | one per development agent | Developer | programmatic access token restricted to Developer |
 
