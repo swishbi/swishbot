@@ -20,7 +20,12 @@ jobs:
   dagster_cloud_default_deploy:
     name: Dagster Serverless Deploy
     runs-on: ubuntu-22.04
-    if: vars.DAGSTER_CLOUD_ENABLED == 'true'
+    # Pull requests opened or updated by the account your AI agents push with
+    # skip branch deployments: every step here gets the Dagster Cloud token,
+    # which can also deploy production, and an agent's branch can carry code
+    # from an untrusted source. Set the repository variable AGENTS_GITHUB_LOGIN
+    # to that account. A skipped job counts as passing, so merges aren't blocked.
+    if: vars.DAGSTER_CLOUD_ENABLED == 'true' && github.event.pull_request.user.login != vars.AGENTS_GITHUB_LOGIN && github.actor != vars.AGENTS_GITHUB_LOGIN
     outputs:
       build_info: ${{ steps.parse-workspace.outputs.build_info }}
 

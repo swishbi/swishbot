@@ -25,44 +25,47 @@ Create environment-specific databases to isolate where each process **writes**. 
 | Database | Purpose | Who writes | Who reads |
 |----------|---------|------------|-----------|
 | **`raw`** | Production source data | Loader | Developer, Automation |
-| **`raw_dev`** | Pipeline development sandbox | Loader (during testing) | Developer |
-| **`analytics`** | Production transformations | Automation | Developer, Analyst |
-| **`analytics_ci`** | CI test transformations | Automation | Automation |
-| **`analytics_dev`** | Developer workspaces | Developer | Developer |
+| **`raw_dev`** | Pipeline development sandbox | Developer (people and agents), Loader | Developer |
+| **`analytics`** | Production transformations | Automation | Developer, Analyst, BI |
+| **`analytics_dev`** | Developer workspaces and CI | Developer (people, agents and CI) | Developer, BI |
 
 Key principles:
 
-- **No `raw_ci` database.** CI tests transformations, not ingestion — it reads source data from production `raw` and writes results to `analytics_ci`. This avoids cloning large raw datasets into CI.
+- **No CI databases.** CI tests transformations, not ingestion. It reads source data from production `raw` and writes results to a schema per pull request in `analytics_dev` (`dbt_ci_pr_<number>`). This avoids cloning large raw datasets into CI.
 - **`raw_dev` is ephemeral.** It exists for testing new pipelines during development. Once a pipeline is promoted to production, the `raw_dev` data for that source is stale and disposable.
-- **CI and production analytics** are only touched by automation — never by humans directly
-- **Development** gives developers write access to `analytics_dev` and read access to production `raw` and `analytics`
+- **Production `analytics`** is only written by Automation: never by people, agents or CI
+- **CI runs untrusted code.** A pull request can carry a bad change, a malicious dependency or an AI agent's mistake, and CI runs it. So CI signs in as its own user on Developer: it reads production (for `--defer`) and writes only the development databases
+- **Development** gives developers write access to `raw_dev` and `analytics_dev` and read access to production `raw` and `analytics`
 - **dbt developer schemas** live in `analytics_dev` using the pattern `dbt_<first-initial><lastname>` (e.g., `dbt_jsmith`)
 
 ## Step 3: Create Roles and Hierarchy
 
-Four core roles with a clear inheritance hierarchy:
+Five core roles with a clear inheritance hierarchy:
 
 ```
 Loader (standalone)
+BI (standalone)
 
 Analyst < Developer < Automation
 ```
 
 | Role | Purpose |
 |------|---------|
-| **Loader** | Standalone role (no inheritance). Reads and writes to raw databases (`raw`, `raw_dev`). Used by ingestion services (dlt, Fivetran, etc.) |
+| **Loader** | Standalone role (no inheritance). Reads and writes to raw databases (`raw`, `raw_dev`). Used by production ingestion (dlt, Fivetran, etc.) |
 | **Analyst** | Read-only access to analytics marts layer. Starting point for business users |
-| **Developer** | Inherits Analyst. Plus: read `raw` and `raw_dev`, read/write `analytics_dev`, read production `analytics` |
-| **Automation** | Inherits Developer. Plus: read/write `analytics` and `analytics_ci`, create schemas. Used by dbt CI/CD |
+| **BI** | Standalone, read-only. Reads production `analytics` and `analytics_dev`. Used by BI tools and semantic layers (Power BI, Cube), one user per tool |
+| **Developer** | Inherits Analyst. Plus: read `raw` and production `analytics`, read/write `raw_dev` and `analytics_dev`. Used by people, development agents and dbt CI |
+| **Automation** | Inherits Developer. Plus: read/write production `analytics`, create schemas. Used by production dbt runs only |
 
 ### Role Permissions Summary
 
-| Role | `raw` | `raw_dev` | `analytics` | `analytics_dev` | `analytics_ci` |
-|------|-------|-----------|-------------|-----------------|----------------|
-| **Loader** | read/write | read/write | — | — | — |
-| **Analyst** | — | — | read (marts only) | — | — |
-| **Developer** | read | read | read | read/write + create schema | — |
-| **Automation** | read | — | read/write + create schema | — | read/write + create schema |
+| Role | `raw` | `raw_dev` | `analytics` | `analytics_dev` |
+|------|-------|-----------|-------------|-----------------|
+| **Loader** | read/write | read/write | — | — |
+| **Analyst** | — | — | read (marts only) | — |
+| **BI** | — | — | read | read |
+| **Developer** | read | read/write + create schema | read | read/write + create schema |
+| **Automation** | read | read/write (inherited) | read/write + create schema | read/write (inherited) |
 
 ### Growing the Analyst Role
 
@@ -71,10 +74,22 @@ As marts expand into domain-specific schemas, create additional analyst roles sc
 - `finance_analyst` → read access to `mrt_finance` only
 - `marketing_analyst` → read access to `mrt_marketing` only
 
+### Users: Who, Not What
+
+Roles say what a login may do; users say who it is. Give every person, service, tool and agent its own user on the role that fits its job, so query history shows who ran what while access stays defined in the roles:
+
+| User | Role | Signs in with |
+|------|------|---------------|
+| `loader` | Loader | key pair |
+| `automation` | Automation | key pair |
+| `dbt_ci` | Developer | key pair |
+| one per BI tool (`powerbi`, `cube`) | BI | key pair |
+| one per development agent | Developer | programmatic access token restricted to Developer |
+
 ### Service Users & Compute (Snowflake-Specific)
 
-- Each role gets its own compute warehouse (e.g., `LOADER_WH`, `ANALYST_WH`, `DEVELOPER_WH`, `AUTOMATION_WH`)
-- Service users (`loader`, `automation`) use **key-pair authentication**, not passwords
+- Each role gets its own compute warehouse (e.g., `LOADER_WH`, `ANALYST_WH`, `DEVELOPER_WH`, `AUTOMATION_WH`, `BI_WH`)
+- Service users use **key-pair authentication**, not passwords. A development agent's programmatic access token is restricted to the Developer role
 - Service users are created with `type = 'SERVICE'`
 
 ## Step 4: Run Platform-Specific Setup Script
@@ -89,7 +104,7 @@ See the examples directory for complete reference scripts:
 
 ### Source Promotion Workflow
 
-1. **Pipeline development** — Loader writes test extractions to `raw_dev`. Developer builds staging models against `raw_dev` using a source database var override
+1. **Pipeline development** — A developer, person or agent, loads test extractions into `raw_dev` and builds staging models against them using a source database var override
 2. **First production deploy** — Run a full backfill into `raw` (prod). Remove the source database var override so dbt reads from `raw`
 3. **Ongoing transformation changes** — CI and dev both read from `raw` (prod) directly. No cloning needed — dbt profiles and source vars control which raw database is read
 

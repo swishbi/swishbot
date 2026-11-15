@@ -6,14 +6,17 @@
       path: "target/dev.duckdb"
 
     ci:
+      # CI's own user (DBT_CI on the DEVELOPER role), never production's login:
+      # pull request code runs here. One schema per pull request in ANALYTICS_DEV.
       type: snowflake
-      account: "{{ env_var('DESTINATION__SNOWFLAKE__CREDENTIALS__ACCOUNT') }}"
-      database: "{{ env_var('DESTINATION__SNOWFLAKE__CREDENTIALS__DATABASE') }}"
-      warehouse: "{{ env_var('DESTINATION__SNOWFLAKE__CREDENTIALS__WAREHOUSE') }}"
-      role: "{{ env_var('DESTINATION__SNOWFLAKE__CREDENTIALS__ROLE') }}"
-      user: "{{ env_var('DESTINATION__SNOWFLAKE__CREDENTIALS__USER') }}"
-      password: "{{ env_var('DESTINATION__SNOWFLAKE__CREDENTIALS__PASSWORD') }}"
-      schema: dbt_ci
+      account: "{{ env_var('DBT_SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('DBT_SNOWFLAKE_USER') }}"
+      role: "{{ env_var('DBT_SNOWFLAKE_ROLE') }}"
+      warehouse: "{{ env_var('DBT_SNOWFLAKE_WAREHOUSE') }}"
+      database: ANALYTICS_DEV
+      schema: "dbt_ci_pr_{{ env_var('DBT_CI_PR_ID', 'manual') }}"
+      private_key: "{{ env_var('DBT_ENV_SECRET_SNOWFLAKE_PRIVATE_KEY') }}"
+      private_key_passphrase: "{{ env_var('DBT_ENV_SECRET_SNOWFLAKE_PRIVATE_KEY_PASSPHRASE') }}"
 
     prod:
       type: snowflake
