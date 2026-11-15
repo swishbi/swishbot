@@ -99,7 +99,8 @@ create or replace user POWERBI with
 -- dbt CI on pull requests. Code on a pull request isn't trusted yet: a bad
 -- change, a malicious dependency, or an AI agent's mistake can run in CI.
 -- So CI runs as DEVELOPER: it reads production for --defer and writes only
--- the development databases, never production.
+-- the development databases, never production. Dagster branch deployments
+-- run pull request code too, so they sign in as DBT_CI as well.
 create or replace user DBT_CI with
     default_role = DEVELOPER
     type = 'SERVICE'
@@ -204,11 +205,15 @@ grant usage on warehouse BI_WH to role BI;
 -- 8. Database Grants
 -- ============================================================================
 
--- Loader: read/write raw databases
+-- Loader: read/write production raw only. RAW_DEV belongs to development:
+-- objects are owned by the role that creates them, and dlt needs ownership
+-- to add columns, so Loader-created RAW_DEV schemas would lock developers out.
+-- On an existing account where Loader already created RAW_DEV schemas:
+--   grant ownership on all schemas in database RAW_DEV to role DEVELOPER copy current grants;
+--   grant ownership on all tables in database RAW_DEV to role DEVELOPER copy current grants;
+--   revoke create schema on database RAW_DEV from role LOADER;
 grant usage on database RAW to role LOADER;
-grant usage on database RAW_DEV to role LOADER;
 grant create schema on database RAW to role LOADER;
-grant create schema on database RAW_DEV to role LOADER;
 
 -- Developer: read raw and analytics, read/write raw_dev and analytics_dev
 grant usage on database RAW to role DEVELOPER;
