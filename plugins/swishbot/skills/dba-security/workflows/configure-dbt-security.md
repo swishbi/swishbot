@@ -113,11 +113,11 @@ my_project:
     ci:
       type: snowflake
       account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
-      user: AUTOMATION
-      role: AUTOMATION
-      warehouse: AUTOMATION_WH
-      database: ANALYTICS_CI
-      schema: dbt_ci              # target.schema → CI namespace
+      user: DBT_CI                # CI's own user, never production's
+      role: DEVELOPER
+      warehouse: DEVELOPER_WH
+      database: ANALYTICS_DEV
+      schema: "dbt_ci_pr_{{ env_var('DBT_CI_PR_ID', 'manual') }}"   # target.schema → one schema per pull request
 
     prod:
       type: snowflake
@@ -132,10 +132,10 @@ my_project:
 | Field | Dev | CI | Prod |
 |-------|-----|-----|------|
 | `target.name` | `dev` | `ci` | `prod` |
-| `target.database` | `ANALYTICS_DEV` | `ANALYTICS_CI` | `ANALYTICS` |
-| `target.schema` | `dbt_jsmith` | `dbt_ci` | `dbt_prod` (unused) |
-| **Role** | `DEVELOPER` | `AUTOMATION` | `AUTOMATION` |
-| **Schema output** | `dbt_jsmith_staging` | `dbt_ci_staging` | `staging` |
+| `target.database` | `ANALYTICS_DEV` | `ANALYTICS_DEV` | `ANALYTICS` |
+| `target.schema` | `dbt_jsmith` | `dbt_ci_pr_42` | `dbt_prod` (unused) |
+| **Role** | `DEVELOPER` | `DEVELOPER` | `AUTOMATION` |
+| **Schema output** | `dbt_jsmith_staging` | `dbt_ci_pr_42_staging` | `staging` |
 | **Sources read from** | `RAW` (or `RAW_DEV` override) | `RAW` | `RAW` |
 
 Sources default to reading from `raw` (prod). During pipeline development, override per source with a dbt var:

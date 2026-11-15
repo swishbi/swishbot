@@ -55,7 +55,7 @@ create or replace role ANALYST
   comment = 'Analyst role can read data in analytics.marts.';
 
 create or replace role DEVELOPER
-  comment = 'Developer role can read data in raw and analytics, and write data in analytics_dev.';
+  comment = 'Developer role can read data in raw and analytics, and write data in raw_dev and analytics_dev.';
 
 create or replace role AUTOMATION
   comment = 'Automation role can read data in raw and write data in analytics.';
@@ -63,12 +63,20 @@ create or replace role AUTOMATION
 create or replace role LOADER
   comment = 'Loader role can read and write data in raw.';
 
+create or replace role BI
+  comment = 'BI role can read all of analytics and analytics_dev; used by BI tools and the semantic layer.';
+
 
 -- ============================================================================
 -- 3. Service Users
 -- ============================================================================
+-- Roles say what a login may do; users say who it is. Every service, tool
+-- and agent gets its own user, so query history shows who ran what, while
+-- access stays defined in the roles above.
+--
 -- Service users use key-pair auth (not passwords).
--- Generate a key pair: openssl genrsa 2048 | openssl pkcs8 -topk8 -inform PEM -out rsa_key.p8 -nocrypt
+-- Generate an encrypted key pair (asks for a passphrase):
+--   openssl genrsa 2048 | openssl pkcs8 -topk8 -v2 aes-256-cbc -inform PEM -out rsa_key.p8
 -- Extract public key:  openssl rsa -in rsa_key.p8 -pubout -out rsa_key.pub
 
 create or replace user LOADER with
@@ -81,8 +89,33 @@ create or replace user AUTOMATION with
     type = 'SERVICE'
     rsa_public_key = 'MIIBIjANBgkqh...';  -- replace with actual public key
 
+-- One user per BI tool or semantic layer (POWERBI, CUBE, ...), on the
+-- read-only BI role.
+create or replace user POWERBI with
+    default_role = BI
+    type = 'SERVICE'
+    rsa_public_key = 'MIIBIjANBgkqh...';  -- replace with actual public key
+
+-- dbt CI on pull requests. Code on a pull request isn't trusted yet: a bad
+-- change, a malicious dependency, or an AI agent's mistake can run in CI.
+-- So CI runs as DEVELOPER: it reads production for --defer and writes only
+-- the development databases, never production.
+create or replace user DBT_CI with
+    default_role = DEVELOPER
+    type = 'SERVICE'
+    rsa_public_key = 'MIIBIjANBgkqh...';  -- replace with actual public key
+
+-- Development agents (dlt and dbt work) also run as DEVELOPER, one user
+-- each, signing in with a programmatic access token restricted to that role:
+--   create user DEV_AGENT with default_role = DEVELOPER type = 'SERVICE';
+--   grant role DEVELOPER to user DEV_AGENT;
+--   alter user DEV_AGENT add programmatic access token dev_agent
+--     role_restriction = 'DEVELOPER' days_to_expiry = 365;
+
 grant role LOADER to user LOADER;
 grant role AUTOMATION to user AUTOMATION;
+grant role BI to user POWERBI;
+grant role DEVELOPER to user DBT_CI;
 
 
 -- ============================================================================
@@ -90,6 +123,7 @@ grant role AUTOMATION to user AUTOMATION;
 -- ============================================================================
 -- Analyst < Developer < Automation (with inheritance)
 -- Loader is standalone (no inheritance into the analyst chain)
+-- BI is standalone too: read-only, owns nothing, and doesn't roll up to SYSADMIN
 -- Both top-level roles roll up to SYSADMIN for admin visibility
 
 grant role ANALYST to role DEVELOPER;
@@ -129,6 +163,12 @@ create or replace warehouse LOADER_WH with
     auto_suspend = 600
     auto_resume = true;
 
+create or replace warehouse BI_WH with
+    warehouse_size = 'XSMALL'
+    initially_suspended = true
+    auto_suspend = 600
+    auto_resume = true;
+
 
 -- ============================================================================
 -- 6. Databases
@@ -146,9 +186,6 @@ create or replace database ANALYTICS
 create or replace database ANALYTICS_DEV
   comment = 'Contains development schemas for transformed data.';
 
-create or replace database ANALYTICS_CI
-  comment = 'Transformed data for CI environment. CI reads raw from production.';
-
 
 -- ============================================================================
 -- 7. Warehouse Grants
@@ -160,6 +197,7 @@ grant usage on warehouse LOADER_WH to role LOADER;
 grant usage on warehouse ANALYST_WH to role ANALYST;
 grant usage on warehouse DEVELOPER_WH to role DEVELOPER;
 grant usage on warehouse AUTOMATION_WH to role AUTOMATION;
+grant usage on warehouse BI_WH to role BI;
 
 
 -- ============================================================================
@@ -172,18 +210,21 @@ grant usage on database RAW_DEV to role LOADER;
 grant create schema on database RAW to role LOADER;
 grant create schema on database RAW_DEV to role LOADER;
 
--- Developer: read raw, read/write analytics_dev, read analytics
+-- Developer: read raw and analytics, read/write raw_dev and analytics_dev
 grant usage on database RAW to role DEVELOPER;
 grant usage on database RAW_DEV to role DEVELOPER;
 grant usage on database ANALYTICS_DEV to role DEVELOPER;
 grant usage on database ANALYTICS to role DEVELOPER;
 grant usage on database ANALYTICS to role ANALYST;
+grant create schema on database RAW_DEV to role DEVELOPER;
 grant create schema on database ANALYTICS_DEV to role DEVELOPER;
 
--- Automation: write analytics (prod and CI)
+-- Automation: write analytics (production only; CI runs as Developer)
 grant create schema on database ANALYTICS to role AUTOMATION;
-grant usage on database ANALYTICS_CI to role AUTOMATION;
-grant create schema on database ANALYTICS_CI to role AUTOMATION;
+
+-- BI: read analytics and analytics_dev, write nothing
+grant usage on database ANALYTICS to role BI;
+grant usage on database ANALYTICS_DEV to role BI;
 
 
 -- ============================================================================
@@ -213,3 +254,11 @@ grant select on future views in database ANALYTICS_DEV to role DEVELOPER;
 grant usage on future schemas in database ANALYTICS to role DEVELOPER;
 grant select on future tables in database ANALYTICS to role DEVELOPER;
 grant select on future views in database ANALYTICS to role DEVELOPER;
+
+-- BI can read analytics and analytics_dev (tables and views)
+grant usage on future schemas in database ANALYTICS to role BI;
+grant select on future tables in database ANALYTICS to role BI;
+grant select on future views in database ANALYTICS to role BI;
+grant usage on future schemas in database ANALYTICS_DEV to role BI;
+grant select on future tables in database ANALYTICS_DEV to role BI;
+grant select on future views in database ANALYTICS_DEV to role BI;

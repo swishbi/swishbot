@@ -33,6 +33,8 @@ As mart complexity grows, split into domain-specific schemas (e.g., `mrt_finance
 
 - **Single admin role for everything** — no separation of concerns, impossible to audit
 - **Giving developers write access to production** — all production writes should go through automation
+- **Running CI as a production role** — pull request code isn't trusted yet; CI gets its own user on Developer and writes only development databases
+- **Lending a person's login to an agent or tool** — agents and BI tools get their own users on the role that fits their job (Developer, BI), never someone's personal account or token
 - **Sharing service account credentials** — each service gets its own user and key pair
 - **No environment separation** — development writes hitting production data
 - **Granting `SELECT *` on raw to analysts** — raw may contain PII/PHI; analysts should only see the marts layer
