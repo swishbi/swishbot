@@ -79,6 +79,7 @@ Find the right resource for your current task:
 - **[dlt](../dlt/SKILL.md)** — Build dlt ingestion pipelines that feed into staging models
 - **[dagster](../dagster/SKILL.md)** — Orchestrate dbt models as Dagster assets
 - **[dba-security](../dba-security/SKILL.md)** — Database separation strategy and access control for warehouse objects
+- **[cube](../cube/SKILL.md)** — The semantic layer where the marts' metrics are defined, once
 
 ---
 

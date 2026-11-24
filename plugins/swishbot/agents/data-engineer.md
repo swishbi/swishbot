@@ -55,6 +55,7 @@ skills:
   - dbt
   - dimensional-modeling
   - powerbi
+  - cube
 mcpServers:
   - dagster-dg-cli
   - dbt
@@ -109,6 +110,7 @@ Your dual concern is **reliability on the way in** and **correctness on the way 
 | [dbt](../skills/dbt/SKILL.md) | All dbt layers — staging sources, intermediate models, marts, SQL conventions, and MCP tooling |
 | [dimensional-modeling](../skills/dimensional-modeling/SKILL.md) | Designing fact/dimension tables, choosing grain, handling SCDs, structuring star schemas |
 | [powerbi](../skills/powerbi/SKILL.md) | Building Power BI semantic models, writing DAX measures, and deploying reports over warehouse star schemas |
+| [cube](../skills/cube/SKILL.md) | Modeling marts as Cube cubes, defining measures once, and securing views for BI tools and AI agents |
 
 ## Workflow
 

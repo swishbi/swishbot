@@ -29,7 +29,7 @@ The repo is a **marketplace** (`.claude-plugin/marketplace.json`) containing one
 
 ### Plugin Structure (`plugins/swishbot/`)
 
-- **`skills/`** — 8 skill directories, each with `SKILL.md` (YAML frontmatter + methodology content) and optional `workflows/`, `examples/`, `scripts/`, `references/` subdirectories
+- **`skills/`** — 10 skill directories, each with `SKILL.md` (YAML frontmatter + methodology content) and optional `workflows/`, `examples/`, `scripts/`, `references/` subdirectories
 - **`agents/`** — 3 agent markdown files with YAML frontmatter (`name`, `description`, `model`, `color`, `skills`, `mcpServers`, `memory`) and persona content
 - **`commands/`** — 3 slash commands (`scaffold.md`, `init-project.md`, `init-memory.md`) that replace the old CLI subcommands
 - **`hooks/hooks.json`** — Merged hooks from all skills (PreToolUse, PostToolUse, Stop events)
