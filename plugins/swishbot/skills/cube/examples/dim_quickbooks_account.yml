@@ -1,0 +1,44 @@
+# Copyright (c) 2026 Swish BI Limited. All rights reserved.
+#
+# A dimension cube over the account dimension. Attributes only; facts
+# join to it many_to_one.
+cubes:
+  - name: dim_quickbooks_account
+    title: "Account"
+    sql_table: finance.dim_quickbooks_account
+
+    access_policy:
+      - group: "*"
+        member_level:
+          excludes: "*"
+        row_level:
+          allow_all: true
+
+    dimensions:
+      - name: account_id
+        sql: account_id
+        type: string
+        primary_key: true
+        title: "Account ID"
+      - name: account_name
+        sql: fully_qualified_name
+        type: string
+        title: "Account"
+        description: "The account's full name including its parents, so two accounts with the same short name stay distinct."
+      - name: account_number
+        sql: account_number
+        type: string
+        title: "Account number"
+      - name: account_type
+        sql: account_type
+        type: string
+        title: "Account type"
+      - name: account_classification
+        sql: classification
+        type: string
+        title: "Classification"
+        description: "Asset, Liability, Equity, Revenue or Expense."
+      - name: is_sub_account
+        sql: is_sub_account
+        type: boolean
+        title: "Is a sub-account"

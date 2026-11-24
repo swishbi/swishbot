@@ -1,0 +1,47 @@
+# Copyright (c) 2026 Swish BI Limited. All rights reserved.
+#
+# Two views over the same cubes. A view exposes exactly the members its
+# includes list, and only the groups in its access policy may query it.
+views:
+  # The BI tool's view: measures, dimensions and the account ID.
+  - name: finance_profit_and_loss
+    title: "Profit and loss"
+    description: "Monthly P&L by account. The view the BI tool reads."
+    access_policy:
+      - group: metabase
+        row_level:
+          allow_all: true
+    cubes:
+      - join_path: rpt_quickbooks_profit_and_loss
+        includes:
+          - net_profit
+          - account_count
+          - month_start
+          - account_id
+      - join_path: rpt_quickbooks_profit_and_loss.dim_quickbooks_account
+        includes:
+          - account_name
+          - account_number
+          - account_type
+          - account_classification
+
+  # The AI agent's view: aggregates only. No account_id, so a session
+  # querying it never sees source-level detail.
+  - name: agent_profit_and_loss
+    title: "Profit and loss (agent)"
+    description: "Monthly P&L aggregates by account name and type, for AI agents."
+    access_policy:
+      - group: agent
+        row_level:
+          allow_all: true
+    cubes:
+      - join_path: rpt_quickbooks_profit_and_loss
+        includes:
+          - net_profit
+          - account_count
+          - month_start
+      - join_path: rpt_quickbooks_profit_and_loss.dim_quickbooks_account
+        includes:
+          - account_name
+          - account_type
+          - account_classification

@@ -1,0 +1,65 @@
+# Copyright (c) 2026 Swish BI Limited. All rights reserved.
+#
+# A fact cube over a P&L mart. Grain: month x P&L account. The mart's
+# net_amount is positive in each account's natural direction; the
+# net_profit measure signs it so the total is income minus expense. The
+# mart carries account_type, so the sign rule reads its own column rather
+# than reaching through the join.
+cubes:
+  - name: rpt_quickbooks_profit_and_loss
+    title: "Profit and loss"
+    description: "One row per month and P&L account."
+    sql_table: finance.rpt_quickbooks_profit_and_loss
+
+    # Data-dependent refresh key: changes exactly when a publish changes
+    # the numbers (right for a file-backed source swapped on publish).
+    refresh_key:
+      sql: >
+        select md5(cast(count(*) as varchar) || '|' ||
+                   cast(coalesce(sum(net_amount), 0) as varchar))
+        from finance.rpt_quickbooks_profit_and_loss
+      every: "1 second"
+
+    # No direct access for anyone: consumers reach this cube only through
+    # views, which carry their own access policies.
+    access_policy:
+      - group: "*"
+        member_level:
+          excludes: "*"
+        row_level:
+          allow_all: true
+
+    joins:
+      - name: dim_quickbooks_account
+        sql: "{CUBE}.account_id = {dim_quickbooks_account}.account_id"
+        relationship: many_to_one
+
+    dimensions:
+      - name: line_key
+        sql: "cast({CUBE}.month_start as varchar) || '|' || {CUBE}.account_id"
+        type: string
+        primary_key: true
+        public: false
+      - name: month_start
+        sql: month_start
+        type: time
+        title: "Month"
+        description: "The month, as a date on its first day. Roll up to quarter or year in the query."
+      - name: account_id
+        sql: account_id
+        type: string
+        title: "Account ID"
+
+    measures:
+      - name: net_profit
+        sql: >
+          case when {CUBE}.account_type in ('Income', 'Other Income')
+               then {CUBE}.net_amount else -{CUBE}.net_amount end
+        type: sum
+        format: currency
+        title: "Net profit (income minus expense)"
+        description: "Income and Other Income count positive; Cost of Goods Sold, Expense and Other Expense count negative."
+      - name: account_count
+        sql: account_id
+        type: count_distinct
+        title: "Accounts"

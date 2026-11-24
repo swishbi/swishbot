@@ -87,6 +87,7 @@ New team members clone the repo, open with Claude Code, and are prompted to acce
 | Skill | Description | Status |
 |-------|-------------|--------|
 | `powerbi` | Power BI best practices | :white_check_mark: |
+| `cube` | Cube semantic layer on self-hosted Cube Core — cubes, measures, joins, views, access | :white_check_mark: |
 
 ### Documentation
 | Skill | Description | Status |

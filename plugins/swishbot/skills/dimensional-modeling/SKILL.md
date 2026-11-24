@@ -54,6 +54,7 @@ Each pattern has a corresponding example file in the [examples/](examples/) dire
 - **[requirements-discovery](../requirements-discovery/SKILL.md)** — Upstream discovery process that identifies which facts and dimensions need to be modeled
 - **[dbt](../dbt/SKILL.md)** — The transformation layer that implements the dimensional models designed here
 - **[powerbi](../powerbi/SKILL.md)** — Power BI semantic models that consume the star schemas designed here
+- **[cube](../cube/SKILL.md)** — Cube cubes, joins and views that serve the star schemas designed here
 
 ---
 

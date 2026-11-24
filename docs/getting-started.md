@@ -49,7 +49,7 @@ New team members clone the repo, open with Claude Code, and are prompted to acce
 
 | Component | Count | Description |
 |-----------|-------|-------------|
-| Skills | 8 | dbt, dagster, dlt, dimensional-modeling, powerbi, requirements-discovery, dba-security, iac-terraform |
+| Skills | 10 | dbt, dagster, dlt, dimensional-modeling, powerbi, cube, requirements-discovery, dba-security, iac-terraform, tech-docs |
 | Agents | 3 | data-engineer, business-analyst, platform-engineer |
 | Hooks | Auto | SQL validation, Terraform validation |
 | MCP servers | 4 | dbt, dagster, dlt, powerbi |

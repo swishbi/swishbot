@@ -232,6 +232,7 @@ Start with the **Modeling MCP server** — it covers the full build-and-validate
 - **[dimensional-modeling](../dimensional-modeling/SKILL.md)** — Star schema design decisions that determine what the semantic model imports
 - **[dbt](../dbt/SKILL.md)** — The transformation layer that produces the `dim_*` and `fct_*` mart tables consumed by the semantic model
 - **[dagster](../dagster/SKILL.md)** — Orchestrate Power BI semantic model refreshes via Dagster
+- **[cube](../cube/SKILL.md)** — The semantic layer to use instead when reporting isn't in Power BI
 
 ---
 
