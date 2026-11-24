@@ -18,25 +18,27 @@ Do NOT create intermediate models for:
 
 ## Step 2: Choose Folder and Name
 
-Organize by **business concern**, not source system. At this layer, data is becoming business-conformed.
+Organize by **source system**, with an optional topic folder. A model that combines sources goes in `conformed/`.
 
 ```
 models/intermediate/
-├── finance/
-│   ├── _finance__models.yml
-│   ├── int_payments_pivoted_to_orders.sql
-│   └── int_orders_summed_to_customers.sql
-├── marketing/
-│   ├── _marketing__models.yml
-│   └── int_web_events_sessionized.sql
-└── operations/
-    ├── _operations__models.yml
-    └── int_work_orders_joined_to_properties.sql
+├── quickbooks/
+│   ├── double_entry/
+│   │   ├── int_quickbooks__invoice_double_entry.sql
+│   │   └── int_quickbooks__invoice_double_entry.yml
+│   ├── int_quickbooks__account_classifications.sql
+│   └── int_quickbooks__account_classifications.yml
+├── crm/
+│   ├── int_crm__deals_joined.sql
+│   └── int_crm__deals_joined.yml
+└── conformed/
+    ├── int_customer_crosswalk.sql
+    └── int_customer_crosswalk.yml
 ```
 
-**Naming pattern:** `int_<entity>s_<verb>ed.sql`
+**Naming pattern:** `int_<source>__<description>.sql`, or `int_<entity>_<description>.sql` in `conformed/`. The description says what the model produces. A model ported from a package keeps the package's name (`int_quickbooks__invoice_double_entry`).
 
-The verb describes what transformation the model performs:
+When the model transforms an entity, a past-tense verb is a good description:
 
 | Verb | Use When |
 |------|----------|
@@ -49,7 +51,7 @@ The verb describes what transformation the model performs:
 | `sessionized` | Grouping events into sessions |
 | `deduplicated` | Removing duplicate records |
 
-Keep the double underscore **only** when operating at the source-system level (e.g., `int_shopify__orders_summed`). Drop it when the model operates across sources or at a business-concept level.
+The double underscore follows the source (`int_crm__deals_joined`). Models in `conformed/` have no source and no double underscore.
 
 ## Step 3: Set Materialization
 

@@ -30,31 +30,45 @@ Reference: https://docs.getdbt.com/best-practices/how-we-structure/1-guide-overv
 
 ```
 models/
-├── staging/                 # 1:1 with source tables, organized by source system
-│   ├── <source_name>/
-│   │   ├── _<source_name>__sources.yml
-│   │   ├── _<source_name>__models.yml
-│   │   ├── stg_<source_name>__<entity>.sql
-│   │   └── stg_<source_name>__<entity>.yml
-│   └── ...
-├── intermediate/            # Purpose-built transforms, organized by business concern
-│   ├── <business_area>/
-│   │   └── int_<entity>s_<verb>ed.sql
-│   └── ...
-└── marts/                   # Business-facing models, organized by department
-    ├── <department>/
-    │   ├── _<department>__models.yml
-    │   └── <entity>.sql
-    └── ...
+├── staging/                          # 1:1 with source objects, organized by source system
+│   └── <source>/
+│       ├── _<source>__sources.yml
+│       ├── base/                     # optional pre-staging cleanup
+│       │   └── base_<source>__<entity>.sql
+│       ├── stg_<source>__<entity>.sql
+│       ├── stg_<source>__<entity>.yml
+│       └── stg_<source>__<entity>__<child>.sql   # a nested array, e.g. stg_quickbooks__invoice__line
+├── intermediate/                     # Purpose-built transforms, organized by source system
+│   ├── <source>/
+│   │   ├── <topic>/                  # optional, e.g. double_entry/
+│   │   │   └── int_<source>__<description>.sql
+│   │   └── int_<source>__<description>.sql
+│   └── conformed/                    # cross-source models drop the source
+│       └── int_<entity>_<description>.sql
+└── marts/
+    └── core/
+        ├── dimensions/
+        │   ├── <source>/
+        │   │   ├── dim_<source>_<entity>.sql
+        │   │   └── bridge/
+        │   │       └── bdg_<source>_<entity>_<entity>.sql
+        │   └── dim_<entity>.sql      # conformed across sources, e.g. dim_date
+        ├── facts/
+        │   └── <source>/
+        │       ├── fct_<source>_<process>.sql
+        │       └── rpt_<source>_<report>.sql     # financial statements and reports
+        └── reports/                  # cross-source reports
 ```
 
 ### Layer Summary
 
 | Layer | Naming | Organized By | Materialization | Exposed to Users |
 |-------|--------|-------------|-----------------|-----------------|
-| **Staging** | `stg_<source>__<entity>` | Source system | `view` | No |
-| **Intermediate** | `int_<entity>s_<verb>ed` | Business concern | `ephemeral` | No |
-| **Marts** | `fct_<entity>` / `dim_<entity>` | Department | `table` / `incremental` | Yes |
+| **Staging** | `stg_<source>__<entity>`, nested arrays `stg_<source>__<entity>__<child>` | Source system | `view` | No |
+| **Intermediate** | `int_<source>__<description>`; cross-source `int_<entity>_<description>` in `conformed/` | Source system | `ephemeral` | No |
+| **Marts** | `dim_<source>_<entity>` / `fct_<source>_<process>` / `rpt_<source>_<report>` / `bdg_…`; conformed dimensions `dim_<entity>` | Type, then source | `table` / `incremental` | Yes |
+
+Examples: `stg_quickbooks__invoice`, `stg_quickbooks__invoice__line`, `int_quickbooks__invoice_double_entry`, `int_quickbooks__account_classifications`, `dim_quickbooks_account`, `fct_quickbooks_general_ledger`, `rpt_quickbooks_balance_sheet`, `dim_date`.
 
 Reference: https://docs.getdbt.com/best-practices/how-we-structure/1-guide-overview
 
@@ -85,10 +99,12 @@ Reference: https://docs.getdbt.com/best-practices/how-we-style/1-how-we-style-ou
 ### Models
 
 - Use `snake_case` for all schema, table, and column names
-- Pluralize model names: `customers`, `orders`, `payments`
-- Use the double-underscore convention to separate source from entity: `stg_stripe__payments`
-- Drop the double underscore at business-conformed layers (intermediate and marts)
-- Do not abbreviate: `customers` not `cust`, `transactions` not `txn`
+- Name models in the **singular**, after the source object one row represents: `stg_quickbooks__invoice`, `dim_quickbooks_account`
+- A double underscore separates the source from the rest in staging and intermediate: `stg_quickbooks__invoice`, `int_quickbooks__invoice_double_entry`. A nested array adds a second one: `stg_quickbooks__invoice__line`
+- Marts use a single underscore after the prefix and source: `dim_quickbooks_account`, `fct_quickbooks_general_ledger`, `rpt_quickbooks_profit_and_loss`
+- Models that combine sources drop the source: `int_job_conformed`, `dim_date`
+- A model ported from a package (for example Fivetran's `dbt_quickbooks`) keeps the package's name and column names
+- Don't invent abbreviations, but keep a source's own (`txn` in `LinkedTxn`) rather than respelling them
 - Do not use reserved words as column names
 
 ### Columns
@@ -103,9 +119,9 @@ Reference: https://docs.getdbt.com/best-practices/how-we-style/1-how-we-style-ou
 
 ### Files
 
-- YAML config per folder: `_<directory>__models.yml`, `_<directory>__sources.yml`
-- Leading underscore sorts YAML to top of each folder
-- One `.yml` file per `.sql` model (or one per folder for small projects)
+- Sources: `_<source>__sources.yml` in the staging folder; the leading underscore sorts it to the top
+- One `.yml` file per `.sql` model, with the model's name: `stg_quickbooks__invoice.yml`
+- Unit tests: `<model>_unit_tests.yml` next to the model
 - Docs blocks: `_<directory>__docs.md`
 
 ## SQL Style
@@ -291,13 +307,13 @@ Every model must have a corresponding YAML file with at minimum:
 ## Anti-Patterns
 
 - **Monolithic YAML**: Do not put all models/sources in a single `schema.yml`. Split by folder.
-- **Abbreviations**: Do not abbreviate table or column names.
+- **Invented abbreviations**: Don't shorten names yourself (`cust`, `amt`). A source's or a ported package's own names stay as they are.
 - **Subqueries**: Use CTEs instead of nested subqueries.
 - **`select *` in non-staging models**: Use `dbt_utils.star()` instead of bare `select *` — it is explicit about the source relation and supports `except` for column exclusion. Bare `select *` hides where columns originate; `star()` makes it traceable.
 - **Platform-specific SQL when a cross-database macro exists**: Use `dbt_utils.safe_divide()` not `nullif` patterns, `dbt.type_string()` not `varchar`, etc.
 - **Right joins**: Rewrite as left joins for readability.
 - **Bare `join`**: Always specify `inner join`, `left join`, etc.
-- **Time dimensions in model names**: Use `orders` not `orders_per_day`. Use metrics for time-based aggregation.
+- **Time dimensions in model names**: Use `orders` not `orders_per_day`. Use metrics for time-based aggregation. A periodic snapshot with its own grain is a different model and is named for it: `fct_quickbooks_general_ledger_by_period`.
 - **Department-specific variants**: Do not create `finance_orders` and `marketing_orders`. Build one `orders` mart.
 
 ---
