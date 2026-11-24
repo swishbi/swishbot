@@ -16,7 +16,7 @@ References:
 
 - **`uv`** installed: https://docs.astral.sh/uv/getting-started/installation/
 - A local dbt project (for CLI tools)
-- A dbt Cloud account (for Discovery, Semantic Layer, Admin API tools — optional)
+- A dbt Cloud account (for Discovery and Admin API tools — optional)
 
 ### Claude Code (CLI)
 
@@ -70,7 +70,7 @@ Some tool groups are disabled by default. Enable them with environment variables
 |----------|---------|---------|
 | `DISABLE_DBT_CLI` | `false` | dbt Core CLI commands (build, run, test, compile) |
 | `DISABLE_DISCOVERY` | `false` | Discovery API (model details, lineage, sources) |
-| `DISABLE_SEMANTIC_LAYER` | `false` | Semantic Layer (metrics, saved queries) |
+| `DISABLE_SEMANTIC_LAYER` | `false` | dbt's MetricFlow Semantic Layer. Not used: metrics live in the project's own semantic layer, so set it to `true` |
 | `DISABLE_ADMIN_API` | `false` | Admin API (jobs, runs) |
 | `DISABLE_SQL` | `true` | Set to `false` to enable SQL execution and text-to-SQL |
 | `DISABLE_DBT_CODEGEN` | `true` | Set to `false` to enable model/source YAML generation |
@@ -117,16 +117,6 @@ Generate boilerplate. Enable with `DISABLE_DBT_CODEGEN=false`.
 | `generate_source` | Creating source YAML from database introspection |
 | `generate_model_yaml` | Generating model YAML with columns |
 | `generate_staging_model` | Scaffolding staging SQL from a source table |
-
-### Semantic Layer Tools (dbt Cloud)
-
-Query metrics and saved queries. Use for analytics exploration.
-
-| Tool | Use When |
-|------|----------|
-| `list_metrics` | Discovering available metrics |
-| `query_metrics` | Running metric queries with filters and grouping |
-| `get_dimensions` / `get_entities` | Understanding metric structure |
 
 ### Admin API Tools (Local + dbt Cloud)
 
