@@ -16,7 +16,7 @@ Use the dbt MCP `get_lineage` and `get_model_details` tools to understand the cu
 ## Step 2: Extract the Logic
 
 1. **Identify the CTE(s)** in the mart that should become intermediate models
-2. **Create the intermediate model** using the naming convention `int_<entity>s_<verb>ed.sql`
+2. **Create the intermediate model** using the naming convention `int_<source>__<description>.sql` (or `int_<entity>_<description>.sql` in `conformed/` when it combines sources)
 3. **Move the CTE logic** into the new intermediate model with a `select * from` final CTE
 4. **Replace the CTE** in the mart with a `{{ ref('int_...') }}` import
 5. **Set materialization** to ephemeral (or view if expensive and multiply-referenced)

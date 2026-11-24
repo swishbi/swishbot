@@ -12,33 +12,41 @@ Create a mart model when:
 
 Do NOT build separate marts for:
 
-- Different time granularities (`orders_per_day`) — use metrics/semantic layer instead
-- Different departments wanting the same entity (`finance_orders`, `marketing_orders`) — build one `orders` mart
+- Different time granularities of the same model (`orders_per_day`) — use metrics/semantic layer instead. A periodic snapshot with its own grain is its own model (`fct_quickbooks_general_ledger_by_period`)
+- Different departments wanting the same entity (`finance_orders`, `marketing_orders`) — build one mart
 
 ## Step 2: Choose Folder and Name
 
-Organize by **department** or business area. Each department gets its own schema in the warehouse.
+Organize by **model type**, then **source system**. Conformed dimensions, which combine sources, sit directly in `dimensions/`.
 
 ```
-models/marts/
-├── finance/
-│   ├── _finance__models.yml
-│   ├── fct_orders.sql
-│   └── fct_payments.sql
-├── marketing/
-│   ├── _marketing__models.yml
-│   └── dim_customers.sql
-└── operations/
-    ├── _operations__models.yml
-    └── fct_work_orders.sql
+models/marts/core/
+├── dimensions/
+│   ├── quickbooks/
+│   │   ├── dim_quickbooks_account.sql
+│   │   └── dim_quickbooks_account.yml
+│   ├── crm/
+│   │   ├── dim_crm_company.sql
+│   │   └── bridge/
+│   │       └── bdg_crm_company_contact.sql
+│   ├── dim_date.sql
+│   └── dim_customer.sql
+├── facts/
+│   └── quickbooks/
+│       ├── fct_quickbooks_general_ledger.sql
+│       ├── fct_quickbooks_general_ledger_by_period.sql
+│       └── rpt_quickbooks_balance_sheet.sql
+└── reports/            # cross-source reports
 ```
 
-Prefix mart models to indicate their type:
+Prefix mart models to indicate their type, then the source, singular, with a single underscore:
 
-- **`fct_`** for fact tables — event streams, transactions, measurements (`fct_orders`, `fct_payments`, `fct_sessions`)
-- **`dim_`** for dimension tables — descriptive entities, people, places, things (`dim_customers`, `dim_products`, `dim_accounts`)
+- **`fct_<source>_<process>`** for fact tables — transactions, events, measurements (`fct_quickbooks_general_ledger`, `fct_quickbooks_payments`)
+- **`dim_<source>_<entity>`** for dimension tables — descriptive entities (`dim_quickbooks_account`, `dim_quickbooks_class`); a conformed dimension drops the source (`dim_date`, `dim_customer`)
+- **`rpt_<source>_<report>`** for financial statements and report-shaped outputs (`rpt_quickbooks_profit_and_loss`, `rpt_quickbooks_balance_sheet`)
+- **`bdg_<source>_<entity>_<entity>`** for bridge tables between two dimensions
 
-Avoid subfolders within a department until you have 10+ marts in that department.
+A model ported from a package (for example Fivetran's `dbt_quickbooks`) keeps the package's names.
 
 ## Step 3: Set Materialization
 
@@ -76,7 +84,7 @@ orders as (
 ),
 
 payments as (
-    select * from {{ ref('int_payments_pivoted_to_orders') }}
+    select * from {{ ref('int_jaffle_shop__payments_pivoted_to_orders') }}
 ),
 
 final as (
