@@ -3,7 +3,8 @@
 // Cube Core configuration: SQL API users mapped to access-policy groups.
 //
 // - Only the users listed here can log in to the SQL API (Postgres
-//   protocol). Each consumer has its own login and group.
+//   protocol). Each consumer has its own login and group, even when the
+//   groups are granted the same views.
 // - Passwords come from the environment, never from the repo. Cube refuses
 //   to start when one is missing, instead of running an open SQL API.
 // - contextToGroups hands each user's group to the access policies in the

@@ -17,9 +17,9 @@ The layers:
 | Object | What it is | Who sees it |
 |--------|-----------|-------------|
 | **Cube** | One per mart: table, primary key, dimensions, measures, joins | Nobody directly; deny-all access policy |
-| **View** | The public contract: a named set of members from one or more cubes | Consumers, through an access policy |
-| **Access policy** | Which group may query a view, and which rows | Enforced by Cube |
-| **SQL API user** | A Postgres-protocol login mapped to a group | One per consumer (BI tool, agent) |
+| **View** | The public contract: one per subject, a named set of members from one or more cubes | Every consumer group granted it, through an access policy |
+| **Access policy** | Which groups may query a view, and which rows | Enforced by Cube |
+| **SQL API user** | A Postgres-protocol login mapped to a group | One per consumer (BI tool, agent), even when consumers share views |
 
 ## Before Starting
 
@@ -50,15 +50,15 @@ The layers:
 |---------|---------|
 | [`examples/rpt_quickbooks_profit_and_loss.yml`](examples/rpt_quickbooks_profit_and_loss.yml) | A fact cube: deny-all policy, data-dependent refresh key, signed measure, join |
 | [`examples/dim_quickbooks_account.yml`](examples/dim_quickbooks_account.yml) | A dimension cube |
-| [`examples/views.yml`](examples/views.yml) | A BI view and an aggregates-only agent view |
+| [`examples/views.yml`](examples/views.yml) | One subject view shared by the BI tool and an agent |
 | [`examples/cube.js`](examples/cube.js) | SQL API users mapped to groups, failing closed |
 
 ## Principles
 
 - **One cube per mart, named after the mart.** The cube's name never needs to change when consumers change.
 - **Measures live in Cube only.** Consumers never re-aggregate raw columns. If a number is needed twice, it's a measure.
-- **Views are the only door.** Every cube denies direct access; each consumer group gets views.
-- **An agent's view has aggregates only.** No IDs, document numbers or names of people.
+- **Views are the only door.** Every cube denies direct access; consumer groups are granted views.
+- **One view per subject, shared.** The BI tool and the business's own agent read the same view, so a number means the same thing in both. Add a restricted view only for a consumer that must not see something, built around what it mustn't see.
 - **Balances are semi-additive.** A closing balance never sums across time periods.
 - **Prove it against the warehouse.** A measure is done when its total equals the mart's total for the same filter.
 
@@ -71,6 +71,7 @@ The layers:
 - **Joining without primary keys.** Cube needs a primary key on both sides to avoid fan-out.
 - **A time-based refresh key on a file that changes on publish.** Cached results outlive the data they describe.
 - **Shared SQL API credentials.** One login per consumer, so access policies can tell them apart.
+- **A copy of each view per consumer by default.** Near-identical views double the access lists and boundary tests, drift apart, and hide nothing from people who reach the data both ways. Share the subject view instead.
 
 ## Related Skills
 

@@ -1,15 +1,20 @@
 # Publish a View and Decide Who Can Query It
 
-Views are the only way consumers reach data. Each consumer group gets the views it needs, through an access policy, and logs in as its own SQL API user.
+Views are the only way consumers reach data. Each view covers one subject and is shared by every consumer group allowed to see that subject, through an access policy. Each consumer still logs in as its own SQL API user.
 
-## Step 1: Decide the Consumers
+## Step 1: Decide the Views and Who Shares Them
 
-| Consumer | Typical view | Members |
-|----------|--------------|---------|
-| BI tool (Metabase, Superset) | `finance_profit_and_loss` | Measures, dimensions, IDs where drill-through needs them |
-| AI agent (Claude Code through an SQL MCP) | `agent_profit_and_loss` | Aggregates only: measures and descriptive dimensions, **no IDs, document numbers or names of people** |
+**One view per subject**, named for the subject (`finance_profit_and_loss`, `finance_general_ledger`), not for a consumer. A view's name and its member names are the contract: dashboards, saved questions and agent prompts use them.
 
-One view per consumer and subject. A view's name and its member names are the contract: dashboards, saved questions and agent prompts use them.
+| Consumer | Login and group | Views |
+|----------|-----------------|-------|
+| BI tool (Metabase, Superset) | `metabase` | The subject views |
+| The business's AI agent (Claude Code through an SQL MCP) | `agent` | The same subject views |
+| A consumer that must not see everything (a client portal, an agent acting for someone outside the business) | its own | Restricted views only (Step 5) |
+
+- **Share by default.** When the same people reach the data through both the BI tool and an agent (often the BI tool's own MCP already gives the agent the BI view), a second, narrower view keeps nothing from them. It only doubles the views, the access lists and the boundary tests, and the two copies drift apart.
+- **Separate logins anyway.** One SQL API user per consumer, even when they share views, so either can be turned off alone and the logs tell them apart.
+- **Restrict only for a reason.** Add a restricted view when a consumer must not see something. Design it around what that consumer mustn't see, and name it for the consumer (`client_profit_and_loss`).
 
 ## Step 2: Write the View
 
@@ -17,10 +22,13 @@ One view per consumer and subject. A view's name and its member names are the co
 views:
   - name: finance_profit_and_loss
     title: "Profit and loss"
-    description: "Monthly P&L by account. The view the BI tool reads."
+    description: "Monthly P&L by account, for the BI tool and the business's AI agent."
 
     access_policy:
       - group: metabase
+        row_level:
+          allow_all: true
+      - group: agent
         row_level:
           allow_all: true
 
@@ -36,7 +44,7 @@ views:
           - account_type
 ```
 
-The view exposes exactly the members its `includes` lists. Anything not listed doesn't exist for that consumer.
+The view exposes exactly the members its `includes` lists. Anything not listed doesn't exist for any consumer of that view.
 
 ## Step 3: Keep Public Names Stable
 
@@ -81,9 +89,11 @@ Full version, failing closed when a password is unset: [`../examples/cube.js`](.
 - The same error text for a wrong user and a wrong password.
 - Check your Cube version's docs: Cube 1.x matches access policies on groups (`contextToGroups`); some releases match on roles (`contextToRoles`).
 
-## Step 5: Restrict Rows When Needed
+## Step 5: Restrict a Consumer When Needed
 
-A view's policy can filter rows by the security context, for example a client user who should see only their company:
+Only for a consumer that must not see something (Step 1). Give it its own restricted view, which lists only the members it may see, and grant that view to its group alone. Never widen a shared view's audience to a consumer it wasn't designed for.
+
+A view's policy can also filter rows by the security context, for example a client user who should see only their company:
 
 ```yaml
     access_policy:
@@ -101,9 +111,10 @@ Row filters use the same format as REST API query filters (`equals`, `contains`,
 
 For each SQL API user, prove both sides (`test-the-model.md`):
 
-- it can query its own views;
-- it's refused on every cube and on other groups' views;
-- an agent's view returns no ID columns.
+- it can query every view granted to its group;
+- it's refused on every cube and on every view not granted to its group;
+- a shared view returns the same total to every group;
+- a restricted view lists none of the members its consumer mustn't see.
 
 ---
 
