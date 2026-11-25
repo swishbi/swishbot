@@ -34,9 +34,10 @@ Automate these as tests in CI, against fixture data, so a model change can't sil
 
 For every SQL API user:
 
-- **Allowed:** a query on each of its views succeeds.
-- **Refused:** a query on any cube, and on any view of another group, fails.
-- **Agents:** the agent's views list no ID or document-number columns.
+- **Allowed:** a query on each view granted to its group succeeds.
+- **Refused:** a query on any cube, and on any view not granted to its group, fails.
+- **Shared views:** the same query returns the same total to every group that shares the view.
+- **Restricted views:** the view lists none of the members its consumer mustn't see.
 - **Unknown users** and wrong passwords are refused with the same message.
 
 ## Step 5: Check the Model Against dbt
